@@ -34,7 +34,8 @@ def load_data(path=LOCAL_SAVE_PATH, filename=LOCAL_CSV_FILENAME):
 
 
 def split_train_test(data, test_ratio):
-    # not a great solution, since it is random and generates different sets each run
+    # not a great solution, since it will break if data order changes or more is added
+    np.random.seed(42)
     shuffled_indices = np.random.permutation(len(data))
     test_set_size = int(len(data) * test_ratio)
     test_indices = shuffled_indices[:test_set_size]
@@ -80,6 +81,7 @@ if __name__ == '__main__':
     print(len(train_set))
     print(len(test_set))
 
-
+    # sklearn has function that splits data randomly:
+    train_set, test_set = train_test_split(raw_data, test_size=0.2, random_state=42)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
