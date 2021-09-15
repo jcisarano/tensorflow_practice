@@ -133,7 +133,14 @@ if __name__ == '__main__':
     # scatter_matrix(data_copy[attributes], figsize=(12,8))
     # plt.show()
 
-    data_copy.plot(kind="scatter", x="median_income", y="median_house_value",alpha=0.1)
-    plt.show()
+    # data_copy.plot(kind="scatter", x="median_income", y="median_house_value",alpha=0.1)
+    # plt.show()
+
+    data_copy["rooms_per_household"] = data_copy["total_rooms"] / data_copy["households"]
+    data_copy["bedrooms_per_room"] = data_copy["total_bedrooms"] / data_copy["total_rooms"]
+    data_copy["population_per_household"] = data_copy["population"] / data_copy["households"]
+
+    corr_matrix = data_copy.corr()
+    print(corr_matrix["median_house_value"].sort_values(ascending=False))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
