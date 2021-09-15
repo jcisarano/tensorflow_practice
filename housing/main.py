@@ -101,4 +101,8 @@ if __name__ == '__main__':
     print(raw_data["income_cat"].value_counts() / len(raw_data))
     print(strat_test_set["income_cat"].value_counts() / len(strat_test_set))
 
+    # no longer need income_cat column, so remove it from datasets
+    for set_ in (strat_train_set, strat_test_set):
+        set_.drop("income_cat", axis=1, inplace=True)
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
