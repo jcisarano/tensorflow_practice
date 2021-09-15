@@ -11,6 +11,7 @@ import numpy as np
 from zlib import crc32
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedShuffleSplit
+from pandas.plotting import scatter_matrix
 
 DATA_SERVER_ROOT: str = "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "housing")
@@ -60,27 +61,27 @@ if __name__ == '__main__':
     fetch_remote_data()
     raw_data = load_data()
     # print(raw_data.head())
-    # print(raw_data.info())
+    print(raw_data.info())
     # print(raw_data["ocean_proximity"].value_counts())
     # print(raw_data.describe())
     # raw_data.hist(bins=50, figsize=(20, 15))
     # plt.show()
     train_set, test_set = split_train_test(raw_data, 0.2)
-    print(len(train_set))
-    print(len(test_set))
+    # print(len(train_set))
+    # print(len(test_set))
 
     # creates new index column to use for train-test split
     raw_data_with_id = raw_data.reset_index()  # adds index column
-    train_set, test_set = split_train_test_by_id(raw_data_with_id, 0.2, "index")
-    print(len(train_set))
-    print(len(test_set))
+    # train_set, test_set = split_train_test_by_id(raw_data_with_id, 0.2, "index")
+    # print(len(train_set))
+    # print(len(test_set))
 
     # uses lat/long to generate index
     raw_data_with_id["id"] = raw_data["longitude"] * 1000 + raw_data["latitude"] * 1000
     train_set, test_set = split_train_test_by_id(raw_data_with_id, 0.2, "id")
     # consistent, but because lat/long are coarse, there is some overlap of ids:
-    print(len(train_set))
-    print(len(test_set))
+    # print(len(train_set))
+    # print(len(test_set))
 
     # sklearn has function that splits data randomly:
     train_set, test_set = train_test_split(raw_data, test_size=0.2, random_state=42)
@@ -98,22 +99,41 @@ if __name__ == '__main__':
         strat_train_set = raw_data.loc[train_index]
         strat_test_set = raw_data.loc[test_index]
 
-    print(raw_data["income_cat"].value_counts() / len(raw_data))
-    print(strat_test_set["income_cat"].value_counts() / len(strat_test_set))
+    # print(raw_data["income_cat"].value_counts() / len(raw_data))
+    # print(strat_test_set["income_cat"].value_counts() / len(strat_test_set))
 
     # no longer need income_cat column, so remove it from datasets
     for set_ in (strat_train_set, strat_test_set):
         set_.drop("income_cat", axis=1, inplace=True)
 
     data_copy = strat_train_set.copy()
-    data_copy.plot(kind="scatter", x="longitude", y="latitude", alpha=0.1)
-    plt.show()
+    # data_copy.plot(kind="scatter", x="longitude", y="latitude", alpha=0.1)
+    # plt.show()
 
-    data_copy.plot(kind="scatter", x="longitude", y="latitude", alpha=0.4,
-                   s=data_copy["population"] / 100, label="population",
-                   figsize=(10, 7), c="median_house_value", cmap=plt.get_cmap("jet"),
-                   colorbar=True, )
-    plt.legend()
+    # data_copy.plot(kind="scatter", x="longitude", y="latitude", alpha=0.4,
+    #               s=data_copy["population"] / 100, label="population",
+    #               figsize=(10, 7), c="median_house_value", cmap=plt.get_cmap("jet"),
+    #               colorbar=True, )
+    # plt.legend()
+    # plt.show()
+
+    # computes _standard correlation coefficient_ between every pair of attributes
+    #   a.k.a Pearson's r
+    # values close to 1 show strong positive correlation
+    # values close to -1 show strong negative correlation
+    # values close to 0 show no correlation
+    # however, it only detects linear correlation, nonlinear relationships can be missed completely
+    corr_matrix = data_copy.corr()
+    # display relationship between median_house_value and all others:
+    print(corr_matrix["median_house_value"].sort_values(ascending=False))
+
+    # scatter_matrix() also plots relationships between variables
+    # attributes array used to select vars:
+    attributes = ["median_house_value","median_income","total_rooms","housing_median_age"]
+    # scatter_matrix(data_copy[attributes], figsize=(12,8))
+    # plt.show()
+
+    data_copy.plot(kind="scatter", x="median_income", y="median_house_value",alpha=0.1)
     plt.show()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
