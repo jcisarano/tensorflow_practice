@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from zlib import crc32
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedShuffleSplit
 
 DATA_SERVER_ROOT: str = "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "housing")
@@ -83,5 +84,21 @@ if __name__ == '__main__':
 
     # sklearn has function that splits data randomly:
     train_set, test_set = train_test_split(raw_data, test_size=0.2, random_state=42)
+
+    # creating train/test distribution based on income distribution
+    raw_data["income_cat"] = pd.cut(raw_data["median_income"],
+                                    bins=[0., 1.5, 3.0, 4.5, 6., np.inf],
+                                    labels=[1, 2, 3, 4, 5])
+    # raw_data["income_cat"].hist()
+    # plt.show()
+
+    # split based on distribution
+    split = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+    for train_index, test_index in split.split(raw_data, raw_data["income_cat"]):
+        strat_train_set = raw_data.loc[train_index]
+        strat_test_set = raw_data.loc[test_index]
+
+    print(raw_data["income_cat"].value_counts() / len(raw_data))
+    print(strat_test_set["income_cat"].value_counts() / len(strat_test_set))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
