@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from zlib import crc32
+from sklearn.model_selection import train_test_split
 
 DATA_SERVER_ROOT: str = "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "housing")
@@ -40,6 +41,18 @@ def split_train_test(data, test_ratio):
     train_indices = shuffled_indices[test_set_size:]
     return data.iloc[train_indices], data.iloc[test_indices]
 
+
+def test_set_check(identifier, test_ratio):
+    return crc32(np.int64(identifier)) & 0xffffffff < test_ratio * 2 ** 32
+
+
+def split_train_test_by_id(data, test_ratio, id_column):
+    # works, but depends on ids never changing, so new data must always be added to the end
+    ids = data[id_column]
+    in_test_set = ids.apply(lambda id_: test_set_check(id_, test_ratio))
+    return data.loc[-in_test_set], data[in_test_set]
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     fetch_remote_data()
@@ -53,6 +66,20 @@ if __name__ == '__main__':
     train_set, test_set = split_train_test(raw_data, 0.2)
     print(len(train_set))
     print(len(test_set))
+
+    # creates new index column to use for train-test split
+    raw_data_with_id = raw_data.reset_index()  # adds index column
+    train_set, test_set = split_train_test_by_id(raw_data_with_id, 0.2, "index")
+    print(len(train_set))
+    print(len(test_set))
+
+    # uses lat/long to generate index
+    raw_data_with_id["id"] = raw_data["longitude"] * 1000 + raw_data["latitude"] * 1000
+    train_set, test_set = split_train_test_by_id(raw_data_with_id, 0.2, "id")
+    # consistent, but because lat/long are coarse, there is some overlap of ids:
+    print(len(train_set))
+    print(len(test_set))
+
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
