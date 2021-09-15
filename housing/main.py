@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
     # scatter_matrix() also plots relationships between variables
     # attributes array used to select vars:
-    attributes = ["median_house_value","median_income","total_rooms","housing_median_age"]
+    attributes = ["median_house_value", "median_income", "total_rooms", "housing_median_age"]
     # scatter_matrix(data_copy[attributes], figsize=(12,8))
     # plt.show()
 
