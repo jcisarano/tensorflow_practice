@@ -6,22 +6,23 @@ import os
 import tarfile
 import urllib.request
 
-DOWNLOAD_ROOT = "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
-HOUSING_PATH = os.path.join("datasets", "housing")
-HOUSING_URL = DOWNLOAD_ROOT + "datasets/housing/housing.tgz"
+DATA_SERVER_ROOT: str = "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
+LOCAL_SAVE_PATH: str = os.path.join("datasets", "housing")
+REMOTE_DATA_URL: str = DATA_SERVER_ROOT + "datasets/housing/housing.tgz"
+LOCAL_FILENAME: str = "housing.tgz"
 
 
-def fetch_housing_data(housing_url=HOUSING_URL, housing_path=HOUSING_PATH):
-    os.makedirs(housing_path, exist_ok=True)
-    tgz_path = os.path.join(housing_path, "housing.tgz")
-    urllib.request.urlretrieve(housing_url, tgz_path)
-    housing_tgz = tarfile.open(tgz_path)
-    housing_tgz.extractall(path=housing_path)
-    housing_tgz.close()
+def fetch_remote_data(remote_data_url=REMOTE_DATA_URL, local_save_path=LOCAL_SAVE_PATH, local_filename=LOCAL_FILENAME):
+    os.makedirs(local_save_path, exist_ok=True)
+    full_local_path = os.path.join(local_save_path, local_filename)
+    urllib.request.urlretrieve(remote_data_url, full_local_path)
+    loaded_file = tarfile.open(full_local_path)
+    loaded_file.extractall(path=local_save_path)
+    loaded_file.close()
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    fetch_housing_data()
+    fetch_remote_data()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
