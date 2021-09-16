@@ -170,6 +170,9 @@ if __name__ == '__main__':
     # now actually replace missing values in training set:
     X = imputer.transform(housing_num)
     # and convert it back to pandas dataframe
-    housing_tr = pd.DataFram(X, columns=housing_num.columns, index=housing_num.index)
+    housing_tr = pd.DataFrame(X, columns=housing_num.columns, index=housing_num.index)
 
+    # handle text column, because ml training won't handle text+
+    housing_cat = housing[["ocean_proximity"]]
+    print(housing_cat.head(10))
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
