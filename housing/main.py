@@ -266,7 +266,7 @@ if __name__ == '__main__':
     housing_predictions = lin_reg.predict(housing_prepared)
     lin_mse = mean_squared_error(housing_labels, housing_predictions)
     lin_rmse = np.sqrt(lin_mse)
-    print(lin_rmse)
+    print("Linear regression:", lin_rmse)
 
     # results not great, they are underfitting the data, so we can:
     #   1) train more data
@@ -284,19 +284,22 @@ if __name__ == '__main__':
     housing_predictions = tree_reg.predict(housing_prepared)
     tree_mse = mean_squared_error(housing_labels, housing_predictions)
     tree_rmse = np.sqrt(tree_mse)
-    print(tree_rmse)
+    print("Decision Tree Regressor:", tree_rmse)
 
     # cross-validation breaks the data into smaller chunks, trains on most of them, then uses last one
     # for evaluation
     from sklearn.model_selection import cross_val_score
+
     scores = cross_val_score(tree_reg, housing_prepared, housing_labels,
                              scoring="neg_mean_squared_error", cv=10)
     tree_rmse_scores = np.sqrt(-scores)
 
+
     def display_scores(dscores):
-        print("Scores:",dscores)
-        print("Mean:",dscores.mean())
+        print("Scores:", dscores)
+        print("Mean:", dscores.mean())
         print("Standard deviation:", dscores.std())
+
 
     display_scores(tree_rmse_scores)
 
@@ -307,5 +310,18 @@ if __name__ == '__main__':
     display_scores(lin_rmse_scores)
     # Linear regression still does better. The rmse is slightly smaller
 
+    # now train with Random Forest Regressor. Internally, it trains many Decision Trees on random subset of features
+    # then averages their predictions. Using layers of modeis is called _ensemble learning_.
+    from sklearn.ensemble import RandomForestRegressor
+
+    forest_reg = RandomForestRegressor()
+    forest_reg.fit(housing_prepared, housing_labels)
+
+    housing_predictions = forest_reg.predict(housing_prepared)
+    forest_mse = mean_squared_error(housing_labels, housing_predictions)
+    forest_rmse = np.sqrt(forest_mse)
+    print("Random Forest Regressor:", forest_rmse)
+    # best results so far, but it would still make sense to try more before spending time tweaking hyperparameters
+    # on this one
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
