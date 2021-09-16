@@ -242,4 +242,37 @@ if __name__ == '__main__':
 
     housing_prepared = full_pipeline.fit_transform(housing) # remember housing is training set w/o labels
 
+
+    ####
+    # Do Linear Regression
+    ####
+    from sklearn.linear_model import LinearRegression
+    lin_reg = LinearRegression()
+    lin_reg.fit(housing_prepared, housing_labels)
+    some_data = housing.iloc[:5]
+    some_labels = housing_labels[:5]
+    some_data_prepared = full_pipeline.transform(some_data)
+
+    # see predictions alongside labels:
+    print("Predictions:", lin_reg.predict(some_data_prepared))
+    print("Labels:", list(some_labels))
+
+    #not so accurate, so view RMSE for the model
+    from sklearn.metrics import mean_squared_error
+    housing_predicitions = lin_reg.predict(housing_prepared)
+    lin_mse = mean_squared_error(housing_labels, housing_predicitions)
+    lin_rmse = np.sqrt(lin_mse)
+    print(lin_rmse)
+
+    # results not great, they are underfitting the data, so we can:
+    #   1) train more data
+    #   2) try a more powerful model
+    #   3) change/add training features
+    #   4) reduce constraints (regularization) on the model
+
+    # try Decision Tree Regressor instead of Linear Regression
+    
+
+
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
