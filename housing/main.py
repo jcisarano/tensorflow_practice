@@ -12,6 +12,7 @@ from zlib import crc32
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedShuffleSplit
 from pandas.plotting import scatter_matrix
+from sklearn.impute import SimpleImputer
 
 DATA_SERVER_ROOT: str = "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "housing")
@@ -129,7 +130,7 @@ if __name__ == '__main__':
 
     # scatter_matrix() also plots relationships between variables
     # attributes array used to select vars:
-    attributes = ["median_house_value", "median_income", "total_rooms", "housing_median_age"]
+    # attributes = ["median_house_value", "median_income", "total_rooms", "housing_median_age"]
     # scatter_matrix(data_copy[attributes], figsize=(12,8))
     # plt.show()
 
@@ -142,5 +143,33 @@ if __name__ == '__main__':
 
     corr_matrix = data_copy.corr()
     print(corr_matrix["median_house_value"].sort_values(ascending=False))
+
+    # separate labels from data because we won't apply teh transforms to the labels
+    housing = strat_train_set.drop("median_house_value", axis=1)
+    housing_labels = strat_train_set["median_house_value"].copy()
+
+    # data cleaning: what to do in case of missing features
+    # can remove rows with bad data:
+    # housing.dropna(subset=["total_bedrooms"])
+    # can remove column with bad data:
+    # housing.drop("total_bedrooms", axis=1)
+    # or replace missing data with median:
+    # median = housing["total_bedrooms"].median()
+    # housing["total_bedrooms"].fillna(median, inplace=True)
+    # print(housing.info())
+
+    # or use scikit SimpleImputer to handle missing data:
+    imputer = SimpleImputer(strategy="median")
+    housing_num = housing.drop("ocean_proximity",axis=1) # drop the text column because imputer only works on numbers
+    imputer.fit(housing_num)
+
+    # compare imputer's results with median vals in housing_num:
+    print(imputer.statistics_)
+    print(housing_num.median().values)
+
+    # now actually replace missing values in training set:
+    X = imputer.transform(housing_num)
+    # and convert it back to pandas dataframe
+    housing_tr = pd.DataFram(X, columns=housing_num.columns, index=housing_num.index)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
