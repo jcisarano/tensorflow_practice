@@ -217,5 +217,29 @@ if __name__ == '__main__':
     housing_extra_attribs = attr_adder.transform(housing.values)
     print(housing_extra_attribs)
 
+    # Set up transformation pipelines to perform multiple transforms in sequence
+    # StandardScaler applies standardization feature scaling
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import StandardScaler
+
+    num_pipeline = Pipeline([
+        ('imputer', SimpleImputer(strategy="median")),
+        ('attribs_adder', CombinedAttributesAdder()),
+        ('std_scaler', StandardScaler()),
+    ])
+
+    housing_num_tr = num_pipeline.fit_transform(housing_num)
+
+    # combine previous pipeline with text category one hot encoder to handle the whole training dataset
+    from sklearn.compose import ColumnTransformer
+    num_attribs = list(housing_num)
+    cat_attribs = ["ocean_proximity"]
+
+    full_pipeline = ColumnTransformer([
+        ("num", num_pipeline, num_attribs),
+        ("cat", OneHotEncoder(), cat_attribs)
+    ])
+
+    housing_prepared = full_pipeline.fit_transform(housing) # remember housing is training set w/o labels
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
