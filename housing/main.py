@@ -197,6 +197,7 @@ if __name__ == '__main__':
 
     rooms_ix, bedrooms_ix, population_ix, households_ix = 3, 4, 5, 6
 
+
     class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
         def __init__(self, add_bedrooms_per_room=True):
             self.add_bedrooms_per_room = add_bedrooms_per_room
@@ -212,6 +213,7 @@ if __name__ == '__main__':
                 return np.c_[X, rooms_per_household, population_per_household, bedrooms_per_room]
             else:
                 return np.c_[X, rooms_per_household, population_per_household]
+
 
     attr_adder = CombinedAttributesAdder(add_bedrooms_per_room=False)
     housing_extra_attribs = attr_adder.transform(housing.values)
@@ -232,6 +234,7 @@ if __name__ == '__main__':
 
     # combine previous pipeline with text category one hot encoder to handle the whole training dataset
     from sklearn.compose import ColumnTransformer
+
     num_attribs = list(housing_num)
     cat_attribs = ["ocean_proximity"]
 
@@ -240,13 +243,13 @@ if __name__ == '__main__':
         ("cat", OneHotEncoder(), cat_attribs)
     ])
 
-    housing_prepared = full_pipeline.fit_transform(housing) # remember housing is training set w/o labels
-
+    housing_prepared = full_pipeline.fit_transform(housing)  # remember housing is training set w/o labels
 
     ####
     # Do Linear Regression
     ####
     from sklearn.linear_model import LinearRegression
+
     lin_reg = LinearRegression()
     lin_reg.fit(housing_prepared, housing_labels)
     some_data = housing.iloc[:5]
@@ -257,8 +260,9 @@ if __name__ == '__main__':
     print("Predictions:", lin_reg.predict(some_data_prepared))
     print("Labels:", list(some_labels))
 
-    #not so accurate, so view RMSE for the model
+    # not so accurate, so view RMSE for the model
     from sklearn.metrics import mean_squared_error
+
     housing_predictions = lin_reg.predict(housing_prepared)
     lin_mse = mean_squared_error(housing_labels, housing_predictions)
     lin_rmse = np.sqrt(lin_mse)
@@ -272,8 +276,9 @@ if __name__ == '__main__':
 
     # try Decision Tree Regressor instead of Linear Regression
     from sklearn.tree import DecisionTreeRegressor
+
     tree_reg = DecisionTreeRegressor()
-    tree_reg.fit(housing_prepared,housing_labels) # this is training
+    tree_reg.fit(housing_prepared, housing_labels)  # this is training
 
     # now do prediction on training data
     housing_predictions = tree_reg.predict(housing_prepared)
@@ -281,8 +286,26 @@ if __name__ == '__main__':
     tree_rmse = np.sqrt(tree_mse)
     print(tree_rmse)
 
+    # cross-validation breaks the data into smaller chunks, trains on most of them, then uses last one
+    # for evaluation
+    from sklearn.model_selection import cross_val_score
+    scores = cross_val_score(tree_reg, housing_prepared, housing_labels,
+                             scoring="neg_mean_squared_error", cv=10)
+    tree_rmse_scores = np.sqrt(-scores)
 
+    def display_scores(dscores):
+        print("Scores:",dscores)
+        print("Mean:",dscores.mean())
+        print("Standard deviation:", dscores.std())
 
+    display_scores(tree_rmse_scores)
+
+    # Decision tree was worse than Linear Regression, so now do cross-validation with linear regression to check:
+    lin_scores = cross_val_score(lin_reg, housing_prepared, housing_labels,
+                                 scoring="neg_mean_squared_error", cv=10)
+    lin_rmse_scores = np.sqrt(-lin_scores)
+    display_scores(lin_rmse_scores)
+    # Linear regression still does better. The rmse is slightly smaller
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
