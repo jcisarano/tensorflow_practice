@@ -13,6 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedShuffleSplit
 from pandas.plotting import scatter_matrix
 from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OrdinalEncoder
 
 DATA_SERVER_ROOT: str = "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "housing")
@@ -175,4 +176,13 @@ if __name__ == '__main__':
     # handle text column, because ml training won't handle text+
     housing_cat = housing[["ocean_proximity"]]
     print(housing_cat.head(10))
+
+    # can use scikit to convert text categories to numbers:
+    ordinal_encoder = OrdinalEncoder()
+    housing_cat_encoded = ordinal_encoder.fit_transform(housing_cat)
+    print(housing_cat_encoded[:10])
+    print(ordinal_encoder.categories_) # array of categories converted
+
+    
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
