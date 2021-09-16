@@ -259,8 +259,8 @@ if __name__ == '__main__':
 
     #not so accurate, so view RMSE for the model
     from sklearn.metrics import mean_squared_error
-    housing_predicitions = lin_reg.predict(housing_prepared)
-    lin_mse = mean_squared_error(housing_labels, housing_predicitions)
+    housing_predictions = lin_reg.predict(housing_prepared)
+    lin_mse = mean_squared_error(housing_labels, housing_predictions)
     lin_rmse = np.sqrt(lin_mse)
     print(lin_rmse)
 
@@ -271,7 +271,17 @@ if __name__ == '__main__':
     #   4) reduce constraints (regularization) on the model
 
     # try Decision Tree Regressor instead of Linear Regression
-    
+    from sklearn.tree import DecisionTreeRegressor
+    tree_reg = DecisionTreeRegressor()
+    tree_reg.fit(housing_prepared,housing_labels) # this is training
+
+    # now do prediction on training data
+    housing_predictions = tree_reg.predict(housing_prepared)
+    tree_mse = mean_squared_error(housing_labels, housing_predictions)
+    tree_rmse = np.sqrt(tree_mse)
+    print(tree_rmse)
+
+
 
 
 
