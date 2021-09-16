@@ -161,7 +161,7 @@ if __name__ == '__main__':
 
     # or use scikit SimpleImputer to handle missing data:
     imputer = SimpleImputer(strategy="median")
-    housing_num = housing.drop("ocean_proximity",axis=1) # drop the text column because imputer only works on numbers
+    housing_num = housing.drop("ocean_proximity", axis=1)  # drop the text column because imputer only works on numbers
     imputer.fit(housing_num)
 
     # compare imputer's results with median vals in housing_num:
@@ -181,8 +181,41 @@ if __name__ == '__main__':
     ordinal_encoder = OrdinalEncoder()
     housing_cat_encoded = ordinal_encoder.fit_transform(housing_cat)
     print(housing_cat_encoded[:10])
-    print(ordinal_encoder.categories_) # array of categories converted
+    print(ordinal_encoder.categories_)  # array of categories converted
 
-    
+    # can be better to use one-hot encoding:
+    from sklearn.preprocessing import OneHotEncoder
+
+    cat_encoder = OneHotEncoder()
+    housing_cat_onehot = cat_encoder.fit_transform(housing_cat)
+    print(housing_cat_onehot.toarray())
+    # and to show the categories:
+    print(cat_encoder.categories_)
+
+    # make a custom transformer to add combined columns (e.g. rooms per household)
+    from sklearn.base import BaseEstimator, TransformerMixin
+
+    rooms_ix, bedrooms_ix, population_ix, households_ix = 3, 4, 5, 6
+
+    class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
+        def __init__(self, add_bedrooms_per_room=True):
+            self.add_bedrooms_per_room = add_bedrooms_per_room
+
+        def fit(self, X, y=None):
+            return self  # do nothing
+
+        def transform(self, X):
+            rooms_per_household = X[:, rooms_ix] / X[:, households_ix]
+            population_per_household = X[:, population_ix] / X[:, households_ix]
+            if self.add_bedrooms_per_room:
+                bedrooms_per_room = X[:, bedrooms_ix] / X[:, rooms_ix]
+                return np.c_[X, rooms_per_household, population_per_household, bedrooms_per_room]
+            else:
+                return np.c_[X, rooms_per_household, population_per_household]
+
+    attr_adder = CombinedAttributesAdder(add_bedrooms_per_room=False)
+    housing_extra_attribs = attr_adder.transform(housing.values)
+    print(housing_extra_attribs)
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
