@@ -339,7 +339,7 @@ if __name__ == '__main__':
         {'bootstrap': [False], 'n_estimators': [3, 10], 'max_features': [2, 3, 4]},
     ]
 
-    forest_reg = RandomForestRegressor()
+    forest_reg = RandomForestRegressor(random_state=42)
     grid_search = GridSearchCV(forest_reg, param_grid, cv=5,
                                scoring='neg_mean_squared_error',
                                return_train_score=True)
