@@ -278,13 +278,22 @@ if __name__ == '__main__':
     from sklearn.tree import DecisionTreeRegressor
 
     tree_reg = DecisionTreeRegressor()
-    tree_reg.fit(housing_prepared, housing_labels)  # this is training
+    tree_reg.fit(housing_prepared, housing_labels)  # this is training the regressor model
 
     # now do prediction on training data
     housing_predictions = tree_reg.predict(housing_prepared)
     tree_mse = mean_squared_error(housing_labels, housing_predictions)
     tree_rmse = np.sqrt(tree_mse)
     print("Decision Tree Regressor:", tree_rmse)
+
+    # try Support Vector Machine regressor
+    from sklearn.svm import SVC
+    svc_reg = SVC()
+    svc_reg.fit(housing_prepared, housing_labels) # trains the regressor model
+    housing_predictions = svc_reg.predict(housing_prepared)
+    svc_mse = mean_squared_error(housing_labels, housing_predictions)
+    svc_rmse = np.sqrt(svc_mse)
+    print("SVC Regressor:", svc_rmse)
 
     # cross-validation breaks the data into smaller chunks, trains on most of them, then uses last one
     # for evaluation
