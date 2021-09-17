@@ -373,6 +373,16 @@ if __name__ == '__main__':
 
     final_mse = mean_squared_error(y_test, final_predictions)
     final_rmse = np.sqrt(final_mse)
-    print("Final rmse:",final_rmse)
+    print("Final rmse:", final_rmse)
+
+    # compute 95% confidence interval
+    from scipy import stats
+
+    confidence = 0.95
+    squared_errors = (final_predictions - y_test) ** 2
+    interval = np.sqrt(stats.t.interval(confidence, len(squared_errors) - 1,
+                                        loc=squared_errors.mean(),
+                                        scale=stats.sem(squared_errors)))
+    print("95% confidence interval:",interval)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
