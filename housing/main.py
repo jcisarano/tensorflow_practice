@@ -287,13 +287,13 @@ if __name__ == '__main__':
     print("Decision Tree Regressor:", tree_rmse)
 
     # try Support Vector Machine regressor
-    from sklearn.svm import SVC
-    svc_reg = SVC()
-    svc_reg.fit(housing_prepared, housing_labels) # trains the regressor model
-    housing_predictions = svc_reg.predict(housing_prepared)
-    svc_mse = mean_squared_error(housing_labels, housing_predictions)
-    svc_rmse = np.sqrt(svc_mse)
-    print("SVC Regressor:", svc_rmse)
+    from sklearn.svm import SVR
+    svr_reg = SVR()
+    svr_reg.fit(housing_prepared, housing_labels) # trains the regressor model
+    housing_predictions = svr_reg.predict(housing_prepared)
+    svr_mse = mean_squared_error(housing_labels, housing_predictions)
+    svr_rmse = np.sqrt(svr_mse)
+    print("SVR Regressor:", svr_rmse)
 
     # cross-validation breaks the data into smaller chunks, trains on most of them, then uses last one
     # for evaluation
