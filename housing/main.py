@@ -357,9 +357,22 @@ if __name__ == '__main__':
 
     # display importances along with their column names
     # least important or redundant features might be candidates to drop
-    extra_attribs = ["rooms_per_hhold","pop_per_hhold","bedrooms_per_room",]
+    extra_attribs = ["rooms_per_hhold", "pop_per_hhold", "bedrooms_per_room", ]
     cat_encoder = full_pipeline.named_transformers_["cat"]
     cat_one_hot_attribs = list(cat_encoder.categories_[0])
     attributes = num_attribs + extra_attribs + cat_one_hot_attribs
     print(sorted(zip(feature_importances, attributes), reverse=True))
+
+    # predict against test set
+    final_model = grid_search.best_estimator_
+    X_test = strat_test_set.drop("median_house_value", axis=1)
+    y_test = strat_test_set["median_house_value"].copy()
+
+    X_test_prepared = full_pipeline.transform(X_test)
+    final_predictions = final_model.predict(X_test_prepared)
+
+    final_mse = mean_squared_error(y_test, final_predictions)
+    final_rmse = np.sqrt(final_mse)
+    print("Final rmse:",final_rmse)
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
