@@ -414,7 +414,6 @@ if __name__ == '__main__':
         print(np.sqrt(-mean_score), params)
     """
 
-    """
     from sklearn.model_selection import RandomizedSearchCV
     from scipy.stats import expon, reciprocal
 
@@ -435,7 +434,6 @@ if __name__ == '__main__':
     cvres = random_search.cv_results_
     for mean_score, params in zip(cvres["mean_test_score"], cvres["params"]):
         print(np.sqrt(-mean_score), params)
-    """
 
 
     def indices_of_top_k(arr, k):
@@ -443,8 +441,8 @@ if __name__ == '__main__':
 
 
     class TopFeatureSelector(BaseEstimator, TransformerMixin):
-        def __init__(self, feature_importances, k):
-            self.feature_importances = feature_importances
+        def __init__(self, feature_importance, k):
+            self.feature_importances = feature_importance
             self.k = k
 
         def fit(self, X, y=None):
@@ -462,4 +460,19 @@ if __name__ == '__main__':
 
     housing_prepared_top_k_features = full_pipeline_w_feature_select.fit_transform(housing)
     print(housing_prepared_top_k_features[0:3])
+
+    prepare_and_select_and_predict_pipeline = Pipeline([
+        ('preparation', full_pipeline),
+        ('feature_selection', TopFeatureSelector(feature_importances, k=5)),
+        # ('random_forest_reg', RandomForestRegressor(**grid_search.best_params_)),
+        ('random_forest_reg', SVR(**random_search.best_params_))
+    ])
+
+    prepare_and_select_and_predict_pipeline.fit(housing, housing_labels)
+    some_data = housing.iloc[:4]
+    some_labels = housing_labels.iloc[:4]
+
+    print("Predictions\t", prepare_and_select_and_predict_pipeline.predict(some_data))
+    print("Labels:\t\t", list(some_labels))
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
