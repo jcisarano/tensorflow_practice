@@ -441,8 +441,8 @@ if __name__ == '__main__':
 
 
     class TopFeatureSelector(BaseEstimator, TransformerMixin):
-        def __init__(self, feature_importance, k):
-            self.feature_importances = feature_importance
+        def __init__(self, feature_importances, k):
+            self.feature_importances = feature_importances
             self.k = k
 
         def fit(self, X, y=None):
@@ -474,5 +474,16 @@ if __name__ == '__main__':
 
     print("Predictions\t", prepare_and_select_and_predict_pipeline.predict(some_data))
     print("Labels:\t\t", list(some_labels))
+
+    # add options to pipeline using grid search
+    param_grid = [{
+        'preparation__num__imputer__strategy': ['mean', 'median', 'most_frequent'],
+        'feature_selection__k': list(range(1, len(feature_importances) + 1))
+    }]
+
+    grid_search_prep = GridSearchCV(prepare_and_select_and_predict_pipeline, param_grid, cv=5,
+                                    scoring='neg_mean_squared_error', verbose=2, n_jobs=4)
+    grid_search_prep.fit(housing, housing_labels)
+    print("Grid search prep best params:", grid_search_prep.best_params_)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
