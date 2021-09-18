@@ -395,6 +395,7 @@ if __name__ == '__main__':
                                         scale=stats.sem(squared_errors)))
     print("95% confidence interval:", interval)
 
+    """
     param_grid = [
         {'kernel': ["linear"], 'C': [10., 30., 100., 300., 1000., 3000., 10000., 30000., ]},
         {'kernel': ["rbf"], 'C': [1., 3., 10., 30., 100., 300., 1000., ], 'gamma': [0.01, 0.03, 0.1, 0.3, 1., 3., ]},
@@ -411,6 +412,7 @@ if __name__ == '__main__':
     cvres = grid_search.cv_results_
     for mean_score, params in zip(cvres["mean_test_score"], cvres["params"]):
         print(np.sqrt(-mean_score), params)
+    """
 
     from sklearn.model_selection import RandomizedSearchCV
     from scipy.stats import expon, reciprocal
