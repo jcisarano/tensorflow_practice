@@ -288,8 +288,9 @@ if __name__ == '__main__':
 
     # try Support Vector Machine regressor
     from sklearn.svm import SVR
+
     svr_reg = SVR()
-    svr_reg.fit(housing_prepared, housing_labels) # trains the regressor model
+    svr_reg.fit(housing_prepared, housing_labels)  # trains the regressor model
     housing_predictions = svr_reg.predict(housing_prepared)
     svr_mse = mean_squared_error(housing_labels, housing_predictions)
     svr_rmse = np.sqrt(svr_mse)
@@ -392,6 +393,24 @@ if __name__ == '__main__':
     interval = np.sqrt(stats.t.interval(confidence, len(squared_errors) - 1,
                                         loc=squared_errors.mean(),
                                         scale=stats.sem(squared_errors)))
-    print("95% confidence interval:",interval)
+    print("95% confidence interval:", interval)
+
+    param_grid = [
+        {'kernel': ["linear"], 'C': [10., 30., 100., 300., 1000., 3000., 10000., 30000., ]},
+        {'kernel': ["rbf"], 'C': [1., 3., 10., 30., 100., 300., 1000., ], 'gamma': [0.01, 0.03, 0.1, 0.3, 1., 3., ]},
+    ]
+
+    svr_reg = SVR()
+    grid_search = GridSearchCV(svr_reg, param_grid, cv=5,
+                               scoring='neg_mean_squared_error',
+                               verbose=2, n_jobs=4)
+    grid_search.fit(housing_prepared, housing_labels)
+    print("### Grid Search with SVR results ###")
+    print(grid_search.best_params_)
+    print(grid_search.best_estimator_)
+    cvres = grid_search.cv_results_
+    for mean_score, params in zip(cvres["mean_test_score"], cvres["params"]):
+        print(np.sqrt(-mean_score), params)
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
