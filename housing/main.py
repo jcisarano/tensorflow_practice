@@ -414,6 +414,7 @@ if __name__ == '__main__':
         print(np.sqrt(-mean_score), params)
     """
 
+    """
     from sklearn.model_selection import RandomizedSearchCV
     from scipy.stats import expon, reciprocal
 
@@ -434,5 +435,31 @@ if __name__ == '__main__':
     cvres = random_search.cv_results_
     for mean_score, params in zip(cvres["mean_test_score"], cvres["params"]):
         print(np.sqrt(-mean_score), params)
+    """
 
+
+    def indices_of_top_k(arr, k):
+        return np.sort(np.argpartition(np.array(arr), -k)[-k:])
+
+
+    class TopFeatureSelector(BaseEstimator, TransformerMixin):
+        def __init__(self, feature_importances, k):
+            self.feature_importances = feature_importances
+            self.k = k
+
+        def fit(self, X, y=None):
+            self.feature_indices_ = indices_of_top_k(self.feature_importances, self.k)
+            return self
+
+        def transform(self, X):
+            return X[:, self.feature_indices_]
+
+
+    full_pipeline_w_feature_select = Pipeline([
+        ('preparation', full_pipeline),
+        ('feature_selection', TopFeatureSelector(feature_importances, k=5))
+    ])
+
+    housing_prepared_top_k_features = full_pipeline_w_feature_select.fit_transform(housing)
+    print(housing_prepared_top_k_features[0:3])
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
