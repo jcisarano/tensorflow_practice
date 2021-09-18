@@ -412,5 +412,25 @@ if __name__ == '__main__':
     for mean_score, params in zip(cvres["mean_test_score"], cvres["params"]):
         print(np.sqrt(-mean_score), params)
 
+    from sklearn.model_selection import RandomizedSearchCV
+    from scipy.stats import expon, reciprocal
+
+    params = {
+        'kernel': ['linear', 'rbf'],
+        'C': reciprocal(20, 200000),
+        'gamma': expon(scale=1.0),
+    }
+    svr_reg = SVR()
+    random_search = RandomizedSearchCV(svr_reg, param_distributions=params,
+                                       n_iter=50, cv=5,
+                                       scoring='neg_mean_squared_error',
+                                       verbose=2, n_jobs=4, random_state=42)
+    random_search.fit(housing_prepared, housing_labels)
+    print("### RandomizedSearchCV results ###")
+    print(random_search.best_params_)
+    print(random_search.best_estimator_)
+    cvres = random_search.cv_results_
+    for mean_score, params in zip(cvres["mean_test_score"], cvres["params"]):
+        print(np.sqrt(-mean_score), params)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
