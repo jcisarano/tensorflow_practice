@@ -30,15 +30,34 @@ def train_SGD(X_train, y_train):
 
 def do_cross_validation(classifier, train_data, train_labels, cv=3, scoring='accuracy'):
     from sklearn.model_selection import cross_val_score
-    return cross_val_score(classifier, train_data, train_labels, cv, scoring)
+    return cross_val_score(classifier, train_data, train_labels, cv=cv, scoring=scoring)
 
+def do_custom_cross_validation(classifier, train_data, train_labels):
+    from sklearn.model_selection import StratifiedKFold
+    from sklearn.base import clone
+
+    skfolds = StratifiedKFold(n_splits=3, random_state=42, shuffle=True)
+
+    results = []
+    for train_index, test_index in skfolds.split(train_data, train_labels):
+        clone_clf = clone(classifier)
+        X_train_folds = train_data[train_index]
+        y_train_folds = train_labels[train_index]
+        X_test_fold = train_data[test_index]
+        y_test_fold = train_labels[test_index]
+
+        clone_clf.fit(X_train_folds, y_train_folds)
+        y_pred = clone_clf.predict(X_test_fold)
+        n_correct = sum(y_pred == y_test_fold)
+        results.append( n_correct / len(y_pred) )
+
+    return results
 
 def plot_digit(data, size=28):
     data_img = data.reshape(size, size)
     plt.imshow(data_img, cmap="binary", interpolation="nearest")
     plt.axis("off")
     plt.show()
-
 
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = fetch_train_test_split()
@@ -55,6 +74,11 @@ if __name__ == '__main__':
     # plot_digit(some_digit)
     # print(trained_classifier.predict([some_digit]))
 
+    print(do_cross_validation(trained_classifier, X_train, y_train_5))
+    # from sklearn.model_selection import cross_val_score
+    # print(cross_val_score(trained_classifier, X_train, y_train_5, cv=3, scoring='accuracy'))
+
+    print(do_custom_cross_validation(trained_classifier, X_train, y_train_5))
 """
 # sort_by_target(mnist) # not sure about this - the jupyter notebook says it is needed? but w/o, my results match the book
 print(mnist["data"], mnist["target"])
