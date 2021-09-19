@@ -74,7 +74,8 @@ def calc_precision_and_recall_and_f1(classifier, train_data, train_labels):
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import f1_score
     y_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3)
-    return precision_score(train_labels, y_train_pred), recall_score(train_labels, y_train_pred), f1_score(train_labels, y_train_pred)
+    return precision_score(train_labels, y_train_pred), recall_score(train_labels, y_train_pred), f1_score(train_labels,
+                                                                                                           y_train_pred)
 
 
 def calc_pr_curve(classifier, train_data, train_labels):
@@ -85,13 +86,22 @@ def calc_pr_curve(classifier, train_data, train_labels):
 
 
 def plot_pr_curve(precisions, recalls, thresholds):
-    plt.figure(figsize=(8,4))
+    plt.figure(figsize=(8, 4))
     plt.plot(thresholds, precisions[:-1], "b--", label="Precision")
     plt.plot(thresholds, recalls[:-1], "g-", label="Recall")
-    plt.xlabel("Threshold",fontsize=16)
-    plt.legend(loc="upper left",fontsize=16)
-    plt.ylim([0,1])
-    plt.xlim([-700000,700000])
+    plt.xlabel("Threshold", fontsize=16)
+    plt.legend(loc="upper left", fontsize=16)
+    plt.ylim([0, 1])
+    plt.xlim([-700000, 700000])
+    plt.show()
+
+
+def plot_precision_v_recall(precisions, recalls):
+    plt.figure(figsize=(8, 6))
+    plt.plot(recalls, precisions, "b-", linewidth=2)
+    plt.xlabel("Recall", fontsize=16)
+    plt.ylabel("Precision", fontsize=16)
+    plt.axis([0, 1, 0, 1])
     plt.show()
 
 
@@ -122,6 +132,10 @@ if __name__ == '__main__':
 
     precisions, recalls, thresholds = calc_pr_curve(trained_classifier, X_train, y_train_5)
     plot_pr_curve(precisions, recalls, thresholds)
+
+    # see that as precision increases, recall will fall:
+    plot_precision_v_recall(precisions,recalls)
+
 """
 # sort_by_target(mnist) # not sure about this - the jupyter notebook says it is needed? but w/o, my results match the book
 print(mnist["data"], mnist["target"])
