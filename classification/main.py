@@ -69,11 +69,12 @@ def calc_confusion_matrix(classifier, train_data, train_labels):
     return confusion_matrix(train_labels, y_train_pred)
 
 
-def calc_precision_and_recall(classifier, train_data, train_labels):
+def calc_precision_and_recall_and_f1(classifier, train_data, train_labels):
     from sklearn.metrics import precision_score, recall_score
     from sklearn.model_selection import cross_val_predict
+    from sklearn.metrics import f1_score
     y_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3)
-    return precision_score(train_labels, y_train_pred), recall_score(train_labels, y_train_pred)
+    return precision_score(train_labels, y_train_pred), recall_score(train_labels, y_train_pred), f1_score(train_labels, y_train_pred)
 
 
 if __name__ == '__main__':
@@ -99,7 +100,7 @@ if __name__ == '__main__':
 
     print(calc_confusion_matrix(trained_classifier, X_train, y_train_5))
 
-    print(calc_precision_and_recall(trained_classifier, X_train, y_train_5))
+    print(calc_precision_and_recall_and_f1(trained_classifier, X_train, y_train_5))
 """
 # sort_by_target(mnist) # not sure about this - the jupyter notebook says it is needed? but w/o, my results match the book
 print(mnist["data"], mnist["target"])
