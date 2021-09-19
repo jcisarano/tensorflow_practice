@@ -14,6 +14,13 @@ def sort_by_target(mnist):
     mnist.target[60000:] = mnist.target[reorder_test + 60000]
 
 
+def plot_digit(data, size=28):
+    data_img = data.reshape(size, size)
+    plt.imshow(data_img, cmap="binary", interpolation="nearest")
+    plt.axis("off")
+    plt.show()
+
+
 def fetch_train_test_split():
     mnist = fetch_openml('mnist_784', version=1, cache=True, as_frame=False)
     mnist.target = mnist.target.astype(np.int8)  # converts from string to int
@@ -58,15 +65,15 @@ def do_custom_cross_validation(classifier, train_data, train_labels):
 def calc_confusion_matrix(classifier, train_data, train_labels):
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import confusion_matrix
-    x_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3)
-    return confusion_matrix(train_labels, x_train_pred)
+    y_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3)
+    return confusion_matrix(train_labels, y_train_pred)
 
 
-def plot_digit(data, size=28):
-    data_img = data.reshape(size, size)
-    plt.imshow(data_img, cmap="binary", interpolation="nearest")
-    plt.axis("off")
-    plt.show()
+def calc_precision_and_recall(classifier, train_data, train_labels):
+    from sklearn.metrics import precision_score, recall_score
+    from sklearn.model_selection import cross_val_predict
+    y_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3)
+    return precision_score(train_labels, y_train_pred), recall_score(train_labels, y_train_pred)
 
 
 if __name__ == '__main__':
@@ -91,6 +98,8 @@ if __name__ == '__main__':
     print(do_custom_cross_validation(trained_classifier, X_train, y_train_5))
 
     print(calc_confusion_matrix(trained_classifier, X_train, y_train_5))
+
+    print(calc_precision_and_recall(trained_classifier, X_train, y_train_5))
 """
 # sort_by_target(mnist) # not sure about this - the jupyter notebook says it is needed? but w/o, my results match the book
 print(mnist["data"], mnist["target"])
