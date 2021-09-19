@@ -105,6 +105,23 @@ def plot_precision_v_recall(precisions, recalls):
     plt.show()
 
 
+def calc_roc_curve(classifier, train_data, train_labels):
+    from sklearn.metrics import roc_curve
+    from sklearn.model_selection import cross_val_predict
+    y_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3, method="decision_function")
+    return roc_curve(train_labels, y_train_pred)
+
+
+def plot_roc_curve(fpr, tpr, label=None):
+    plt.figure(figsize=(8, 6))
+    plt.plot(fpr, tpr, linewidth=2, label=label)
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.axis([0, 1, 0, 1])
+    plt.xlabel('False Positive Rate', fontsize=16)
+    plt.ylabel('True Positive Rate', fontsize=16)
+    plt.show()
+
+
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = fetch_train_test_split()
     # print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
@@ -124,17 +141,19 @@ if __name__ == '__main__':
     # from sklearn.model_selection import cross_val_score
     # print(cross_val_score(trained_classifier, X_train, y_train_5, cv=3, scoring='accuracy'))
 
-    print(do_custom_cross_validation(trained_classifier, X_train, y_train_5))
+    # print(do_custom_cross_validation(trained_classifier, X_train, y_train_5))
 
-    print(calc_confusion_matrix(trained_classifier, X_train, y_train_5))
+    # print(calc_confusion_matrix(trained_classifier, X_train, y_train_5))
 
-    print(calc_precision_and_recall_and_f1(trained_classifier, X_train, y_train_5))
+    # print(calc_precision_and_recall_and_f1(trained_classifier, X_train, y_train_5))
 
-    precisions, recalls, thresholds = calc_pr_curve(trained_classifier, X_train, y_train_5)
-    plot_pr_curve(precisions, recalls, thresholds)
+    # precisions, recalls, thresholds = calc_pr_curve(trained_classifier, X_train, y_train_5)
+    # plot_pr_curve(precisions, recalls, thresholds)
 
     # see that as precision increases, recall will fall:
-    plot_precision_v_recall(precisions,recalls)
+    # plot_precision_v_recall(precisions, recalls)
+    fpr, tpr, thresholds = calc_roc_curve(trained_classifier, X_train, y_train_5)
+    plot_roc_curve(fpr, tpr)
 
 """
 # sort_by_target(mnist) # not sure about this - the jupyter notebook says it is needed? but w/o, my results match the book
