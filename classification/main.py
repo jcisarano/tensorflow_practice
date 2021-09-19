@@ -14,8 +14,48 @@ def sort_by_target(mnist):
     mnist.target[60000:] = mnist.target[reorder_test + 60000]
 
 
-mnist = fetch_openml('mnist_784', version=1, cache=True, as_frame=False)
-mnist.target = mnist.target.astype(np.int8)  # converts from string to int
+def fetch_train_test_split():
+    mnist = fetch_openml('mnist_784', version=1, cache=True, as_frame=False)
+    mnist.target = mnist.target.astype(np.int8)  # converts from string to int
+    X, y = mnist["data"], mnist["target"]
+    return X[:60000], X[60000:], y[:60000], y[60000:]
+
+
+def train_SGD(X_train, y_train):
+    from sklearn.linear_model import SGDClassifier
+    sgd_clf = SGDClassifier(random_state=42, max_iter=5, tol=-np.infty)
+    sgd_clf.fit(X_train, y_train)
+    return sgd_clf
+
+
+def do_cross_validation(classifier, train_data, train_labels, cv=3, scoring='accuracy'):
+    from sklearn.model_selection import cross_val_score
+    return cross_val_score(classifier, train_data, train_labels, cv, scoring)
+
+
+def plot_digit(data, size=28):
+    data_img = data.reshape(size, size)
+    plt.imshow(data_img, cmap="binary", interpolation="nearest")
+    plt.axis("off")
+    plt.show()
+
+
+if __name__ == '__main__':
+    X_train, X_test, y_train, y_test = fetch_train_test_split()
+    #print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+
+    # for now, simplify problem to detecting number 5 only
+    # sot convert labels so only fives are true
+    y_train_5 = (y_train == 5)
+    y_test_5 = (y_test == 5)
+
+    trained_classifier = train_SGD(X_train, y_train_5)
+
+    # some_digit = X_train[0]
+    # plot_digit(some_digit)
+    # print(trained_classifier.predict([some_digit]))
+
+"""
 # sort_by_target(mnist) # not sure about this - the jupyter notebook says it is needed? but w/o, my results match the book
 print(mnist["data"], mnist["target"])
 print(mnist.keys())
@@ -31,5 +71,8 @@ plt.axis("off")
 plt.show()
 
 print(y[0])
+
+X_train, X_test, y_train, y_test = X[:60000], X[60000:], y[:60000], y[60000:]
+"""
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
