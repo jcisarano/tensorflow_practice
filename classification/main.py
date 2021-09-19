@@ -77,6 +77,24 @@ def calc_precision_and_recall_and_f1(classifier, train_data, train_labels):
     return precision_score(train_labels, y_train_pred), recall_score(train_labels, y_train_pred), f1_score(train_labels, y_train_pred)
 
 
+def calc_pr_curve(classifier, train_data, train_labels):
+    from sklearn.model_selection import cross_val_predict
+    from sklearn.metrics import precision_recall_curve
+    y_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3, method="decision_function")
+    return precision_recall_curve(train_labels, y_train_pred)
+
+
+def plot_pr_curve(precisions, recalls, thresholds):
+    plt.figure(figsize=(8,4))
+    plt.plot(thresholds, precisions[:-1], "b--", label="Precision")
+    plt.plot(thresholds, recalls[:-1], "g-", label="Recall")
+    plt.xlabel("Threshold",fontsize=16)
+    plt.legend(loc="upper left",fontsize=16)
+    plt.ylim([0,1])
+    plt.xlim([-700000,700000])
+    plt.show()
+
+
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = fetch_train_test_split()
     # print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
@@ -101,6 +119,9 @@ if __name__ == '__main__':
     print(calc_confusion_matrix(trained_classifier, X_train, y_train_5))
 
     print(calc_precision_and_recall_and_f1(trained_classifier, X_train, y_train_5))
+
+    precisions, recalls, thresholds = calc_pr_curve(trained_classifier, X_train, y_train_5)
+    plot_pr_curve(precisions, recalls, thresholds)
 """
 # sort_by_target(mnist) # not sure about this - the jupyter notebook says it is needed? but w/o, my results match the book
 print(mnist["data"], mnist["target"])
