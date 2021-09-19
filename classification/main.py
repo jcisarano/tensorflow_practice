@@ -32,6 +32,7 @@ def do_cross_validation(classifier, train_data, train_labels, cv=3, scoring='acc
     from sklearn.model_selection import cross_val_score
     return cross_val_score(classifier, train_data, train_labels, cv=cv, scoring=scoring)
 
+
 def do_custom_cross_validation(classifier, train_data, train_labels):
     from sklearn.model_selection import StratifiedKFold
     from sklearn.base import clone
@@ -49,9 +50,17 @@ def do_custom_cross_validation(classifier, train_data, train_labels):
         clone_clf.fit(X_train_folds, y_train_folds)
         y_pred = clone_clf.predict(X_test_fold)
         n_correct = sum(y_pred == y_test_fold)
-        results.append( n_correct / len(y_pred) )
+        results.append(n_correct / len(y_pred))
 
     return results
+
+
+def calc_confusion_matrix(classifier, train_data, train_labels):
+    from sklearn.model_selection import cross_val_predict
+    from sklearn.metrics import confusion_matrix
+    x_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3)
+    return confusion_matrix(train_labels, x_train_pred)
+
 
 def plot_digit(data, size=28):
     data_img = data.reshape(size, size)
@@ -59,9 +68,10 @@ def plot_digit(data, size=28):
     plt.axis("off")
     plt.show()
 
+
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = fetch_train_test_split()
-    #print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+    # print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
     # for now, simplify problem to detecting number 5 only
     # sot convert labels so only fives are true
@@ -79,6 +89,8 @@ if __name__ == '__main__':
     # print(cross_val_score(trained_classifier, X_train, y_train_5, cv=3, scoring='accuracy'))
 
     print(do_custom_cross_validation(trained_classifier, X_train, y_train_5))
+
+    print(calc_confusion_matrix(trained_classifier, X_train, y_train_5))
 """
 # sort_by_target(mnist) # not sure about this - the jupyter notebook says it is needed? but w/o, my results match the book
 print(mnist["data"], mnist["target"])
