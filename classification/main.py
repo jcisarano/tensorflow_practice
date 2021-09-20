@@ -112,6 +112,11 @@ def calc_roc_curve(classifier, train_data, train_labels):
     return roc_curve(train_labels, y_train_pred)
 
 
+def calc_roc_auc(train_labels, y_scores):
+    from sklearn.metrics import roc_auc_score
+    return roc_auc_score(train_labels, y_scores)
+
+
 def plot_roc_curve(fpr, tpr, label=None):
     plt.figure(figsize=(8, 6))
     plt.plot(fpr, tpr, linewidth=2, label=label)
@@ -152,27 +157,17 @@ if __name__ == '__main__':
 
     # see that as precision increases, recall will fall:
     # plot_precision_v_recall(precisions, recalls)
-    fpr, tpr, thresholds = calc_roc_curve(trained_classifier, X_train, y_train_5)
-    plot_roc_curve(fpr, tpr)
+    # fpr, tpr, thresholds = calc_roc_curve(trained_classifier, X_train, y_train_5)
+    # plot_roc_curve(fpr, tpr)
 
-"""
-# sort_by_target(mnist) # not sure about this - the jupyter notebook says it is needed? but w/o, my results match the book
-print(mnist["data"], mnist["target"])
-print(mnist.keys())
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.model_selection import cross_val_predict
+    from sklearn.metrics import roc_curve
 
-X, y = mnist["data"], mnist["target"]
-print(X.shape)
-print(y.shape)
-
-some_digit = X[0]
-some_digit_image = some_digit.reshape(28, 28)
-plt.imshow(some_digit_image, cmap="binary")
-plt.axis("off")
-plt.show()
-
-print(y[0])
-
-X_train, X_test, y_train, y_test = X[:60000], X[60000:], y[:60000], y[60000:]
-"""
+    forest_clf = RandomForestClassifier(random_state=42, n_estimators=10)
+    y_probs_forest = cross_val_predict(forest_clf, X_train, y_train_5, cv=3, method="predict_proba")
+    y_scores_forest = y_probs_forest[:, 1]
+    fpr_forest, tpr_forest, thresholds_forest = roc_curve(y_train_5, y_scores_forest)
+    plot_roc_curve(fpr_forest, tpr_forest, "Random Forest")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
