@@ -58,4 +58,17 @@ if __name__ == '__main__':
     # matrix is 2-dimensional array of numbers
     # tensor is n-dimensional array of numbers, where n can be any number
 
+
+    ### Creating tensors with tf.Variable
+    changeable_tensor = tf.Variable([10, 7])
+    unchangeable_tensor = tf.constant([10,7])
+    print(changeable_tensor, '\n', unchangeable_tensor)
+
+    # use .assign() to change tensor created with .Variable():
+    changeable_tensor[0].assign(7)
+    print(changeable_tensor)
+    # cannot do this to tensor created with .constant()
+
+
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
