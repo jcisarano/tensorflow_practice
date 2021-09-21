@@ -99,4 +99,22 @@ if __name__ == '__main__':
     shuffled = tf.random.shuffle(not_shuffled, seed=42)
     print(shuffled)
 
+    ## Other ways to make tensors
+    print(tf.ones([10,7]))
+    print(tf.zeros([10,7]))
+
+    # turn numpy arrays into tf tensors
+    # tensors run much faster on gpu
+    import numpy as np
+    numpy_a = np.arange(1,25, dtype=np.int32)
+    print(numpy_a)
+
+    # convert:
+    A = tf.constant(numpy_a)
+    print(A)
+
+    # convert to 3 dimensional version
+    # number of elements must match before and after, in this case 2*3*4=24 or 3*8=24
+    A = tf.constant(numpy_a, shape=(2,3,4))
+    print(A)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
