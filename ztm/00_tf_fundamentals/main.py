@@ -87,12 +87,12 @@ if __name__ == '__main__':
     ### Shuffle order of elements in a tensor
     # depending on the problem, it can be useful to have random distribution of training data
     not_shuffled = tf.constant([[10, 7],
-                               [3, 4],
-                               [1, 5], ]
+                                [3, 4],
+                                [1, 5], ]
                                )
     # print(not_shuffled.ndim)  # remember ndim is the number of dimensions in the shape
     print(not_shuffled)
-    shuffled = tf.random.shuffle(not_shuffled) # randomly shuffles tensor along its first dimension
+    shuffled = tf.random.shuffle(not_shuffled)  # randomly shuffles tensor along its first dimension
     print(shuffled)
 
     # tf.random.set_seed(42)
@@ -100,13 +100,14 @@ if __name__ == '__main__':
     print(shuffled)
 
     ## Other ways to make tensors
-    print(tf.ones([10,7]))
-    print(tf.zeros([10,7]))
+    print(tf.ones([10, 7]))
+    print(tf.zeros([10, 7]))
 
     # turn numpy arrays into tf tensors
     # tensors run much faster on gpu
     import numpy as np
-    numpy_a = np.arange(1,25, dtype=np.int32)
+
+    numpy_a = np.arange(1, 25, dtype=np.int32)
     print(numpy_a)
 
     # convert:
@@ -115,6 +116,28 @@ if __name__ == '__main__':
 
     # convert to 3 dimensional version
     # number of elements must match before and after, in this case 2*3*4=24 or 3*8=24
-    A = tf.constant(numpy_a, shape=(2,3,4))
+    A = tf.constant(numpy_a, shape=(2, 3, 4))
     print(A)
+
+    # Tensor information
+    # Shape - length or number of elements of each dimension, tf.shape
+    # Rank - number of tensor dimensions, e.g. scalar is rank 0, vector rank 1, matrix rank 2, tensor rank n, tf.ndim
+    # Axis or dimension - particular dimension of a tensor, tensor[0], tensor[:,1]
+    # Size - total number of elements in the tensor, tf.size(tensor)
+
+    # Create a rank 4 tensor (4 dimensions)
+    rank_4_tensor = tf.zeros(shape=[2, 3, 4, 5])
+    print(rank_4_tensor)
+    print(rank_4_tensor[0])
+
+    print('\n',rank_4_tensor.shape, rank_4_tensor.ndim, tf.size(rank_4_tensor))
+    print("Datatype of every element:", rank_4_tensor.dtype)
+    print("Number of dimensions (rank):", rank_4_tensor.ndim)
+    print("Shape of tensor", rank_4_tensor.shape)
+    print("Elements along the 0 axis:", rank_4_tensor.shape[0])
+    print("Elements along the last axis:", rank_4_tensor.shape[-1])
+    print("Total number of elements:", tf.size(rank_4_tensor))
+    print("Total number of elements:", tf.size(rank_4_tensor).numpy()) # converts to number only
+
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
