@@ -130,14 +130,42 @@ if __name__ == '__main__':
     print(rank_4_tensor)
     print(rank_4_tensor[0])
 
-    print('\n',rank_4_tensor.shape, rank_4_tensor.ndim, tf.size(rank_4_tensor))
+    print('\n', rank_4_tensor.shape, rank_4_tensor.ndim, tf.size(rank_4_tensor))
     print("Datatype of every element:", rank_4_tensor.dtype)
     print("Number of dimensions (rank):", rank_4_tensor.ndim)
     print("Shape of tensor", rank_4_tensor.shape)
     print("Elements along the 0 axis:", rank_4_tensor.shape[0])
     print("Elements along the last axis:", rank_4_tensor.shape[-1])
     print("Total number of elements:", tf.size(rank_4_tensor))
-    print("Total number of elements:", tf.size(rank_4_tensor).numpy()) # converts to number only
+    print("Total number of elements:", tf.size(rank_4_tensor).numpy())  # converts to number only
+
+    # Indexing tensors works just like Python lists
+    # Get the first two elements of each dimension:
+    print(rank_4_tensor[:2, :2, :2, :2])
+
+    # Get first element from each dimension from each index except get the whole last one:
+    print(rank_4_tensor[:1, :1, :1, :])
+
+    # same, but for the second to last:
+    print(rank_4_tensor[:1, :1, :, :1])
+
+    # same, but for the first:
+    print(rank_4_tensor[:, :1, :1, :1], "\n\n\n")
+
+    # create a rank 2 tensor:
+    rank_2_tensor = tf.constant([[10, 7], [3, 4]])
+    print(rank_2_tensor)
+    print(rank_2_tensor.shape, rank_2_tensor.ndim, tf.size(rank_2_tensor))
+
+    # get last element
+    print(rank_2_tensor[:, -1])
+
+    # add extra dimension to existing tensor w/o changing existing info:
+    rank_3_tensor = rank_2_tensor[..., tf.newaxis]  # adds a new axis of 1 at the end, ... means all previous axes
+    print(rank_3_tensor)
+
+    print(tf.expand_dims(rank_2_tensor, axis=-1))  # same as above, adds last axis
+    print(tf.expand_dims(rank_2_tensor, axis=0))   # expands 0 axis
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
