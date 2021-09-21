@@ -69,6 +69,23 @@ if __name__ == '__main__':
     print(changeable_tensor)
     # cannot do this to tensor created with .constant()
 
+    # NOTE: tensorflow usually decides whether to make variable or constant. If in doubt, use constant and change later if needed.
+
+    ### Create random tensors
+    # random tensors can be any dimensions and are filled with random numbers
+    # e.g. good for initializing random weights at start of learning
+    random_1 = tf.random.Generator.from_seed(42)
+    random_1 = random_1.normal(shape=(3, 2))  # normal distribution is symmetrical bell-shaped graph
+    print(random_1)
+
+    random_2 = tf.random.Generator.from_seed(42)
+    random_2 = random_2.normal(shape=(3, 2))
+    print(random_2)
+
+    # seed means the two will be the same
+    print(random_1 == random_2)
+
+
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
