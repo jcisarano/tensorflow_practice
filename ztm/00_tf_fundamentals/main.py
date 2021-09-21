@@ -58,10 +58,9 @@ if __name__ == '__main__':
     # matrix is 2-dimensional array of numbers
     # tensor is n-dimensional array of numbers, where n can be any number
 
-
     ### Creating tensors with tf.Variable
     changeable_tensor = tf.Variable([10, 7])
-    unchangeable_tensor = tf.constant([10,7])
+    unchangeable_tensor = tf.constant([10, 7])
     print(changeable_tensor, '\n', unchangeable_tensor)
 
     # use .assign() to change tensor created with .Variable():
@@ -85,7 +84,19 @@ if __name__ == '__main__':
     # seed means the two will be the same
     print(random_1 == random_2)
 
+    ### Shuffle order of elements in a tensor
+    # depending on the problem, it can be useful to have random distribution of training data
+    not_shuffled = tf.constant([[10, 7],
+                               [3, 4],
+                               [1, 5], ]
+                               )
+    # print(not_shuffled.ndim)  # remember ndim is the number of dimensions in the shape
+    print(not_shuffled)
+    shuffled = tf.random.shuffle(not_shuffled) # randomly shuffles tensor along its first dimension
+    print(shuffled)
 
-
+    # tf.random.set_seed(42)
+    shuffled = tf.random.shuffle(not_shuffled, seed=42)
+    print(shuffled)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
