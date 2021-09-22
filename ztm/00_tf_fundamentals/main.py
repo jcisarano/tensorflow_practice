@@ -165,7 +165,17 @@ if __name__ == '__main__':
     print(rank_3_tensor)
 
     print(tf.expand_dims(rank_2_tensor, axis=-1))  # same as above, adds last axis
-    print(tf.expand_dims(rank_2_tensor, axis=0))   # expands 0 axis
+    print(tf.expand_dims(rank_2_tensor, axis=0))  # expands 0 axis
 
+    # Basic tensor operations
+    # addition:
+    tensor = tf.constant([[10, 7], [3, 4]])
+    print(tensor + 10)  # original tensor is unchanged
+    # multiplication
+    print(tensor * 10)
+
+    # tensorflow built-in arithmetic functions
+    # tensorflow versions of most operators are faster on GPU, especially with big tensors
+    print(tf.math.multiply(tensor, 10))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
