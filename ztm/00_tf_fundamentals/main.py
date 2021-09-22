@@ -176,6 +176,24 @@ if __name__ == '__main__':
 
     # tensorflow built-in arithmetic functions
     # tensorflow versions of most operators are faster on GPU, especially with big tensors
-    print(tf.math.multiply(tensor, 10))
+    print(tf.multiply(tensor, 10))
+    print(tensor * tensor)  # element-wise multiplication
+
+    # matrix multiplications - dot product
+    print(tf.matmul(tensor, tensor))
+    # same thing:
+    print(tensor @ tensor)
+
+    # tensors with different shapes
+    X = tf.constant([[1, 2],
+                     [3, 4],
+                     [5, 6]])
+    Y = tf.constant([[7, 8],
+                     [9, 10],
+                     [11, 12]])
+    # sizes incompatible for dot product:
+    # X @ Y
+    # inner dimensions must match
+    # resulting shape is inner dimensions
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
