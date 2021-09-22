@@ -206,5 +206,16 @@ if __name__ == '__main__':
     # however, transpose flips axes, so result is different from reshape()
     print(tf.transpose(X) @ Y)
 
+    # dot product - another way to do it - same result as above
+    print(tf.tensordot(tf.transpose(X), Y, axes=1))
+
+    # each of these gives different results
+    print(tf.matmul(X, tf.transpose(Y)))
+    print(tf.matmul(X, tf.reshape(Y, shape=(2, 3))))
+
+    print("\nNormal Y:", Y)
+    print("Reshape Y (2,3):", tf.reshape(Y, shape=(2, 3)))  # reshape takes elements in order and fits them to the new shape
+    print("Transpose Y:", tf.transpose(Y))  # transpose flips axes
+    # generally, transpose is more useful, e.g. when trying to multiply two matrices that do not match shapes
     
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
