@@ -194,6 +194,17 @@ if __name__ == '__main__':
     # sizes incompatible for dot product:
     # X @ Y
     # inner dimensions must match
-    # resulting shape is inner dimensions
+    # resulting shape is outer dimensions
 
+    # so change the shape of Y to make it work
+    print(X @ tf.reshape(Y, shape=(2, 3)))
+
+    # or
+    print(tf.reshape(X, shape=(2, 3)) @ Y)
+
+    # or, using transpose
+    # however, transpose flips axes, so result is different from reshape()
+    print(tf.transpose(X) @ Y)
+
+    
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
