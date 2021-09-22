@@ -217,5 +217,27 @@ if __name__ == '__main__':
     print("Reshape Y (2,3):", tf.reshape(Y, shape=(2, 3)))  # reshape takes elements in order and fits them to the new shape
     print("Transpose Y:", tf.transpose(Y))  # transpose flips axes
     # generally, transpose is more useful, e.g. when trying to multiply two matrices that do not match shapes
-    
+
+    # tensor multiplication choices:
+    # tf.multiply
+    # tf.matmul
+    # tf.tensordot
+    # @
+
+    # tensor data types
+    B = tf.constant([1.7, 7.4])
+    print(B)
+
+    C = tf.constant([1, 7])
+    print(C)
+
+    # changing data type
+    D = tf.cast(B, dtype=tf.float16)
+    print(D, D.dtype)
+
+    E = tf.cast(C, dtype=tf.float32)
+    print(E, E.dtype)
+
+    F = tf.cast(E, dtype=tf.float16)
+    print(F, F.dtype)
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
