@@ -240,4 +240,24 @@ if __name__ == '__main__':
 
     F = tf.cast(E, dtype=tf.float16)
     print(F, F.dtype)
+
+    # absolute value
+    D = tf.constant([-7, -10])
+    print(tf.abs(D), "\n\n")
+
+    # aggregating tensors
+    # minimum of tensor, maximum of tensor, mean of tensor, sum of tensor
+
+    E = tf.constant(np.random.randint(0, 100, size=50))
+    print(tf.size(E), E.shape, E.ndim)
+    print(tf.reduce_min(E))
+    print(tf.reduce_max(E))
+    print(tf.reduce_mean(E))
+    print(tf.reduce_sum(E))
+
+    import tensorflow_probability as tfp  # required to do variance
+    print(tfp.stats.variance(E))
+    print(tf.math.reduce_std(tf.cast(E, dtype=tf.float32)))  # reduce_std requires float
+
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
