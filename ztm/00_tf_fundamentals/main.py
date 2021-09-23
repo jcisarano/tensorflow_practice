@@ -303,7 +303,8 @@ if __name__ == '__main__':
     # note that the default types of tf and np are different
     numpy_J = tf.constant(np.array([3., 7., 10.]))
     tensor_J = tf.constant([3., 7., 10.])
-    print(numpy_J.dtype, tensor_J.dtype)  # float64 vs float32
+    print(numpy_J.dtype, tensor_J.dtype, "\n\n")  # float64 vs float32
 
-    
+    print(tf.config.list_physical_devices("GPU"))
+    print(tf.config.list_logical_devices("CPU"))
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
