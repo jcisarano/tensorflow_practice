@@ -291,6 +291,19 @@ if __name__ == '__main__':
     print(H)
     print(tf.square(H))
     print(tf.sqrt(tf.cast(H, dtype=tf.float32)))
-    print(tf.math.log(tf.cast(H, dtype=tf.float32)))
+    print(tf.math.log(tf.cast(H, dtype=tf.float32)), "\n\n")
 
+    # compatibility with numpy
+    J = tf.constant(np.array([3., 7., 10.]))
+    print(J)
+    print(np.array(J), type(np.array(J)))
+    print(J.numpy(), type(J.numpy()))
+    print(J.numpy()[0])
+
+    # note that the default types of tf and np are different
+    numpy_J = tf.constant(np.array([3., 7., 10.]))
+    tensor_J = tf.constant([3., 7., 10.])
+    print(numpy_J.dtype, tensor_J.dtype)  # float64 vs float32
+
+    
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
