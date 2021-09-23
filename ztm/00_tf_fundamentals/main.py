@@ -256,7 +256,18 @@ if __name__ == '__main__':
     print(tf.reduce_sum(E))
 
     print(tf.math.reduce_variance(tf.cast(E, dtype=tf.float32)))
-    print(tf.math.reduce_std(tf.cast(E, dtype=tf.float32)))  # reduce_std requires float
+    print(tf.math.reduce_std(tf.cast(E, dtype=tf.float32)),"\n\n")  # reduce_std requires float
 
+    # positional max and min
+    tf.random.set_seed(42)
+    F = tf.random.uniform(shape=[50])
+    print(F)
+    print(tf.argmax(F))     # returns the index of the highest value
+    print(F[tf.argmax(F)])
+    print(tf.reduce_max(F))
+
+    print(tf.argmin(F))     # returns the index of the lowest value
+    print(F[tf.argmin(F)])
+    print(tf.reduce_min(F))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
