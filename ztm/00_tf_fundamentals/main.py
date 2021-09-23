@@ -214,7 +214,8 @@ if __name__ == '__main__':
     print(tf.matmul(X, tf.reshape(Y, shape=(2, 3))))
 
     print("\nNormal Y:", Y)
-    print("Reshape Y (2,3):", tf.reshape(Y, shape=(2, 3)))  # reshape takes elements in order and fits them to the new shape
+    print("Reshape Y (2,3):",
+          tf.reshape(Y, shape=(2, 3)))  # reshape takes elements in order and fits them to the new shape
     print("Transpose Y:", tf.transpose(Y))  # transpose flips axes
     # generally, transpose is more useful, e.g. when trying to multiply two matrices that do not match shapes
 
@@ -256,17 +257,17 @@ if __name__ == '__main__':
     print(tf.reduce_sum(E))
 
     print(tf.math.reduce_variance(tf.cast(E, dtype=tf.float32)))
-    print(tf.math.reduce_std(tf.cast(E, dtype=tf.float32)),"\n\n")  # reduce_std requires float
+    print(tf.math.reduce_std(tf.cast(E, dtype=tf.float32)), "\n\n")  # reduce_std requires float
 
     # positional max and min
     tf.random.set_seed(42)
     F = tf.random.uniform(shape=[50])
     print(F)
-    print(tf.argmax(F))     # returns the index of the highest value
+    print(tf.argmax(F))  # returns the index of the highest value
     print(F[tf.argmax(F)])
     print(tf.reduce_max(F))
 
-    print(tf.argmin(F))     # returns the index of the lowest value
+    print(tf.argmin(F))  # returns the index of the lowest value
     print(F[tf.argmin(F)])
     print(tf.reduce_min(F), "\n\n")
 
@@ -276,6 +277,13 @@ if __name__ == '__main__':
     G = tf.constant(tf.random.uniform(shape=[50]), shape=(1, 1, 1, 1, 50))
     print(G.shape)
     G_sq = tf.squeeze(G)
-    print(G_sq.shape)
+    print(G_sq.shape, "\n\n")
+
+    # one hot encoding
+    some_list = [0, 1, 2, 3, 1, 3, 0]  # represents list to encode
+    print(tf.one_hot(some_list, depth=4))
+
+    # specify custom values:
+    print(tf.one_hot(some_list, depth=4, on_value="hello",off_value="goodbye"))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
