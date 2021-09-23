@@ -284,6 +284,13 @@ if __name__ == '__main__':
     print(tf.one_hot(some_list, depth=4))
 
     # specify custom values:
-    print(tf.one_hot(some_list, depth=4, on_value="hello",off_value="goodbye"))
+    print(tf.one_hot(some_list, depth=4, on_value="hello", off_value="goodbye"), "\n\n")
+
+    # square, log, sqrt
+    H = tf.range(1, 10)
+    print(H)
+    print(tf.square(H))
+    print(tf.sqrt(tf.cast(H, dtype=tf.float32)))
+    print(tf.math.log(tf.cast(H, dtype=tf.float32)))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
