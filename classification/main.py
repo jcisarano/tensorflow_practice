@@ -136,13 +136,13 @@ if __name__ == '__main__':
     y_train_5 = (y_train == 5)
     y_test_5 = (y_test == 5)
 
-    trained_classifier = train_SGD(X_train, y_train_5)
+    # trained_classifier = train_SGD(X_train, y_train_5)
 
-    # some_digit = X_train[0]
-    # plot_digit(some_digit)
+    some_digit = X_train[0]
+    plot_digit(some_digit)
     # print(trained_classifier.predict([some_digit]))
 
-    print(do_cross_validation(trained_classifier, X_train, y_train_5))
+    # print(do_cross_validation(trained_classifier, X_train, y_train_5))
     # from sklearn.model_selection import cross_val_score
     # print(cross_val_score(trained_classifier, X_train, y_train_5, cv=3, scoring='accuracy'))
 
@@ -160,6 +160,7 @@ if __name__ == '__main__':
     # fpr, tpr, thresholds = calc_roc_curve(trained_classifier, X_train, y_train_5)
     # plot_roc_curve(fpr, tpr)
 
+    """
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import roc_curve
@@ -169,5 +170,41 @@ if __name__ == '__main__':
     y_scores_forest = y_probs_forest[:, 1]
     fpr_forest, tpr_forest, thresholds_forest = roc_curve(y_train_5, y_scores_forest)
     plot_roc_curve(fpr_forest, tpr_forest, "Random Forest")
+    """
+
+    """
+    # multiclass classifier
+    # SVC will automatically select OvO or OvR multiclass classifiers when needed
+    # SVC Support Vector Machine classifier
+    from sklearn.svm import SVC
+    from sklearn.multiclass import OneVsRestClassifier
+    svm_clf = SVC()
+    svm_clf.fit(X_train, y_train)
+    print(svm_clf.predict([some_digit]))
+    some_digit_scores = svm_clf.decision_function([some_digit])
+    print(some_digit_scores)
+
+    # Force a OvR classifier with SVC
+    over_clf = OneVsRestClassifier(SVC())
+    over_clf.fit(X_train, y_train)
+    print(over_clf.predict([some_digit]))
+    print(len(over_clf.estimators_))
+    """
+
+    # SGD model
+    from sklearn.model_selection import cross_val_score
+    from sklearn.linear_model import SGDClassifier
+    sgd_clf = SGDClassifier(random_state=42, max_iter=5, tol=-np.infty)
+    sgd_clf.fit(X_train,y_train)
+    print(sgd_clf.predict([some_digit]))
+    print(cross_val_score(sgd_clf, X_train, y_train, cv=3, scoring='accuracy'))
+
+    # now scale data to improve performance
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train.astype(np.float64))
+    print(cross_val_score(sgd_clf, X_train_scaled, y_train, cv=3, scoring="accuracy"))
+
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
