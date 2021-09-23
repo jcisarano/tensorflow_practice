@@ -255,8 +255,7 @@ if __name__ == '__main__':
     print(tf.reduce_mean(E))
     print(tf.reduce_sum(E))
 
-    import tensorflow_probability as tfp  # required to do variance
-    print(tfp.stats.variance(E))
+    print(tf.math.reduce_variance(tf.cast(E, dtype=tf.float32)))
     print(tf.math.reduce_std(tf.cast(E, dtype=tf.float32)))  # reduce_std requires float
 
 
