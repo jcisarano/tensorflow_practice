@@ -268,6 +268,14 @@ if __name__ == '__main__':
 
     print(tf.argmin(F))     # returns the index of the lowest value
     print(F[tf.argmin(F)])
-    print(tf.reduce_min(F))
+    print(tf.reduce_min(F), "\n\n")
+
+    # squeezing a tensor
+    # squeeze removes dimensions of size one
+    tf.random.set_seed(42)
+    G = tf.constant(tf.random.uniform(shape=[50]), shape=(1, 1, 1, 1, 50))
+    print(G.shape)
+    G_sq = tf.squeeze(G)
+    print(G_sq.shape)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
