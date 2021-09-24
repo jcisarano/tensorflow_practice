@@ -143,6 +143,11 @@ def plot_digits(instances, images_per_row=10, **options):
     plt.axis("off")
 
 
+def image_shift(image, x_shift=1, y_shift=1):
+    from scipy.ndimage.interpolation import shift
+    return shift(image.reshape(28, 28), [x_shift, y_shift], cval=0)
+
+
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = fetch_train_test_split()
     # print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
@@ -295,6 +300,8 @@ if __name__ == '__main__':
     plot_digit(X_test_mod[some_index])
     plot_digit(clean_digit)
     """
+
+    """
     # EX 1 97% accuracy on MNIST dataset
     from sklearn.neighbors import KNeighborsClassifier
     from sklearn.metrics import accuracy_score
@@ -318,7 +325,13 @@ if __name__ == '__main__':
     y_pred_grid = grid_search.best_estimator_.predict(X_test)
     print(grid_search.best_params_)
     print(accuracy_score(y_test, y_pred_grid))
+    """
 
-    #EX 2 Image shift
+    print(X_train.shape)
+
+    # EX 2 Image shift
+    plot_digit(X_train[0])
+    shifted_digit = image_shift(X_train[0], x_shift=5, y_shift=5)
+    plot_digit(shifted_digit)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
