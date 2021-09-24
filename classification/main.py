@@ -195,7 +195,7 @@ if __name__ == '__main__':
     from sklearn.model_selection import cross_val_score
     from sklearn.linear_model import SGDClassifier
     sgd_clf = SGDClassifier(random_state=42, max_iter=5, tol=-np.infty)
-    sgd_clf.fit(X_train,y_train)
+    sgd_clf.fit(X_train, y_train)
     print(sgd_clf.predict([some_digit]))
     print(cross_val_score(sgd_clf, X_train, y_train, cv=3, scoring='accuracy'))
 
@@ -204,6 +204,18 @@ if __name__ == '__main__':
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train.astype(np.float64))
     print(cross_val_score(sgd_clf, X_train_scaled, y_train, cv=3, scoring="accuracy"))
+
+    # plot confusion matrix to analyze any errors
+    conf_mx = calc_confusion_matrix(sgd_clf, X_train_scaled, y_train)
+    plt.matshow(conf_mx, cmap=plt.cm.gray)
+    plt.show()
+
+    # normalize confusion matrix to get better view of errors only
+    row_sums = conf_mx.sum(axis=1, keepdims=True)
+    norm_conf_mx = conf_mx / row_sums
+    np.fill_diagonal(norm_conf_mx, 0)
+    plt.matshow(norm_conf_mx, cmap=plt.cm.gray)
+    plt.show()
 
 
 
