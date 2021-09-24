@@ -65,8 +65,8 @@ def do_custom_cross_validation(classifier, train_data, train_labels):
 def calc_confusion_matrix(classifier, train_data, train_labels):
     from sklearn.model_selection import cross_val_predict
     from sklearn.metrics import confusion_matrix
-    y_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3)
-    return confusion_matrix(train_labels, y_train_pred)
+    _y_train_pred = cross_val_predict(classifier, train_data, train_labels, cv=3)
+    return confusion_matrix(train_labels, _y_train_pred), _y_train_pred
 
 
 def calc_precision_and_recall_and_f1(classifier, train_data, train_labels):
@@ -127,6 +127,22 @@ def plot_roc_curve(fpr, tpr, label=None):
     plt.show()
 
 
+def plot_digits(instances, images_per_row=10, **options):
+    size = 28
+    images_per_row = min(len(instances), images_per_row)
+    images = [instance.reshape(size, size) for instance in instances]
+    n_rows = (len(instances) - 1) // images_per_row + 1
+    row_images = []
+    n_empty = n_rows * images_per_row - len(instances)
+    images.append(np.zeros((size, size * n_empty)))
+    for row in range(n_rows):
+        rimages = images[row * images_per_row: (row + 1) * images_per_row]
+        row_images.append(np.concatenate(rimages, axis=1))
+    image = np.concatenate(row_images, axis=0)
+    plt.imshow(image, cmap=mpl.cm.binary, **options)
+    plt.axis("off")
+
+
 if __name__ == '__main__':
     X_train, X_test, y_train, y_test = fetch_train_test_split()
     # print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
@@ -139,7 +155,7 @@ if __name__ == '__main__':
     # trained_classifier = train_SGD(X_train, y_train_5)
 
     some_digit = X_train[0]
-    plot_digit(some_digit)
+    # plot_digit(some_digit)
     # print(trained_classifier.predict([some_digit]))
 
     # print(do_cross_validation(trained_classifier, X_train, y_train_5))
@@ -194,6 +210,7 @@ if __name__ == '__main__':
     # SGD model
     from sklearn.model_selection import cross_val_score
     from sklearn.linear_model import SGDClassifier
+
     sgd_clf = SGDClassifier(random_state=42, max_iter=5, tol=-np.infty)
     sgd_clf.fit(X_train, y_train)
     print(sgd_clf.predict([some_digit]))
@@ -201,12 +218,13 @@ if __name__ == '__main__':
 
     # now scale data to improve performance
     from sklearn.preprocessing import StandardScaler
+
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train.astype(np.float64))
     print(cross_val_score(sgd_clf, X_train_scaled, y_train, cv=3, scoring="accuracy"))
 
     # plot confusion matrix to analyze any errors
-    conf_mx = calc_confusion_matrix(sgd_clf, X_train_scaled, y_train)
+    conf_mx, y_train_pred = calc_confusion_matrix(sgd_clf, X_train_scaled, y_train)
     plt.matshow(conf_mx, cmap=plt.cm.gray)
     plt.show()
 
@@ -217,6 +235,22 @@ if __name__ == '__main__':
     plt.matshow(norm_conf_mx, cmap=plt.cm.gray)
     plt.show()
 
+    # plot sample error digit images
+    cl_a, cl_b = 3, 5
+    X_aa = X_train[(y_train == cl_a) & (y_train_pred == cl_a)]
+    X_ab = X_train[(y_train == cl_a) & (y_train_pred == cl_b)]
+    X_ba = X_train[(y_train == cl_b) & (y_train_pred == cl_a)]
+    X_bb = X_train[(y_train == cl_b) & (y_train_pred == cl_b)]
 
+    plt.figure(figsize=(8, 8))
+    plt.subplot(221)
+    plot_digits(X_aa[:25], images_per_row=5)
+    plt.subplot(222)
+    plot_digits(X_ab[:25], images_per_row=5)
+    plt.subplot(223)
+    plot_digits(X_ba[:25], images_per_row=5)
+    plt.subplot(224)
+    plot_digits(X_bb[:25], images_per_row=5)
+    plt.show()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
