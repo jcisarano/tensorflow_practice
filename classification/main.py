@@ -278,14 +278,15 @@ if __name__ == '__main__':
     # multioutput classification
     # multiple labels output for each row and each labels can have multiple values
     # example will take noisy input images and clean them up
-    noise = np.random.randint(0,100,(len(X_train), 784))
+    noise = np.random.randint(0, 100, (len(X_train), 784))
     X_train_mod = X_train + noise
-    noise = np.random.randint(0,100,(len(X_test), 784))
+    noise = np.random.randint(0, 100, (len(X_test), 784))
     X_test_mod = X_test + noise
     y_train_mod = X_train
     y_test_mod = X_test
 
     from sklearn.neighbors import KNeighborsClassifier
+
     knn_clf = KNeighborsClassifier()
     knn_clf.fit(X_train_mod, y_train_mod)
     some_index = 5500
