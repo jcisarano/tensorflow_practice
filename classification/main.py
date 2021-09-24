@@ -254,7 +254,9 @@ if __name__ == '__main__':
     plt.show()
     """
 
+    """
     # multilabel classification
+    # multiple true/false labels for each row of data
     # use same digits data, but output if the digit is larger than 7 and odd/even
     from sklearn.neighbors import KNeighborsClassifier
     y_train_large = (y_train >= 7)
@@ -265,11 +267,30 @@ if __name__ == '__main__':
     knn_clf.fit(X_train, y_multilabel)
     print(knn_clf.predict([some_digit]))
 
+    # calculate F1 score
     from sklearn.metrics import f1_score
     from sklearn.model_selection import cross_val_predict
-
     # n_jobs=-1 means use all available cpus, cv=3 means 3 splits for cross val comparisons
     y_train_knn_pred = cross_val_predict(knn_clf, X_train, y_multilabel, cv=3, n_jobs=-1)
     print(f1_score(y_multilabel, y_train_knn_pred, average='macro'))
+    """
+
+    # multioutput classification
+    # multiple labels output for each row and each labels can have multiple values
+    # example will take noisy input images and clean them up
+    noise = np.random.randint(0,100,(len(X_train), 784))
+    X_train_mod = X_train + noise
+    noise = np.random.randint(0,100,(len(X_test), 784))
+    X_test_mod = X_test + noise
+    y_train_mod = X_train
+    y_test_mod = X_test
+
+    from sklearn.neighbors import KNeighborsClassifier
+    knn_clf = KNeighborsClassifier()
+    knn_clf.fit(X_train_mod, y_train_mod)
+    some_index = 5500
+    clean_digit = knn_clf.predict([X_test_mod[some_index]])
+    plot_digit(X_test_mod[some_index])
+    plot_digit(clean_digit)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
