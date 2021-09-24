@@ -207,6 +207,7 @@ if __name__ == '__main__':
     print(len(over_clf.estimators_))
     """
 
+    """
     # SGD model
     from sklearn.model_selection import cross_val_score
     from sklearn.linear_model import SGDClassifier
@@ -241,7 +242,6 @@ if __name__ == '__main__':
     X_ab = X_train[(y_train == cl_a) & (y_train_pred == cl_b)]
     X_ba = X_train[(y_train == cl_b) & (y_train_pred == cl_a)]
     X_bb = X_train[(y_train == cl_b) & (y_train_pred == cl_b)]
-
     plt.figure(figsize=(8, 8))
     plt.subplot(221)
     plot_digits(X_aa[:25], images_per_row=5)
@@ -252,5 +252,24 @@ if __name__ == '__main__':
     plt.subplot(224)
     plot_digits(X_bb[:25], images_per_row=5)
     plt.show()
+    """
+
+    # multilabel classification
+    # use same digits data, but output if the digit is larger than 7 and odd/even
+    from sklearn.neighbors import KNeighborsClassifier
+    y_train_large = (y_train >= 7)
+    y_train_odd = (y_train % 2 == 1)
+    y_multilabel = np.c_[y_train_large, y_train_odd]
+
+    knn_clf = KNeighborsClassifier()
+    knn_clf.fit(X_train, y_multilabel)
+    print(knn_clf.predict([some_digit]))
+
+    from sklearn.metrics import f1_score
+    from sklearn.model_selection import cross_val_predict
+
+    # n_jobs=-1 means use all available cpus, cv=3 means 3 splits for cross val comparisons
+    y_train_knn_pred = cross_val_predict(knn_clf, X_train, y_multilabel, cv=3, n_jobs=-1)
+    print(f1_score(y_multilabel, y_train_knn_pred, average='macro'))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
