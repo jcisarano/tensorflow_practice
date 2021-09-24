@@ -275,6 +275,7 @@ if __name__ == '__main__':
     print(f1_score(y_multilabel, y_train_knn_pred, average='macro'))
     """
 
+    """
     # multioutput classification
     # multiple labels output for each row and each labels can have multiple values
     # example will take noisy input images and clean them up
@@ -293,5 +294,28 @@ if __name__ == '__main__':
     clean_digit = knn_clf.predict([X_test_mod[some_index]])
     plot_digit(X_test_mod[some_index])
     plot_digit(clean_digit)
+    """
+    # EX 1 97% accuracy on MNIST dataset
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.metrics import accuracy_score
+    from sklearn.model_selection import GridSearchCV
+
+    knn_clf = KNeighborsClassifier(n_jobs=-1, weights='distance', n_neighbors=4)
+    knn_clf.fit(X_train, y_train)
+    y_pred = knn_clf.predict(X_test)
+    print(accuracy_score(y_test, y_pred))
+
+    param_grid = [{
+        'weights': ['uniform', 'distance'],
+        'n_neighbors': [4, 5, 6]
+    }]
+
+    print("\nTry grid search to get better result:")
+    grid_search = GridSearchCV(knn_clf,
+                               param_grid, cv=5, scoring='neg_mean_squared_error',
+                               return_train_score=True, n_jobs=-1, verbose=3)
+    grid_search.fit(X_train, y_train)
+    y_pred_grid = grid_search.best_estimator_.predict(X_test)
+    print(accuracy_score(y_test, y_pred_grid))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
