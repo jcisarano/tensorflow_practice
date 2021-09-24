@@ -316,6 +316,9 @@ if __name__ == '__main__':
                                return_train_score=True, n_jobs=-1, verbose=3)
     grid_search.fit(X_train, y_train)
     y_pred_grid = grid_search.best_estimator_.predict(X_test)
+    print(grid_search.best_params_)
     print(accuracy_score(y_test, y_pred_grid))
+
+    #EX 2 Image shift
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
