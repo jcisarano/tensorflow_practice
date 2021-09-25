@@ -415,15 +415,15 @@ if __name__ == '__main__':
     test_data = load_data(filename=LOCAL_TEST_CSV_FILENAME)
     y_train = train_data["Survived"]
 
-    # train_data["AgeBucket"] = np.floor_divide(train_data["Age"], 15)
-    # test_data["AgeBucket"] = np.floor_divide(test_data["Age"], 15)
+    train_data["AgeBucket"] = np.floor_divide(train_data["Age"], 15)
+    test_data["AgeBucket"] = np.floor_divide(test_data["Age"], 15)
     # train_data["RelativesOnboard"] = train_data["SibSp"] + train_data["Parch"]
     # test_data["RelativesOnboard"] = test_data["SibSp"] + test_data["Parch"]
     # print(train_data["AgeBucket"].value_counts())
 
 
     numeric_pipeline = Pipeline([
-        ("select_numeric", DataFrameSelector(["Age", "SibSp", "Parch", "Fare"])),
+        ("select_numeric", DataFrameSelector(["SibSp", "Parch", "Fare", "AgeBucket"])),
         ("imputer", SimpleImputer(strategy="median")),  # imputer will replace empty values with median
     ])
 
