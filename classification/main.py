@@ -151,16 +151,6 @@ def image_shift(image, x_move=1, y_move=1, x_dim=28, y_dim=28):
     return shift(image.reshape(x_dim, y_dim), [x_move, y_move], cval=0).reshape(x_dim * y_dim)
 
 
-LOCAL_SAVE_PATH: str = os.path.join("datasets")
-LOCAL_TRAIN_CSV_FILENAME: str = "train.csv"
-LOCAL_TEST_CSV_FILENAME: str = "test.csv"
-
-
-def load_data(path=LOCAL_SAVE_PATH, filename=LOCAL_TRAIN_CSV_FILENAME):
-    csv_path = os.path.join(path, filename)
-    return pd.read_csv(csv_path)
-
-
 def split_train_test(data, test_ratio, r_seed=42):
     np.random.seed(r_seed)  # make sure the shuffle is the same every time
     shuffled = np.random.permutation(len(data))
@@ -383,6 +373,17 @@ if __name__ == '__main__':
     from sklearn.pipeline import Pipeline
     from sklearn.impute import SimpleImputer
     from sklearn.preprocessing import OneHotEncoder
+    from sklearn.pipeline import FeatureUnion
+
+    LOCAL_SAVE_PATH: str = os.path.join("datasets")
+    LOCAL_TRAIN_CSV_FILENAME: str = "train.csv"
+    LOCAL_TEST_CSV_FILENAME: str = "test.csv"
+
+
+    def load_data(path=LOCAL_SAVE_PATH, filename=LOCAL_TRAIN_CSV_FILENAME):
+        csv_path = os.path.join(path, filename)
+        return pd.read_csv(csv_path)
+
 
     class DataFrameSelector(BaseEstimator, TransformerMixin):
         # class for use with pipeline that will return only the selected columns
@@ -411,18 +412,56 @@ if __name__ == '__main__':
 
 
     train_data = load_data()
+    test_data = load_data(filename=LOCAL_TEST_CSV_FILENAME)
+    y_train = train_data["Survived"]
     numeric_pipeline = Pipeline([
         ("select_numeric", DataFrameSelector(["Age", "SibSp", "Parch", "Fare"])),
         ("imputer", SimpleImputer(strategy="median")),  # imputer will replace empty values with median
     ])
 
-    print(numeric_pipeline.fit_transform(train_data))
+    # print(numeric_pipeline.fit_transform(train_data))
 
     categorical_pipeline = Pipeline([
         ("select_categorical", DataFrameSelector(["Pclass", "Sex", "Embarked"])),  # pick only the categorical cols
         ("mf_imputer", MostFrequentImputer()),  # replace empty values with the most common value
         ("categorical_encoder", OneHotEncoder(sparse=False)),
     ])
-    print(categorical_pipeline.fit_transform(train_data))
+    # print(categorical_pipeline.fit_transform(train_data))
+
+    # combines the output of the two pipelines
+    pre_pipeline = FeatureUnion([
+        ("numeric_pipeline", numeric_pipeline),
+        ("categorical_pipeline", categorical_pipeline),
+    ])
+
+    X_train = pre_pipeline.fit_transform(train_data)
+    print(X_train)
+
+    from sklearn.svm import SVC
+    from sklearn.multiclass import OneVsRestClassifier
+
+    svm_clf = SVC()
+    svm_clf.fit(X_train, y_train)
+
+    X_test = pre_pipeline.transform(test_data)
+    y_pred = svm_clf.predict(X_test)
+
+    # the kaggle titanic test data does not have labels, so use cross validation to check accuracy
+    svm_cv_scores = do_cross_validation(svm_clf, X_train, y_train, cv=10)
+    print(svm_cv_scores.mean())
+
+    # try another model
+    from sklearn.ensemble import RandomForestClassifier
+
+    # from sklearn.model_selection import cross_val_predict
+    # from sklearn.metrics import roc_curve
+
+    forest_clf = RandomForestClassifier(random_state=42, n_estimators=10)
+    forest_clf.fit(X_train, y_train)
+    forest_y_pred = forest_clf.predict(X_test)
+    forest_cv_scores = do_cross_validation(forest_clf, X_train, y_train, cv=10)
+    print(forest_cv_scores.mean())
+
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
