@@ -440,7 +440,7 @@ if __name__ == '__main__':
     from sklearn.svm import SVC
     from sklearn.multiclass import OneVsRestClassifier
 
-    svm_clf = SVC()
+    svm_clf = SVC(gamma="auto")
     svm_clf.fit(X_train, y_train)
 
     X_test = pre_pipeline.transform(test_data)
@@ -456,7 +456,7 @@ if __name__ == '__main__':
     # from sklearn.model_selection import cross_val_predict
     # from sklearn.metrics import roc_curve
 
-    forest_clf = RandomForestClassifier(random_state=42, n_estimators=10)
+    forest_clf = RandomForestClassifier(random_state=42, n_estimators=100)
     forest_clf.fit(X_train, y_train)
     forest_y_pred = forest_clf.predict(X_test)
     forest_cv_scores = do_cross_validation(forest_clf, X_train, y_train, cv=10)
