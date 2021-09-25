@@ -143,9 +143,10 @@ def plot_digits(instances, images_per_row=10, **options):
     plt.axis("off")
 
 
-def image_shift(image, x_shift=1, y_shift=1):
+def image_shift(image, x_move=1, y_move=1, x_dim=28, y_dim=28):
     from scipy.ndimage.interpolation import shift
-    return shift(image.reshape(28, 28), [x_shift, y_shift], cval=0)
+    # first reshapes the image to square image, then returns it to 1d array
+    return shift(image.reshape(x_dim, y_dim), [x_move, y_move], cval=0).reshape(x_dim * y_dim)
 
 
 if __name__ == '__main__':
@@ -330,8 +331,31 @@ if __name__ == '__main__':
     print(X_train.shape)
 
     # EX 2 Image shift
-    plot_digit(X_train[0])
-    shifted_digit = image_shift(X_train[0], x_shift=5, y_shift=5)
-    plot_digit(shifted_digit)
+
+    # test digit shift:
+    # plot_digit(X_train[0])
+    # shifted_digit = image_shift(X_train[0], x_shift=5, y_shift=5)
+    # plot_digit(shifted_digit)
+
+    # duplicate training data
+    X_train_expanded = [X_train]
+    y_train_expanded = [y_train]
+    # loop through desired pixel shifts and build new array:
+    for x_shift, y_shift in ((-1, 0), (1, 0), (0, 1), (0, -1)):
+        shifted = np.apply_along_axis(image_shift, 1, X_train, x_shift, y_shift)
+        X_train_expanded.append(shifted)  # appends list to expanded, ends up with list of lists
+        y_train_expanded.append(y_train)  # labels stay the same, but need to match size of X
+
+    X_train_expanded = np.concatenate(X_train_expanded)  # returns np array instead of python list
+    y_train_expanded = np.concatenate(y_train_expanded)
+    print(X_train_expanded.shape, X_train.shape)
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.metrics import accuracy_score
+
+    knn_clf = KNeighborsClassifier(n_jobs=-1, weights='distance', n_neighbors=4)
+    knn_clf.fit(X_train_expanded, y_train_expanded)
+    y_pred = knn_clf.predict(X_test)
+    # result is slightly more accurate: 0.9763 vs 0.9714
+    print(accuracy_score(y_test, y_pred))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
