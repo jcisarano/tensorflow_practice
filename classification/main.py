@@ -462,12 +462,19 @@ if __name__ == '__main__':
     forest_cv_scores = do_cross_validation(forest_clf, X_train, y_train, cv=10)
     print(forest_cv_scores.mean())
 
+    output = np.c_[test_data["PassengerId"], forest_y_pred]
+    np.savetxt("out.csv", output, delimiter=',', fmt='%s')
+
+    df = pd.DataFrame(output, columns=["PassengerId", "Survived"])
+    df.to_csv("out_pd.csv", index=False, header=True, sep=",")
+
+    """
     plt.figure(figsize=(8,4))
     plt.plot([1]*10, svm_cv_scores, ".")
     plt.plot([2]*10, forest_cv_scores, ".")
     plt.boxplot([svm_cv_scores,forest_cv_scores], labels=("SVM","Random Forest"))
     plt.ylabel("Accuracy", fontsize=14)
     plt.show()
-
+    """
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
