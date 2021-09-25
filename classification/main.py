@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import pandas as pd
 from sklearn.datasets import fetch_openml
@@ -149,18 +151,37 @@ def image_shift(image, x_move=1, y_move=1, x_dim=28, y_dim=28):
     return shift(image.reshape(x_dim, y_dim), [x_move, y_move], cval=0).reshape(x_dim * y_dim)
 
 
+LOCAL_SAVE_PATH: str = os.path.join("datasets")
+LOCAL_TRAIN_CSV_FILENAME: str = "train.csv"
+LOCAL_TEST_CSV_FILENAME: str = "test.csv"
+
+
+def load_data(path=LOCAL_SAVE_PATH, filename=LOCAL_TRAIN_CSV_FILENAME):
+    csv_path = os.path.join(path, filename)
+    return pd.read_csv(csv_path)
+
+
+def split_train_test(data, test_ratio, r_seed=42):
+    np.random.seed(r_seed)  # make sure the shuffle is the same every time
+    shuffled = np.random.permutation(len(data))
+    test_set_size = int(len(data) * test_ratio)
+    test_indices = shuffled[:test_set_size]
+    train_indices = shuffled[test_set_size:]
+    return data.iloc[train_indices], data.iloc[test_indices]
+
+
 if __name__ == '__main__':
-    X_train, X_test, y_train, y_test = fetch_train_test_split()
+    # X_train, X_test, y_train, y_test = fetch_train_test_split()
     # print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
     # for now, simplify problem to detecting number 5 only
     # sot convert labels so only fives are true
-    y_train_5 = (y_train == 5)
-    y_test_5 = (y_test == 5)
+    # y_train_5 = (y_train == 5)
+    # y_test_5 = (y_test == 5)
 
     # trained_classifier = train_SGD(X_train, y_train_5)
 
-    some_digit = X_train[0]
+    # some_digit = X_train[0]
     # plot_digit(some_digit)
     # print(trained_classifier.predict([some_digit]))
 
@@ -328,8 +349,7 @@ if __name__ == '__main__':
     print(accuracy_score(y_test, y_pred_grid))
     """
 
-    print(X_train.shape)
-
+    """    
     # EX 2 Image shift
 
     # test digit shift:
@@ -357,5 +377,52 @@ if __name__ == '__main__':
     y_pred = knn_clf.predict(X_test)
     # result is slightly more accurate: 0.9763 vs 0.9714
     print(accuracy_score(y_test, y_pred))
+    """
+
+    from sklearn.base import BaseEstimator, TransformerMixin
+    from sklearn.pipeline import Pipeline
+    from sklearn.impute import SimpleImputer
+    from sklearn.preprocessing import OneHotEncoder
+
+    class DataFrameSelector(BaseEstimator, TransformerMixin):
+        # class for use with pipeline that will return only the selected columns
+        def __init__(self, attribute_names):
+            self.attribute_names = attribute_names
+
+        def fit(self, X, y=None):
+            return self
+
+        def transform(self, X):
+            return X[self.attribute_names]
+
+
+    class MostFrequentImputer(BaseEstimator, TransformerMixin):
+        # imputer for categorical data, will set the most common value if none set
+        def __init__(self):
+            self.most_frequent_ = None
+
+        def fit(self, X, y=None):
+            self.most_frequent_ = pd.Series([X[c].value_counts().index[0] for c in X],
+                                            index=X.columns)
+            return self
+
+        def transform(self, X, y=None):
+            return X.fillna(self.most_frequent_)
+
+
+    train_data = load_data()
+    numeric_pipeline = Pipeline([
+        ("select_numeric", DataFrameSelector(["Age", "SibSp", "Parch", "Fare"])),
+        ("imputer", SimpleImputer(strategy="median")),  # imputer will replace empty values with median
+    ])
+
+    print(numeric_pipeline.fit_transform(train_data))
+
+    categorical_pipeline = Pipeline([
+        ("select_categorical", DataFrameSelector(["Pclass", "Sex", "Embarked"])),  # pick only the categorical cols
+        ("mf_imputer", MostFrequentImputer()),  # replace empty values with the most common value
+        ("categorical_encoder", OneHotEncoder(sparse=False)),
+    ])
+    print(categorical_pipeline.fit_transform(train_data))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
