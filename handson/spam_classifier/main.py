@@ -54,5 +54,7 @@ if __name__ == '__main__':
     ham_emails = [load_emails(name, HAM_PATH) for name in ham_filenames]
     spam_emails = [load_emails(name, SPAM_PATH) for name in spam_filenames]
 
+    print(structures_counter(ham_emails).most_common())
+    print(structures_counter(spam_emails).most_common())
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
