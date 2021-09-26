@@ -374,6 +374,7 @@ if __name__ == '__main__':
     from sklearn.impute import SimpleImputer
     from sklearn.preprocessing import OneHotEncoder
     from sklearn.pipeline import FeatureUnion
+    from sklearn.model_selection import GridSearchCV
 
     LOCAL_SAVE_PATH: str = os.path.join("datasets")
     LOCAL_TRAIN_CSV_FILENAME: str = "train.csv"
@@ -452,7 +453,7 @@ if __name__ == '__main__':
     svm_clf.fit(X_train, y_train)
 
     X_test = pre_pipeline.transform(test_data)
-    y_pred = svm_clf.predict(X_test)
+    svm_y_pred = svm_clf.predict(X_test)
 
     # the kaggle titanic test data does not have labels, so use cross validation to check accuracy
     svm_cv_scores = do_cross_validation(svm_clf, X_train, y_train, cv=10)
@@ -464,11 +465,32 @@ if __name__ == '__main__':
     # from sklearn.model_selection import cross_val_predict
     # from sklearn.metrics import roc_curve
 
-    forest_clf = RandomForestClassifier(random_state=42, n_estimators=100)
+    forest_clf = RandomForestClassifier(random_state=42, n_estimators=500)
     forest_clf.fit(X_train, y_train)
     forest_y_pred = forest_clf.predict(X_test)
     forest_cv_scores = do_cross_validation(forest_clf, X_train, y_train, cv=10)
     print(forest_cv_scores.mean())
+
+    """
+    param_grid = [
+        {'n_estimators': [400, 500, 600], 'max_features': [2, 4, 6]},
+    ]
+
+    # these params end up overfitting (train set better than test set
+    #param_grid = [
+    #   {'n_estimators': [700, 800, 900], 'max_features': [10,11,12]},
+    #]
+
+    forest_clf_grid = RandomForestClassifier(random_state=42)
+    grid_search = GridSearchCV(forest_clf, param_grid, cv=5,
+                               scoring='neg_mean_squared_error',
+                               return_train_score=True, n_jobs=-1, verbose=3)
+    grid_search.fit(X_train, y_train)
+    forest_cv_scores_grid = do_cross_validation(grid_search.best_estimator_, X_train, y_train, cv=10)
+    print(grid_search.best_params_)
+    print(forest_cv_scores_grid.mean())
+    forest_y_pred_grid = grid_search.best_estimator_.predict(X_test)
+    """
 
     output = np.c_[test_data["PassengerId"], forest_y_pred]
     np.savetxt("out.csv", output, delimiter=',', fmt='%s')
