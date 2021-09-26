@@ -376,15 +376,20 @@ if __name__ == '__main__':
     from sklearn.pipeline import FeatureUnion
     from sklearn.model_selection import GridSearchCV
 
-    LOCAL_SAVE_PATH: str = os.path.join("datasets")
+    LOCAL_DATA_PATH: str = os.path.join("datasets")
     LOCAL_TRAIN_CSV_FILENAME: str = "train.csv"
     LOCAL_TEST_CSV_FILENAME: str = "test.csv"
 
 
-    def load_data(path=LOCAL_SAVE_PATH, filename=LOCAL_TRAIN_CSV_FILENAME):
+    def load_data(path=LOCAL_DATA_PATH, filename=LOCAL_TRAIN_CSV_FILENAME):
         csv_path = os.path.join(path, filename)
         return pd.read_csv(csv_path)
 
+    def load_filenames_in_directory(path):
+        f = []
+        for (_, _, filenames) in os.walk(path):
+            f.extend(filenames)
+        return f
 
     class DataFrameSelector(BaseEstimator, TransformerMixin):
         # class for use with pipeline that will return only the selected columns
@@ -459,13 +464,13 @@ if __name__ == '__main__':
     svm_cv_scores = do_cross_validation(svm_clf, X_train, y_train, cv=10)
     print(svm_cv_scores.mean())
 
-    # try another model
+    # try RandomForestClassifier model
     from sklearn.ensemble import RandomForestClassifier
 
     # from sklearn.model_selection import cross_val_predict
     # from sklearn.metrics import roc_curve
 
-    forest_clf = RandomForestClassifier(random_state=42, n_estimators=500)
+    forest_clf = RandomForestClassifier(random_state=42, n_estimators=400)
     forest_clf.fit(X_train, y_train)
     forest_y_pred = forest_clf.predict(X_test)
     forest_cv_scores = do_cross_validation(forest_clf, X_train, y_train, cv=10)
@@ -492,11 +497,20 @@ if __name__ == '__main__':
     forest_y_pred_grid = grid_search.best_estimator_.predict(X_test)
     """
 
+    from sklearn.linear_model import SGDClassifier
+    sgd_clf = SGDClassifier(random_state=42, max_iter=5, tol=-np.infty)
+    sgd_clf.fit(X_train, y_train)
+    sgd_y_pred = sgd_clf.predict(X_test)
+    sgd_cv_scores = do_cross_validation(sgd_clf, X_train, y_train, cv=10)
+    print(sgd_cv_scores.mean())
+
+    """
     output = np.c_[test_data["PassengerId"], forest_y_pred]
     np.savetxt("out.csv", output, delimiter=',', fmt='%s')
 
     df = pd.DataFrame(output, columns=["PassengerId", "Survived"])
     df.to_csv("out_pd.csv", index=False, header=True, sep=",")
+    """
 
     """
     plt.figure(figsize=(8,4))
