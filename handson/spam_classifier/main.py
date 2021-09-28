@@ -9,6 +9,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
+import nltk
 
 import re
 from html import unescape
@@ -107,6 +108,11 @@ if __name__ == '__main__':
     sample_html_spam = html_spam_emails[7]
     print(html_to_plain_text(sample_html_spam.get_content())[:1000], "...")
     print(email_to_text(sample_html_spam)[:100], "...")
+
+    # stemming
+    stemmer = nltk.PorterStemmer()
+    for word in ("Computations", "Computation", "Computing", "Computed", "Compute", "Compulsive"):
+        print(word, "->", stemmer.stem(word))
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
