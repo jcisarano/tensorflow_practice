@@ -3,6 +3,7 @@ import email
 import email.policy
 from collections import Counter
 
+
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -55,6 +56,23 @@ def html_to_plain_text(html):
     return unescape(text)
 
 
+def email_to_text(email):
+    html = None
+    for part in email.walk():
+        content_type = part.get_content_type()
+        if content_type not in ("text/plain", "text/html"):
+            continue
+        try:
+            content = part.get_content()
+        except:  # in case of encoding issues
+            content = str(part.get_payload())
+        if content_type == "text/plain":
+            return content
+        else:
+            html = content
+        if html:
+            return html_to_plain_text(html)
+
 
 DATASET_PATH: str = os.path.join("datasets")
 SPAM_PATH: str = os.path.join(DATASET_PATH, "spam")
@@ -88,7 +106,7 @@ if __name__ == '__main__':
                         if get_email_structure(email) == "text/html"]
     sample_html_spam = html_spam_emails[7]
     print(html_to_plain_text(sample_html_spam.get_content())[:1000], "...")
-
+    print(email_to_text(sample_html_spam)[:100], "...")
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
