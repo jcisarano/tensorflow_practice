@@ -10,6 +10,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 import nltk
 from scipy.sparse import csr_matrix
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
 
 import re
 from html import unescape
@@ -200,5 +202,8 @@ if __name__ == '__main__':
     ])
 
     X_train_transformed = preprocess_pipeline.fit_transform(X_train)
+    log_clf = LogisticRegression(solver="liblinear", random_state=42)
+    score = cross_val_score(log_clf, X_train_transformed, y_train, cv=3, verbose=3)
+    print(score.mean())
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
