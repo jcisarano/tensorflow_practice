@@ -66,6 +66,7 @@ if __name__ == '__main__':
     # Compiling - change optimization function, learning rate,
     # Fitting - more epochs, more data
 
+    # redo the model, but with more training epochs
     model = tf.keras.Sequential([
         tf.keras.layers.Dense(1)
     ])
@@ -80,5 +81,16 @@ if __name__ == '__main__':
     print(model.predict([17.]))
 
 
+    # try other tweaks
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(1)
+    ])
+
+    model.compile(loss=tf.keras.losses.mae,
+                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
+                  metrics=["mae"])
+    model.fit(X, y, epochs=1000)
+    print(X, y)
+    print(model.predict([17.]))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
