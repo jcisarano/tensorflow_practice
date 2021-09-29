@@ -66,5 +66,19 @@ if __name__ == '__main__':
     # Compiling - change optimization function, learning rate,
     # Fitting - more epochs, more data
 
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(1)
+    ])
+
+    model.compile(loss=tf.keras.losses.mae,
+                  optimizer=tf.keras.optimizers.SGD(),
+                  metrics=["mae"])
+
+    model.fit(X, y, epochs=100)
+
+    print(X, y)
+    print(model.predict([17.]))
+
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
