@@ -83,6 +83,7 @@ if __name__ == '__main__':
 
     # try other tweaks
     model = tf.keras.Sequential([
+        tf.keras.layers.Dense(100, activation="relu"),
         tf.keras.layers.Dense(1)
     ])
 
@@ -91,6 +92,6 @@ if __name__ == '__main__':
                   metrics=["mae"])
     model.fit(X, y, epochs=1000)
     print(X, y)
-    print(model.predict([17.]))
+    print(model.predict([17., 20., 35., 88.]))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
