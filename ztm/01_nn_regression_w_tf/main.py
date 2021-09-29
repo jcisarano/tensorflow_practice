@@ -20,7 +20,45 @@ if __name__ == '__main__':
 
     input_shape = X[0].shape
     output_shape = y[0].shape
-    print(input_shape, output_shape)
+    print(input_shape, output_shape) # scalar values, so output has no shape
     print(X[0], y[0])
+
+    # turn numpy arrays into tensors and check shapes again
+    X = tf.cast(tf.constant(X), tf.float32)
+    y = tf.cast(tf.constant(y), tf.float32)
+    print(X, y)
+    input_shape = X[0].shape
+    output_shape = y[0].shape
+    print(input_shape, output_shape)  # still no dims to shape
+
+    # Steps to modelling with tensorflow
+    # Prep data - format it to tensors, clean it up
+    # Create model, input/output layers, hidden layers if needed
+    # Compile model - define loss function, optimizer (how the model will improve itself) and evaluation metric (how to interpret its performance)
+    # Fit model
+    # Evaluate
+    # Improve through experimentation
+    # Save and reload if needed
+
+    tf.random.set_seed(42)
+    # Create model using Sequential API
+    # Sequential groups a linear stack of layers for model
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(1)
+    ])
+
+    # Compile model
+    # Mean Absolute Error (MAE): loss = mean(abs(y_true - y_pred), axis=1)
+    # Stochastic Gradient Descent (SGD): tells NN how to improve
+    model.compile(loss=tf.keras.losses.mae,
+                  optimizer=tf.keras.optimizers.SGD(),
+                  metrics=["mae"])
+
+    # Fit model
+    model.fit(X, y, epochs=5)
+
+    # try prediction
+    print(X, y)
+    print(model.predict([17.]))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
