@@ -61,4 +61,10 @@ if __name__ == '__main__':
     print(X, y)
     print(model.predict([17.]))
 
+    # Improving model
+    # Creating - more layers, more hidden units, change activation function
+    # Compiling - change optimization function, learning rate,
+    # Fitting - more epochs, more data
+
+
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
