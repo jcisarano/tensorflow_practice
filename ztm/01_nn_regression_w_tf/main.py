@@ -217,7 +217,7 @@ if __name__ == '__main__':
 
     # two layers, trained 100 epochs
     model_2 = tf.keras.Sequential([
-        tf.keras.layers.Dense(10, activation="relu"),
+        tf.keras.layers.Dense(100, activation="relu"),
         tf.keras.layers.Dense(1),
     ])
     model_2.compile(loss=tf.keras.losses.mae,
