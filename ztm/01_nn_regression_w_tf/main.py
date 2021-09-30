@@ -146,8 +146,9 @@ if __name__ == '__main__':
     # Build neural network for data:
     # create model
     model = tf.keras.Sequential([
-        tf.keras.layers.Dense(1, input_shape=[1])  # input shape is shape of desired output, in this case a single scalar
-    ])
+        tf.keras.layers.Dense(10, input_shape=[1], name="input_layer"),
+        tf.keras.layers.Dense(1, input_shape=[1], name="output_layer")  # input shape is shape of desired output, in this case a single scalar
+    ], name="test model")
 
     model.compile(
         loss=tf.keras.losses.mae,
