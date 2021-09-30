@@ -15,12 +15,12 @@ def plot_predictions(train_data, train_labels, test_data, test_labels, predictio
     plt.show()
 
 
-def mae(y_true,y_pred):
-    return tf.metrics.mean_absolute_error(y_true=y_true, y_pred=y_pred)
+def mae(y_true, y_pred):
+    return tf.metrics.mean_absolute_error(y_true=y_true, y_pred=tf.squeeze(y_pred))
 
 
 def mse(y_true, y_pred):
-    return tf.metrics.mean_squared_error(y_true=y_true, y_pred=y_pred)
+    return tf.metrics.mean_squared_error(y_true=y_true, y_pred=tf.squeeze(y_pred))
 
 if __name__ == '__main__':
     print(tf.__version__)
@@ -187,11 +187,38 @@ if __name__ == '__main__':
 
     # another way to calculate MAE
     # need to squeeze y_pred because its shape is (10,1) where y_text is (10,)
-    mae = mae(y_test, tf.squeeze(y_pred))
-    print(mae)
+    ma = mae(y_test, y_pred)
+    print(ma)
 
     # calculate MSE
-    mse = mse(y_test, tf.squeeze(y_pred))
-    print(mse)
+    ms = mse(y_test, y_pred)
+    print(ms)
+
+    # experiments to improve the model
+    # build -> fit -> evaluate -> tweak ->fit ....
+    # get more data
+    # increase model size, more layers, more hidden units per layer,
+    # train longer
+
+    # same as original, trained 100 epochs
+    model_1 = tf.keras.Sequential([
+        tf.keras.layers.Dense(1)
+    ])
+    model_1.compile(loss=tf.keras.losses.mae,
+                    optimizer=tf.keras.optimizers.SGD(),
+                    metrics=["mae"])
+    model_1.fit(X_train, y_train, epochs=100, verbose=0)
+    y_pred_1 = model_1.predict(X_test)
+    plot_predictions(train_data=X_train, train_labels=y_train, test_data=X_test, test_labels=y_test, predictions=y_pred_1)
+
+    mae_1 = mae(y_true=y_test, y_pred=tf.squeeze(y_pred_1))
+    mse_1 = mse(y_test, y_pred_1)
+    print(mae_1, mae_1)
+
+    # two layers, trained 100 epochs
+
+
+    # two layers, trained 500 epochs
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
