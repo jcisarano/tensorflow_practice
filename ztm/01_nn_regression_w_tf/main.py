@@ -147,11 +147,11 @@ if __name__ == '__main__':
     print(X_train, X_test)
     print(y_train, y_test)
 
-    plt.figure(figsize=(10, 7))
-    plt.scatter(X_train, y_train, color="blue", label="Training data")
-    plt.scatter(X_test, y_test, color="red", label="Test data")
-    plt.legend()
-    plt.show()
+    # plt.figure(figsize=(10, 7))
+    # plt.scatter(X_train, y_train, color="blue", label="Training data")
+    # plt.scatter(X_test, y_test, color="red", label="Test data")
+    # plt.legend()
+   # plt.show()
 
     # Build neural network for data:
     # create model
@@ -181,5 +181,17 @@ if __name__ == '__main__':
     y_pred = model.predict(X_test)
 
     plot_predictions(train_data=X_train, train_labels=y_train, test_data=X_test, test_labels=y_test, predictions=y_pred)
+
+    # main evaluation metrics for regression are MAE and MSE
+    print(model.evaluate(X_test, y_test))
+
+    # another way to calculate MAE
+    # need to squeeze y_pred because its shape is (10,1) where y_text is (10,)
+    mae = tf.metrics.mean_absolute_error(y_test, tf.squeeze(y_pred))
+    print(mae)
+
+    # calculate MSE
+    mse = tf.metrics.mean_squared_error(y_test, tf.squeeze(y_pred))
+    print(mse)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
