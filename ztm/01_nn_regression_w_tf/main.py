@@ -121,19 +121,27 @@ if __name__ == '__main__':
     y = X + 10
     print(y)
 
-    plt.scatter(X, y)
-    plt.show()
+    # plt.scatter(X, y)
+    # plt.show()
 
     # test-train sets
     # training set is what the model learns from, usually 70-80% of your data
-    # validation set - tunes the model, aka dev set
-    # test set used to evaluate the model
+    # validation set - tunes the model, aka dev set, 10-15% of total data
+    # test set used to evaluate the model, 10-15% of total data
 
-    X_train = X[:int((len(X) * 0.8))]
-    X_test = X[int(len(X) * 0.8):]
-    y_train = y[:int((len(y) * 0.8))]
-    y_test = y[int(len(y) * 0.8):]
+    # split the data into training and test sets, 80/20 split
+    split_index = int(len(X) * 0.8)
+    X_train = X[:split_index]  # slices array up to the index (exclusive)
+    X_test = X[split_index:]  # slices array from index to the end (inclusive)
+    y_train = y[:split_index]
+    y_test = y[split_index:]
     print(X_train, X_test)
     print(y_train, y_test)
+
+    plt.figure(figsize=(10, 7))
+    plt.scatter(X_train, y_train, color="blue", label="Training data")
+    plt.scatter(X_test, y_test, color="red", label="Test data")
+    plt.legend()
+    plt.show()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
