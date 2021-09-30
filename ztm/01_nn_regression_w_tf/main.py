@@ -158,7 +158,11 @@ if __name__ == '__main__':
     # shows info on model, e.g. layers, output shape, # params
     # Dense layer == fully connected layers, i.e. every node in layer A connects to every other node in layer B
     print(model.summary())
-    model.fit(X_train, y_train, epochs=100, verbose=0)
+
+    # from tensorflow.keras.utils import plot_model
+    # plot_model(model=model, show_shapes=True)
+
+    # model.fit(X_train, y_train, epochs=100, verbose=0)
 
 
 
