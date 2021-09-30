@@ -6,12 +6,13 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     print(tf.__version__)
+    """
     X = np.array([-7., -4., -1., 2., 5., 8., 11., 14.])
 
     y = np.array([3., 6., 9., 12., 15., 18., 21., 24.])
 
-    plt.scatter(X, y, c="red")
-    plt.show()
+    # plt.scatter(X, y, c="red")
+    # plt.show()
 
     # examining desired output shape
     house_info = tf.constant(["bedroom", "bathroom", "garage"])
@@ -30,6 +31,7 @@ if __name__ == '__main__':
     input_shape = X[0].shape
     output_shape = y[0].shape
     print(input_shape, output_shape)  # still no dims to shape
+    """
 
     # Steps to modelling with tensorflow
     # Prep data - format it to tensors, clean it up
@@ -40,6 +42,7 @@ if __name__ == '__main__':
     # Improve through experimentation
     # Save and reload if needed
 
+    """
     tf.random.set_seed(42)
     # Create model using Sequential API
     # Sequential groups a linear stack of layers for model
@@ -47,6 +50,7 @@ if __name__ == '__main__':
         tf.keras.layers.Dense(1)
     ])
 
+    
     # Compile model
     # Mean Absolute Error (MAE): loss = mean(abs(y_true - y_pred), axis=1)
     # Stochastic Gradient Descent (SGD): tells NN how to improve
@@ -60,7 +64,9 @@ if __name__ == '__main__':
     # try prediction
     print(X, y)
     print(model.predict([17.]))
+    """
 
+    """
     # Improving model
     # Creating - more layers, more hidden units, change activation function
     # Compiling - change optimization function, learning rate,
@@ -83,15 +89,51 @@ if __name__ == '__main__':
 
     # try other tweaks
     model = tf.keras.Sequential([
-        tf.keras.layers.Dense(100, activation="relu"),
+        tf.keras.layers.Dense(100, activation="None"),
         tf.keras.layers.Dense(1)
     ])
 
+    # the learning rate can be the most important hyper parameter to tweak
     model.compile(loss=tf.keras.losses.mae,
                   optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
                   metrics=["mae"])
-    model.fit(X, y, epochs=1000)
+    model.fit(X, y, epochs=100)
     print(X, y)
-    print(model.predict([17., 20., 35., 88.]))
+    print(model.predict([17., 20., 35., 88., 150.]))
+    """
+
+    # typical workflow
+    # build model -> fit -> evaluate -> tweak -> fit -> evaluate -> tweak ...
+
+    # evaluation means "visualize, visualize, visualize"
+    # what data are we working with? what does it look like?
+    # what does the model look like?
+    # how does the model perform while it learns?
+    # how does the predictions line up against the ground truth (the original labels)?
+
+    # a bigger test case, with a bigger dataset
+    # creates tensor with values from -100 to 100 in steps of 4
+    X = tf.range(-100, 100, 4)
+    X = tf.random.shuffle(X, seed=42)  # shuffled data is better for training, I think? Avoids patterns due to order
+    print(X)
+
+    # labels (same relationship as before: X val plus 10)
+    y = X + 10
+    print(y)
+
+    plt.scatter(X, y)
+    plt.show()
+
+    # test-train sets
+    # training set is what the model learns from, usually 70-80% of your data
+    # validation set - tunes the model, aka dev set
+    # test set used to evaluate the model
+
+    X_train = X[:int((len(X) * 0.8))]
+    X_test = X[int(len(X) * 0.8):]
+    y_train = y[:int((len(y) * 0.8))]
+    y_test = y[int(len(y) * 0.8):]
+    print(X_train, X_test)
+    print(y_train, y_test)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
