@@ -4,6 +4,16 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+def plot_predictions(train_data, train_labels, test_data, test_labels, predictions):
+    # plots training, test data and predictions against ground truth
+    plt.scatter(train_data, train_labels, c="blue", label="Training data")
+    plt.scatter(test_data, test_labels, c="green", label="Testing data")
+    plt.scatter(test_data, predictions, c="red", label="Predictions")
+    plt.legend()
+    plt.show()
+
+
 if __name__ == '__main__':
     print(tf.__version__)
     """
@@ -147,8 +157,9 @@ if __name__ == '__main__':
     # create model
     model = tf.keras.Sequential([
         tf.keras.layers.Dense(10, input_shape=[1], name="input_layer"),
-        tf.keras.layers.Dense(1, input_shape=[1], name="output_layer")  # input shape is shape of desired output, in this case a single scalar
-    ], name="test model")
+        tf.keras.layers.Dense(1, input_shape=[1], name="output_layer")
+        # input shape is shape of desired output, in this case a single scalar
+    ], name="test_model")
 
     model.compile(
         loss=tf.keras.losses.mae,
@@ -165,6 +176,10 @@ if __name__ == '__main__':
 
     # model.fit(X_train, y_train, epochs=100, verbose=0)
 
+    # plot predictions against ground truth labels
+    # e.g. y_test vs y_pred
+    y_pred = model.predict(X_test)
 
+    plot_predictions(train_data=X_train, train_labels=y_train, test_data=X_test, test_labels=y_test, predictions=y_pred)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
