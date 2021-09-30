@@ -111,15 +111,14 @@ if __name__ == '__main__':
     # how does the model perform while it learns?
     # how does the predictions line up against the ground truth (the original labels)?
 
+    tf.random.set_seed(42)
     # a bigger test case, with a bigger dataset
     # creates tensor with values from -100 to 100 in steps of 4
     X = tf.range(-100, 100, 4)
-    X = tf.random.shuffle(X, seed=42)  # shuffled data is better for training, I think? Avoids patterns due to order
-    print(X)
+    # X = tf.random.shuffle(X, seed=42)  # shuffled data is better for training, I think? Avoids patterns due to order
 
     # labels (same relationship as before: X val plus 10)
     y = X + 10
-    print(y)
 
     # plt.scatter(X, y)
     # plt.show()
@@ -143,5 +142,24 @@ if __name__ == '__main__':
     plt.scatter(X_test, y_test, color="red", label="Test data")
     plt.legend()
     plt.show()
+
+    # Build neural network for data:
+    # create model
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(1, input_shape=[1])  # input shape is shape of desired output, in this case a single scalar
+    ])
+
+    model.compile(
+        loss=tf.keras.losses.mae,
+        optimizer=tf.keras.optimizers.SGD(),
+        metrics=["mae"]
+    )
+
+    # shows info on model, e.g. layers, output shape, # params
+    # Dense layer == fully connected layers, i.e. every node in layer A connects to every other node in layer B
+    print(model.summary())
+    model.fit(X_train, y_train, epochs=100, verbose=0)
+
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
