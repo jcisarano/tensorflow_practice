@@ -7,12 +7,20 @@ import matplotlib.pyplot as plt
 
 def plot_predictions(train_data, train_labels, test_data, test_labels, predictions):
     # plots training, test data and predictions against ground truth
+    plt.figure(figsize=(10, 7))
     plt.scatter(train_data, train_labels, c="blue", label="Training data")
     plt.scatter(test_data, test_labels, c="green", label="Testing data")
     plt.scatter(test_data, predictions, c="red", label="Predictions")
     plt.legend()
     plt.show()
 
+
+def mae(y_true,y_pred):
+    return tf.metrics.mean_absolute_error(y_true=y_true, y_pred=y_pred)
+
+
+def mse(y_true, y_pred):
+    return tf.metrics.mean_squared_error(y_true=y_true, y_pred=y_pred)
 
 if __name__ == '__main__':
     print(tf.__version__)
@@ -147,18 +155,10 @@ if __name__ == '__main__':
     print(X_train, X_test)
     print(y_train, y_test)
 
-    # plt.figure(figsize=(10, 7))
-    # plt.scatter(X_train, y_train, color="blue", label="Training data")
-    # plt.scatter(X_test, y_test, color="red", label="Test data")
-    # plt.legend()
-   # plt.show()
-
     # Build neural network for data:
     # create model
     model = tf.keras.Sequential([
-        tf.keras.layers.Dense(10, input_shape=[1], name="input_layer"),
-        tf.keras.layers.Dense(1, input_shape=[1], name="output_layer")
-        # input shape is shape of desired output, in this case a single scalar
+        tf.keras.layers.Dense(1, input_shape=[1], name="output_layer")  # input shape is shape of desired output, in this case a single scalar
     ], name="test_model")
 
     model.compile(
@@ -187,11 +187,11 @@ if __name__ == '__main__':
 
     # another way to calculate MAE
     # need to squeeze y_pred because its shape is (10,1) where y_text is (10,)
-    mae = tf.metrics.mean_absolute_error(y_test, tf.squeeze(y_pred))
+    mae = mae(y_test, tf.squeeze(y_pred))
     print(mae)
 
     # calculate MSE
-    mse = tf.metrics.mean_squared_error(y_test, tf.squeeze(y_pred))
+    mse = mse(y_test, tf.squeeze(y_pred))
     print(mse)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
