@@ -306,5 +306,29 @@ if __name__ == '__main__':
     # we will use one-hot encoding
     insurance_one_hot = pd.get_dummies(insurance)
 
+    y = insurance_one_hot["charges"]
+    X = insurance_one_hot.drop(columns=['charges'])
+    split_index = int(len(X) * 0.8)
+    X_train = X[:split_index]
+    y_train = y[:split_index]
+    X_test = X[split_index:]
+    y_test = y[split_index:]
+
+    print()
+
+    insurance_model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(1)
+    ])
+
+    insurance_model.compile(loss=tf.keras.losses.mae,
+                            optimizer=tf.keras.optimizers.SGD(),
+                            metrics=["mae"])
+
+    insurance_model.fit(X_train, y_train, epochs=100, verbose=0)
+
+    insurance_pred = insurance_model.predict(X_test, workers=-1, verbose=3)
+
+
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
