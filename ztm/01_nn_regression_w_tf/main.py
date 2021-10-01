@@ -307,16 +307,26 @@ if __name__ == '__main__':
     insurance_one_hot = pd.get_dummies(insurance)
 
     y = insurance_one_hot["charges"]
-    X = insurance_one_hot.drop(columns=['charges'])
-    split_index = int(len(X) * 0.8)
-    X_train = X[:split_index]
-    y_train = y[:split_index]
-    X_test = X[split_index:]
-    y_test = y[split_index:]
+    X = insurance_one_hot.drop(columns=['charges'], axis=1)
+    # print(X.head())
+    # print(y.head())
 
-    print()
+    # split_index = int(len(X) * 0.8)
+    # X_train = X[:split_index]
+    # y_train = y[:split_index]
+    # X_test = X[split_index:]
+    # y_test = y[split_index:]
 
+    # easier way to split, does random shuffle of data
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    print(len(X), len(X_train), len(X_test))
+
+
+    # first model
+    tf.random.set_seed = 42
     insurance_model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(100, activation="relu"),
         tf.keras.layers.Dense(1)
     ])
 
@@ -324,9 +334,13 @@ if __name__ == '__main__':
                             optimizer=tf.keras.optimizers.SGD(),
                             metrics=["mae"])
 
-    insurance_model.fit(X_train, y_train, epochs=100, verbose=0)
+    insurance_model.fit(X_train, y_train, epochs=100, workers=-1, verbose=0)
+    print(insurance_model.evaluate(X_test, y_test, verbose=0))
 
-    insurance_pred = insurance_model.predict(X_test, workers=-1, verbose=3)
+    # error is significant, given average data:
+    print(y_train.median(), y_train.mean())
+
+    # insurance_pred = insurance_model.predict(X_test, workers=-1, verbose=3)
 
 
 
