@@ -3,6 +3,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def plot_predictions(train_data, train_labels, test_data, test_labels, predictions):
@@ -247,6 +248,30 @@ if __name__ == '__main__':
     mae_3 = mae(y_test, y_pred_3)
     mse_3 = mae(y_test, y_pred_3)
     print(mae_3, mse_3)
+
+    # comparing results from different models using pandas DataFrame
+    model_results = [["model_1", mae_1.numpy(), mse_1.numpy()],
+                     ["model_2", mae_2.numpy(), mse_2.numpy()],
+                     ["model_3", mae_3.numpy(), mse_3.numpy()]]
+    all_results = pd.DataFrame(model_results, columns=["model", "mae", "mse"])
+    print(all_results)
+
+    # experiments should start small and increase in size/complexity only when needed
+    # try to keep time between experiments small
+    # the more experiments you do, the more you will figure out what works/does not work
+    # experiment, experiment, experiment
+
+    # TensorBoard is a tf library to help track modeling experiments
+    # Weights & Biases - a tool for tracking all kinds of ML experiments, works with TensorBoard
+
+    # save model to use again later
+    # two formats for save: SavedModel and HDF5, determined by file extension. SavedModel is default
+    # hdf5 is good for large models in general format usable by different applications outside tensorflow
+    # SavedModel is good for tensorflow only use
+    model_3.save(filepath='models/model_3')
+    model_3.save(filepath='models/model_3_hdf5_format.h5')
+
+    
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
