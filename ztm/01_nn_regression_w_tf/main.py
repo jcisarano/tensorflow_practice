@@ -292,5 +292,7 @@ if __name__ == '__main__':
     print(y_pred_3 == y_pred_loaded_via_h5)
 
 
+    # larger example - insurance dataset
+    # insurance = pd.read_csv("https://raw.githubusercontent.com/stedy/Machine-Learning-with-R-datasets/master/insurance.csv")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
