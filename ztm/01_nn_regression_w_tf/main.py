@@ -153,9 +153,10 @@ if __name__ == '__main__':
     X_test = X[split_index:]  # slices array from index to the end (inclusive)
     y_train = y[:split_index]
     y_test = y[split_index:]
-    print(X_train, X_test)
-    print(y_train, y_test)
+    # print(X_train, X_test)
+    # print(y_train, y_test)
 
+    """
     # Build neural network for data:
     # create model
     model = tf.keras.Sequential([
@@ -194,6 +195,8 @@ if __name__ == '__main__':
     # calculate MSE
     ms = mse(y_test, y_pred)
     print(ms)
+    """
+
 
     # experiments to improve the model
     # build -> fit -> evaluate -> tweak ->fit ....
@@ -201,6 +204,7 @@ if __name__ == '__main__':
     # increase model size, more layers, more hidden units per layer,
     # train longer
 
+    """
     # same as original, trained 100 epochs
     model_1 = tf.keras.Sequential([
         tf.keras.layers.Dense(1)
@@ -232,6 +236,8 @@ if __name__ == '__main__':
     mae_2 = mae(y_test, y_pred_2)
     mse_2 = mse(y_test, y_pred_2)
     print(mae_2, mse_2)
+    """
+
 
     # two layers, trained 500 epochs
     model_3 = tf.keras.Sequential([
@@ -249,12 +255,14 @@ if __name__ == '__main__':
     mse_3 = mae(y_test, y_pred_3)
     print(mae_3, mse_3)
 
+    """
     # comparing results from different models using pandas DataFrame
     model_results = [["model_1", mae_1.numpy(), mse_1.numpy()],
                      ["model_2", mae_2.numpy(), mse_2.numpy()],
                      ["model_3", mae_3.numpy(), mse_3.numpy()]]
     all_results = pd.DataFrame(model_results, columns=["model", "mae", "mse"])
     print(all_results)
+    """
 
     # experiments should start small and increase in size/complexity only when needed
     # try to keep time between experiments small
