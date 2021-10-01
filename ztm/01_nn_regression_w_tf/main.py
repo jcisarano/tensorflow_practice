@@ -271,7 +271,18 @@ if __name__ == '__main__':
     model_3.save(filepath='models/model_3')
     model_3.save(filepath='models/model_3_hdf5_format.h5')
 
-    
+    # load saved SavedModel format
+    loaded_via_sm = tf.keras.models.load_model("models/model_3")
+    print(loaded_via_sm.summary())
+    y_pred_loaded_via_sm = loaded_via_sm.predict(X_test)
+    print(y_pred_3 == y_pred_loaded_via_sm)
+
+    # load saved HDF5 format
+    loaded_via_H5 = tf.keras.models.load_model("models/model_3_hdf5_format.h5")
+    print(loaded_via_H5.summary())
+    y_pred_loaded_via_h5 = loaded_via_H5.predict(X_test)
+    print(y_pred_3 == y_pred_loaded_via_h5)
+
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
