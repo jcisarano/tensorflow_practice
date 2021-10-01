@@ -121,6 +121,7 @@ if __name__ == '__main__':
     print(model.predict([17., 20., 35., 88., 150.]))
     """
 
+    """
     # typical workflow
     # build model -> fit -> evaluate -> tweak -> fit -> evaluate -> tweak ...
 
@@ -155,6 +156,7 @@ if __name__ == '__main__':
     y_test = y[split_index:]
     # print(X_train, X_test)
     # print(y_train, y_test)
+    """
 
     """
     # Build neural network for data:
@@ -238,7 +240,7 @@ if __name__ == '__main__':
     print(mae_2, mse_2)
     """
 
-
+    """
     # two layers, trained 500 epochs
     model_3 = tf.keras.Sequential([
         tf.keras.layers.Dense(100, activation="relu"),
@@ -254,6 +256,7 @@ if __name__ == '__main__':
     mae_3 = mae(y_test, y_pred_3)
     mse_3 = mae(y_test, y_pred_3)
     print(mae_3, mse_3)
+    """
 
     """
     # comparing results from different models using pandas DataFrame
@@ -272,6 +275,7 @@ if __name__ == '__main__':
     # TensorBoard is a tf library to help track modeling experiments
     # Weights & Biases - a tool for tracking all kinds of ML experiments, works with TensorBoard
 
+    """
     # save model to use again later
     # two formats for save: SavedModel and HDF5, determined by file extension. SavedModel is default
     # hdf5 is good for large models in general format usable by different applications outside tensorflow
@@ -290,9 +294,17 @@ if __name__ == '__main__':
     print(loaded_via_H5.summary())
     y_pred_loaded_via_h5 = loaded_via_H5.predict(X_test)
     print(y_pred_3 == y_pred_loaded_via_h5)
-
+    """
 
     # larger example - insurance dataset
+    # to predict insurance charges based on other indicators
     # insurance = pd.read_csv("https://raw.githubusercontent.com/stedy/Machine-Learning-with-R-datasets/master/insurance.csv")
+    insurance = pd.read_csv("datasets/insurance.csv")
+    print(insurance)
+
+    # need to reformat data to convert non-numerical input features into numerical features
+    # we will use one-hot encoding
+    insurance_one_hot = pd.get_dummies(insurance)
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
