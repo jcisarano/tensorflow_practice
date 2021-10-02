@@ -324,7 +324,7 @@ if __name__ == '__main__':
 
 
     # first model
-    tf.random.set_seed = 42
+    tf.random.set_seed(42)
     insurance_model = tf.keras.models.Sequential([
         tf.keras.layers.Dense(100, activation="relu"),
         tf.keras.layers.Dense(1)
@@ -341,6 +341,22 @@ if __name__ == '__main__':
     print(y_train.median(), y_train.mean())
 
     # insurance_pred = insurance_model.predict(X_test, workers=-1, verbose=3)
+
+    # experiments to improve model performance
+    # 1 add an extra layer with more hidden units, change optimizer to Adam()
+    # 2 train for longer
+    # 3 ???
+
+    # tf.random.set_seed(42)
+    insurance_model_2 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(100, activation="relu"),
+        tf.keras.layers.Dense(10),
+        tf.keras.layers.Dense(1)
+    ])
+
+    insurance_model_2.compile(optimizer=tf.keras.optimizers.Adam(), metrics=["mae"], loss=tf.keras.losses.mae)
+    insurance_model_2.fit(X_train, y_train, epochs=100, workers=-1, verbose=0)
+    print(insurance_model_2.evaluate(X_test, y_test, verbose=0))
 
 
 
