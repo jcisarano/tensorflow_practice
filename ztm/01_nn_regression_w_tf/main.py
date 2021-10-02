@@ -296,12 +296,11 @@ if __name__ == '__main__':
     print(y_pred_3 == y_pred_loaded_via_h5)
     """
 
-    """
     # larger example - insurance dataset
     # to predict insurance charges based on other indicators
     # insurance = pd.read_csv("https://raw.githubusercontent.com/stedy/Machine-Learning-with-R-datasets/master/insurance.csv")
     insurance = pd.read_csv("datasets/insurance.csv")
-    print(insurance)
+    # print(insurance)
 
     # need to reformat data to convert non-numerical input features into numerical features
     # we will use one-hot encoding
@@ -321,8 +320,7 @@ if __name__ == '__main__':
     # easier way to split, does random shuffle of data
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    print(len(X), len(X_train), len(X_test))
-    """
+    # print(len(X), len(X_train), len(X_test))
 
     """
     # first model
@@ -350,7 +348,6 @@ if __name__ == '__main__':
     # 2 train for longer
     # 3 ???
 
-    """
     tf.random.set_seed(42)
     insurance_model_2 = tf.keras.models.Sequential([
         tf.keras.layers.Dense(100, activation="relu"),
@@ -370,9 +367,9 @@ if __name__ == '__main__':
         tf.keras.layers.Dense(1),
     ])
     insurance_model_3.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(), metrics=["mae"])
-    history = insurance_model_3.fit(X_train, y_train, epochs=400, workers=-1, verbose=0)
+    history = insurance_model_3.fit(X_train, y_train, epochs=200, workers=-1, verbose=0)
     print(insurance_model_3.evaluate(X_test, y_test, verbose=0))
-    """
+
 
     # pd.DataFrame(history.history).plot()
     # plt.ylabel("loss")
@@ -400,9 +397,10 @@ if __name__ == '__main__':
     from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
     from sklearn.model_selection import train_test_split
 
+    tf.random.set_seed(42)
     # reimport the data to start over fresh
     insurance = pd.read_csv("datasets/insurance.csv")
-    print(insurance)
+    # print(insurance)
     ct = make_column_transformer(
         (MinMaxScaler(), ["age", "bmi", "children"]),
         (OneHotEncoder(handle_unknown="ignore"), ["sex", "smoker", "region"])
@@ -425,6 +423,15 @@ if __name__ == '__main__':
     # print(X_train.loc[0])
     # print(X_train_normal[0])
     # print(X_train.shape, X_train_normal.shape)
+
+    insurance_model_4 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(100, activation="relu"),
+        tf.keras.layers.Dense(10),
+        tf.keras.layers.Dense(1),
+    ])
+    insurance_model_4.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(), metrics=["mae"])
+    insurance_model_4.fit(X_train_normal, y_train, workers=-1, epochs=100, verbose=0)
+    print(insurance_model_4.evaluate(X_test_normal, y_test, workers=-1, verbose=0))
 
 
 
