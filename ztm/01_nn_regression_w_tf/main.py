@@ -366,7 +366,19 @@ if __name__ == '__main__':
         tf.keras.layers.Dense(1),
     ])
     insurance_model_3.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(), metrics=["mae"])
-    insurance_model_3.fit(X_train, y_train, epochs=400, workers=-1, verbose=0)
+    history = insurance_model_3.fit(X_train, y_train, epochs=400, workers=-1, verbose=0)
     print(insurance_model_3.evaluate(X_test, y_test, verbose=0))
+
+    pd.DataFrame(history.history).plot()
+    plt.ylabel("loss")
+    plt.xlabel("epochs")
+    plt.show()
+    
+    # improving data preprocessing: normalization and standardization
+    # usual preprocessing steps:
+    # 1 turn all data into numbers (nn can't use strings)
+    # 2 make sure all tensor shapes fit
+    # 3 scale features using normalization/standardization
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
