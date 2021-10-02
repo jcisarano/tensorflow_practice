@@ -359,6 +359,14 @@ if __name__ == '__main__':
     print(insurance_model_2.evaluate(X_test, y_test, verbose=0))
 
 
-
+    tf.random.set_seed(42)
+    insurance_model_3 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(100, activation="relu"),
+        tf.keras.layers.Dense(10),
+        tf.keras.layers.Dense(1),
+    ])
+    insurance_model_3.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(), metrics=["mae"])
+    insurance_model_3.fit(X_train, y_train, epochs=400, workers=-1, verbose=0)
+    print(insurance_model_3.evaluate(X_test, y_test, verbose=0))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
