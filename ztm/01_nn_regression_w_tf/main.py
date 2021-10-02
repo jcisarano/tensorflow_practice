@@ -296,6 +296,7 @@ if __name__ == '__main__':
     print(y_pred_3 == y_pred_loaded_via_h5)
     """
 
+    """
     # larger example - insurance dataset
     # to predict insurance charges based on other indicators
     # insurance = pd.read_csv("https://raw.githubusercontent.com/stedy/Machine-Learning-with-R-datasets/master/insurance.csv")
@@ -321,8 +322,9 @@ if __name__ == '__main__':
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     print(len(X), len(X_train), len(X_test))
+    """
 
-
+    """
     # first model
     tf.random.set_seed(42)
     insurance_model = tf.keras.models.Sequential([
@@ -341,13 +343,15 @@ if __name__ == '__main__':
     print(y_train.median(), y_train.mean())
 
     # insurance_pred = insurance_model.predict(X_test, workers=-1, verbose=3)
+    """
 
     # experiments to improve model performance
     # 1 add an extra layer with more hidden units, change optimizer to Adam()
     # 2 train for longer
     # 3 ???
 
-    # tf.random.set_seed(42)
+    """
+    tf.random.set_seed(42)
     insurance_model_2 = tf.keras.models.Sequential([
         tf.keras.layers.Dense(100, activation="relu"),
         tf.keras.layers.Dense(10),
@@ -368,17 +372,60 @@ if __name__ == '__main__':
     insurance_model_3.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(), metrics=["mae"])
     history = insurance_model_3.fit(X_train, y_train, epochs=400, workers=-1, verbose=0)
     print(insurance_model_3.evaluate(X_test, y_test, verbose=0))
+    """
 
-    pd.DataFrame(history.history).plot()
-    plt.ylabel("loss")
-    plt.xlabel("epochs")
-    plt.show()
-    
+    # pd.DataFrame(history.history).plot()
+    # plt.ylabel("loss")
+    # plt.xlabel("epochs")
+    # plt.show()
+
     # improving data preprocessing: normalization and standardization
     # usual preprocessing steps:
     # 1 turn all data into numbers (nn can't use strings)
     # 2 make sure all tensor shapes fit
-    # 3 scale features using normalization/standardization
+    # 3 scale features using normalization/standardization (nn tend to prefer normalization)
+
+    # X["age"].plot(kind="hist")
+    # X["bmi"].plot(kind="hist")
+    # plt.show()
+
+    # scikit-learn scalers
+    # MinMaxScaler - normalizes all values (0-1) while maintaining the original distribution
+    # StandardScaler - removes mean and divides all values by standard deviation, note: reduces the effect of outliers
+    # StandardScaler creates a normal distribution, bell-shaped, Gaussian
+    # Generally, it is worth trying both to see which is better
+
+    # preprocessing practice
+    from sklearn.compose import make_column_transformer
+    from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
+    from sklearn.model_selection import train_test_split
+
+    # reimport the data to start over fresh
+    insurance = pd.read_csv("datasets/insurance.csv")
+    print(insurance)
+    ct = make_column_transformer(
+        (MinMaxScaler(), ["age", "bmi", "children"]),
+        (OneHotEncoder(handle_unknown="ignore"), ["sex", "smoker", "region"])
+    )
+
+    # create features and labels
+    X = insurance.drop("charges", axis=1)
+    y = insurance["charges"]
+
+    # create train/test splits
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # fit column transformer to training data only
+    ct.fit(X_train)
+
+    # transform training and test data with normalization and one-hot encoding
+    X_train_normal = ct.transform(X_train)
+    X_test_normal = ct.transform(X_test)
+
+    # print(X_train.loc[0])
+    # print(X_train_normal[0])
+    # print(X_train.shape, X_train_normal.shape)
+
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
