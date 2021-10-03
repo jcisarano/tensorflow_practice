@@ -460,8 +460,8 @@ if __name__ == '__main__':
         tf.keras.layers.Dense(10, activation="relu", input_shape=(X_train.shape[1],)),
         tf.keras.layers.Dense(1),
     ])
-    boston_model.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.SGD(), metrics=["mae"])
-    boston_model.fit(X_train, y_train, epochs=100, workers=-1)
+    boston_model.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), metrics=["mae"])
+    boston_model.fit(X_train, y_train, epochs=200, workers=-1)
     # print(boston_model.predict(X_test))
     print(boston_model.evaluate(X_test, y_test, workers=-1, verbose=0))
 
