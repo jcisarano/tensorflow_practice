@@ -5,6 +5,6 @@ import NormalEquation as ne
 
 if __name__ == '__main__':
     X, y = ne.generate_data()
-    print(X.shape, y.shape)
+    ne.plot_data(X,y)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
