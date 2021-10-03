@@ -461,9 +461,22 @@ if __name__ == '__main__':
         tf.keras.layers.Dense(1),
     ])
     boston_model.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), metrics=["mae"])
-    boston_model.fit(X_train, y_train, epochs=200, workers=-1)
+    boston_model.fit(X_train, y_train, epochs=200, workers=-1, verbose=0)
     # print(boston_model.predict(X_test))
     print(boston_model.evaluate(X_test, y_test, workers=-1, verbose=0))
 
+
+    # try boston data with scaling
+    from sklearn.preprocessing import MinMaxScaler
+    scaler = MinMaxScaler()
+    X_train_normalized = scaler.fit_transform(X_train)
+    X_test_normalized = scaler.transform(X_test)
+    boston_model_2 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(10, activation="relu"),
+        tf.keras.layers.Dense(1),
+    ])
+    boston_model_2.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), metrics=["mae"])
+    boston_model_2.fit(X_train_normalized, y_train, epochs=200, workers=-1, verbose=0)
+    print(boston_model_2.evaluate(X_test_normalized, y_test, workers=-1, verbose=0))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
