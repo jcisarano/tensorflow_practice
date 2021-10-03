@@ -4,7 +4,6 @@ import numpy as np
 import NormalEquation as ne
 
 if __name__ == '__main__':
-    X, y = ne.generate_data()
-    ne.plot_data(X,y)
+    ne.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
