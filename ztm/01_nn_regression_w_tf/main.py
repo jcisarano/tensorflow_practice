@@ -23,6 +23,7 @@ def mae(y_true, y_pred):
 def mse(y_true, y_pred):
     return tf.metrics.mean_squared_error(y_true=y_true, y_pred=tf.squeeze(y_pred))
 
+
 if __name__ == '__main__':
     print(tf.__version__)
     """
@@ -433,6 +434,16 @@ if __name__ == '__main__':
     insurance_model_4.fit(X_train_normal, y_train, workers=-1, epochs=100, verbose=0)
     print(insurance_model_4.evaluate(X_test_normal, y_test, workers=-1, verbose=0))
 
+    # another insurance model to experiment with
+    insurance_model_5 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(100, activation="relu"),
+        tf.keras.layers.Dense(50),
+        tf.keras.layers.Dense(10),
+        tf.keras.layers.Dense(1)
+    ])
 
+    insurance_model_5.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), metrics=["mae"])
+    insurance_model_5.fit(X_train_normal, y_train, epochs=500, workers=-1)
+    print(insurance_model_5.evaluate(X_test_normal, y_test, workers=-1))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
