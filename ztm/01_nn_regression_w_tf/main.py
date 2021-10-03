@@ -297,6 +297,7 @@ if __name__ == '__main__':
     print(y_pred_3 == y_pred_loaded_via_h5)
     """
 
+
     # larger example - insurance dataset
     # to predict insurance charges based on other indicators
     # insurance = pd.read_csv("https://raw.githubusercontent.com/stedy/Machine-Learning-with-R-datasets/master/insurance.csv")
@@ -309,8 +310,8 @@ if __name__ == '__main__':
 
     y = insurance_one_hot["charges"]
     X = insurance_one_hot.drop(columns=['charges'], axis=1)
-    # print(X.head())
-    # print(y.head())
+    print(X.head())
+    print(y.head())
 
     # split_index = int(len(X) * 0.8)
     # X_train = X[:split_index]
@@ -322,6 +323,7 @@ if __name__ == '__main__':
     from sklearn.model_selection import train_test_split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     # print(len(X), len(X_train), len(X_test))
+
 
     """
     # first model
@@ -344,6 +346,7 @@ if __name__ == '__main__':
     # insurance_pred = insurance_model.predict(X_test, workers=-1, verbose=3)
     """
 
+    """
     # experiments to improve model performance
     # 1 add an extra layer with more hidden units, change optimizer to Adam()
     # 2 train for longer
@@ -370,6 +373,7 @@ if __name__ == '__main__':
     insurance_model_3.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(), metrics=["mae"])
     history = insurance_model_3.fit(X_train, y_train, epochs=200, workers=-1, verbose=0)
     print(insurance_model_3.evaluate(X_test, y_test, verbose=0))
+    """
 
 
     # pd.DataFrame(history.history).plot()
@@ -393,6 +397,7 @@ if __name__ == '__main__':
     # StandardScaler creates a normal distribution, bell-shaped, Gaussian
     # Generally, it is worth trying both to see which is better
 
+    """
     # preprocessing practice
     from sklearn.compose import make_column_transformer
     from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
@@ -445,5 +450,20 @@ if __name__ == '__main__':
     insurance_model_5.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), metrics=["mae"])
     insurance_model_5.fit(X_train_normal, y_train, epochs=500, workers=-1)
     print(insurance_model_5.evaluate(X_test_normal, y_test, workers=-1))
+    """
+
+    (X_train, y_train), (X_test, y_test) = tf.keras.datasets.boston_housing.load_data(path="boston_housing.npz", test_split=0.2, seed=42)
+
+    print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
+
+    boston_model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(10, activation="relu", input_shape=(X_train.shape[1],)),
+        tf.keras.layers.Dense(1),
+    ])
+    boston_model.compile(loss=tf.keras.losses.mae, optimizer=tf.keras.optimizers.SGD(), metrics=["mae"])
+    boston_model.fit(X_train, y_train, epochs=100, workers=-1)
+    # print(boston_model.predict(X_test))
+    print(boston_model.evaluate(X_test, y_test, workers=-1, verbose=0))
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
