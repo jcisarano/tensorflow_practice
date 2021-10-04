@@ -65,7 +65,7 @@ def learning_schedule(t, t0, t1):
 
 
 def stochastic_gradient_descent(X, y, X_test, theta, m, theta_path_sgd, n_epochs=50, t0=5, t1=50):
-    X_b = np.c_[np.ones((X.shape)), X]
+    X_b = np.c_[np.ones(X.shape), X]
     X_test_b = np.c_[np.ones(X_test.shape), X_test]
     for epoch in range(n_epochs):
         for i in range(m):
@@ -92,6 +92,25 @@ def do_sgd(X, y):
     sgd_reg = SGDRegressor(max_iter=50, tol=-np.infty, penalty=None, eta0=0.1, random_state=42)
     sgd_reg.fit(X, y.ravel())
     print(sgd_reg.intercept_, sgd_reg.coef_)
+
+
+def mini_batch_gradient_descent(X, y, theta, theta_path_mgd, m, n_iterations=50, minibatch_size=20, t0=200, t1=1000):
+    X_b = np.c_[np.ones(X.shape), X]
+    t = 0
+    for epoch in range(n_iterations):
+        shuffled_indices = np.random.permutation(m)
+        X_b_shuffled = X_b[shuffled_indices]
+        y_shuffled = y[shuffled_indices]
+        for i in range(0, m, minibatch_size):
+            t += 1
+            xi = X_b_shuffled[i:i+minibatch_size]
+            yi = y_shuffled[i:i+minibatch_size]
+            gradients = 2/minibatch_size * xi.T.dot(xi.dot(theta) - yi)
+            eta = learning_schedule(t, t0, t1)
+            theta = theta - eta*gradients
+            theta_path_mgd.append(theta)
+
+    # print(theta)
 
 
 def run():
@@ -142,4 +161,17 @@ def run():
     theta = np.random.randn(2, 1)
 
     stochastic_gradient_descent(X, y, X_new, theta, m, theta_path_sgd, n_epochs=50, t0=5, t1=50)
-    do_sgd(X ,y)
+    do_sgd(X, y)
+
+    # mini-batch gradient descent
+    np.random.seed(42)
+    theta = np.random.randn(2, 1)  # random initialization
+    theta_path_mgd = []
+    m = len(X)
+    mini_batch_gradient_descent(X, y, theta, theta_path_mgd, m, n_iterations=50, minibatch_size=20, t0=200, t1=1000)
+
+    # theta_path_bgd = np.array(theta_path_bgd)
+    # theta_path_sgd = np.array(theta_path_sgd)
+    # theta_path_mgd = np.array(theta_path_mgd)
+
+
