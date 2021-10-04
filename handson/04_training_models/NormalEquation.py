@@ -50,7 +50,7 @@ def plot_gradient_descent(X_train, y_train, X_train_b, X_test, X_test_b, theta, 
             y_predict = X_test_b.dot(theta)
             style = "b-" if iteration > 0 else "r--"
             plt.plot(X_test, y_predict, style)
-        gradients = 2/m * X_test_b.T.dot(X_test_b.dot(theta) - y_train)
+        gradients = 2/m * X_train_b.T.dot(X_train_b.dot(theta) - y_train)
         theta = theta - eta * gradients
         if theta_path is not None:
             theta_path.append(theta)
