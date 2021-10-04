@@ -112,6 +112,18 @@ def mini_batch_gradient_descent(X, y, theta, theta_path_mgd, m, n_iterations=50,
 
     # print(theta)
 
+def plot_all_gradient_descent(sgd_path, mgd_path, bgd_path):
+    plt.figure(figsize=(10, 7))
+    plt.plot(sgd_path[:, 0], sgd_path[:, 1], "r-s", linewidth=1, label="Stochastic")
+    plt.plot(mgd_path[:, 0], mgd_path[:, 1], "g-+", linewidth=1, label="Mini-batch")
+    plt.plot(bgd_path[:, 0], bgd_path[:, 1], "b-o", linewidth=1, label="Batch")
+    plt.legend(loc="upper left", fontsize=16)
+    plt.xlabel(r"$\theta_0$", fontsize=20)
+    plt.ylabel(r"$\theta_1$", fontsize=20, rotation=0)
+    plt.axis([2.5, 4.5, 2.3, 3.9])
+    plt.show()
+
+
 
 def run():
     X, y = generate_data()
@@ -170,8 +182,10 @@ def run():
     m = len(X)
     mini_batch_gradient_descent(X, y, theta, theta_path_mgd, m, n_iterations=50, minibatch_size=20, t0=200, t1=1000)
 
-    # theta_path_bgd = np.array(theta_path_bgd)
-    # theta_path_sgd = np.array(theta_path_sgd)
-    # theta_path_mgd = np.array(theta_path_mgd)
+    # compare plots of all gradient decent methods so far
+    bgd_path = np.array(theta_path_bgd)
+    sgd_path = np.array(theta_path_sgd)
+    mgd_path = np.array(theta_path_mgd)
+    plot_all_gradient_descent(sgd_path, mgd_path, bgd_path)
 
 
