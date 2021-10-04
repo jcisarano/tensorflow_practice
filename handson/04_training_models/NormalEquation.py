@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+from sklearn.linear_model import LinearRegression
 
 def generate_data(random_seed=42):
     np.random.seed(random_seed)
@@ -26,6 +26,20 @@ def calc_theta_best(X, y):
     return np.linalg.inv(X_b.T.dot(X_b)).dot(X_b.T).dot(y)
 
 
+def do_linear_regression(X_train, y_train, X_test):
+    lin_reg = LinearRegression()
+    lin_reg.fit(X_train, y_train)
+    # print(lin_reg.intercept_, lin_reg.coef_)
+    return lin_reg.predict(X_test)
+
+
+def do_linear_regression_with_batch_gd(X, y, eta=0.1, n_iterations=1000, m=100):
+    theta = np.random.randn(2, 1)
+    for iteration in range(n_iterations):
+        gradients = 2/m * X.T.dot(X.dot(theta) - y)
+        theta = theta - eta * gradients
+    return theta
+
 def run():
     X, y = generate_data()
     plot_data(X, y)
@@ -39,4 +53,15 @@ def run():
     print(y_predict)
     plot_data(X, y, X_new, y_predict)
 
+    print(do_linear_regression(X, y, X_new))
 
+    # LinearRegression() uses listsq() internally:
+    X_with_bias_column = np.c_[np.ones((100, 1)), X]
+    theta_best_svd, residuals, rank, x = np.linalg.lstsq(X_with_bias_column, y, rcond=1e-6)
+    print(theta_best_svd)
+    # listsq() uses this internally::
+    print(np.linalg.pinv(X_with_bias_column).dot(y))
+
+    # linear regression using batch gradient descent
+    theta = do_linear_regression_with_batch_gd(X_with_bias_column, y)
+    print(theta)
