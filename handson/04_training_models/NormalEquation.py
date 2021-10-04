@@ -36,7 +36,7 @@ def do_linear_regression(X_train, y_train, X_test):
 def do_linear_regression_with_batch_gd(X, y, eta=0.1, n_iterations=1000, m=100):
     theta = np.random.randn(2, 1)
     for iteration in range(n_iterations):
-        gradients = 2/m * X.T.dot(X.dot(theta) - y)
+        gradients = calc_theta_best(X, y)
         theta = theta - eta * gradients
     return theta
 
@@ -61,7 +61,7 @@ def plot_gradient_descent(X_train, y_train, X_train_b, X_test, X_test_b, theta, 
 def run():
     X, y = generate_data()
     # plot_data(X, y)
-    t_b = calc_theta_best(X,y)
+    t_b = calc_theta_best(X, y)
     # print(t_b)
 
     # make predictions using theta best
@@ -81,7 +81,8 @@ def run():
     print(np.linalg.pinv(X_with_bias_column).dot(y))
 
     # linear regression using batch gradient descent
-    theta = do_linear_regression_with_batch_gd(X_with_bias_column, y)
+    # theta = do_linear_regression_with_batch_gd(X_with_bias_column, y)
+    theta = do_linear_regression_with_batch_gd(X, y)
     print(theta)
     print(X_new_b.dot(theta))
 
