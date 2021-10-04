@@ -40,11 +40,29 @@ def do_linear_regression_with_batch_gd(X, y, eta=0.1, n_iterations=1000, m=100):
         theta = theta - eta * gradients
     return theta
 
+
+def plot_gradient_descent(X_train, y_train, X_train_b, X_test, X_test_b, theta, eta, theta_path=None):
+    m = len(X_train_b)
+    plt.plot(X_train, y_train, "b.")
+    n_iterations = 1000
+    for iteration in range(n_iterations):
+        if iteration < 10:
+            y_predict = X_test_b.dot(theta)
+            style = "b-" if iteration > 0 else "r--"
+            plt.plot(X_test, y_predict, style)
+        gradients = 2/m * X_test_b.T.dot(X_test_b.dot(theta) - y_train)
+        theta = theta - eta * gradients
+        if theta_path is not None:
+            theta_path.append(theta)
+    plt.xlabel("$x_1$", fontsize=18)
+    plt.axis([0, 2, 0, 15])
+    plt.title(r"$\eta = {}$".format(eta), fontsize=16)
+
 def run():
     X, y = generate_data()
-    plot_data(X, y)
+    # plot_data(X, y)
     t_b = calc_theta_best(X,y)
-    print(t_b)
+    # print(t_b)
 
     # make predictions using theta best
     X_new = np.array([[0], [2]])
@@ -65,3 +83,17 @@ def run():
     # linear regression using batch gradient descent
     theta = do_linear_regression_with_batch_gd(X_with_bias_column, y)
     print(theta)
+    print(X_new_b.dot(theta))
+
+    np.random.seed(42)
+    theta_path_bgd = []
+    theta = np.random.randn(2, 1)
+    plt.figure(figsize=(10, 4))
+    plt.subplot(131)
+    plot_gradient_descent(X, y, X_with_bias_column, X_new, X_new_b, theta, eta=0.02)
+    plt.ylabel("$y$", rotation=0, fontsize=18)
+    plt.subplot(132)
+    plot_gradient_descent(X, y, X_with_bias_column, X_new, X_new_b, theta, eta=0.1, theta_path=theta_path_bgd)
+    plt.subplot(133)
+    plot_gradient_descent(X, y, X_with_bias_column, X_new, X_new_b, theta, eta=0.5)
+    plt.show()
