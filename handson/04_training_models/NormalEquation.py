@@ -9,10 +9,11 @@ def generate_data(random_seed=42):
     return X, y
 
 
-def plot_data(X, y, X_line=None, y_line=None):
+def plot_data(X, y, X_pred=None, y_pred=None):
     plt.plot(X, y, "b.")
-    if X_line is not None and y_line is not None:
-        plt.plot(X_line, y_line, "r-")
+    if X_pred is not None and y_pred is not None:
+        plt.plot(X_pred, y_pred, "r-", label="Predictions")
+        plt.legend(loc="upper left", fontsize=14)
     plt.xlabel("$X_1$", fontsize=18)
     plt.ylabel("$y$", rotation=0, fontsize=18)
     plt.axis([0, 2, 0, 15])
