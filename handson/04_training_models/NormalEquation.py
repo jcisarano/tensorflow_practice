@@ -189,6 +189,27 @@ def plot_learning_curves(model, X, y, axis=[0, 80, 0, 3]):
     plt.show()
 
 
+def graph_linear_vs_polynomial_regression(X, y, X_test, model_class, polynomial, alphas, **model_kargs):
+    from sklearn.linear_model import Ridge
+    for alpha, style in zip(alphas, ("b-", "g--", "r:")):
+        model = model_class(alpha, **model_kargs) if alpha > 0 else LinearRegression()
+        if polynomial:
+            model = Pipeline([
+                ("poly_features", PolynomialFeatures(degree=10, include_bias=False)),
+                ("std_scaler", StandardScaler()),
+                ("regul_reg", model)
+            ])
+        model.fit(X, y)
+        y_pred_regul = model.predict(X_test)
+        lw = 2 if alpha > 0 else 1
+        plt.plot(X_test, y_pred_regul, style, linewidth=lw, label=r"$\alpha = {}$".format(alpha))
+    plt.plot(X, y, "b.", linewidth=3)
+    plt.legend(loc="upper left", fontsize=15)
+    plt.xlabel("$x_1$", fontsize=18)
+    plt.axis([0, 3, 0, 4])
+
+
+
 def run():
     X, y = generate_data()
     # plot_data(X, y)
@@ -281,4 +302,29 @@ def run():
         ("lin_reg", LinearRegression()),
     ])
     plot_learning_curves(polynomial_regression, X, y)
+
+    """Regularized Models"""
+    # Ridge regularization with linear regression vs polynomial regression
+    from sklearn.linear_model import Ridge
+    np.random.seed(42)
+    m = 20
+    X = 3*np.random.rand(m, 1)
+    y = 1 + 0.5*X + np.random.randn(m, 1)/1.5
+    X_test = np.linspace(0, 3, 100).reshape(100, 1)
+
+    plt.figure(figsize=(8, 4))
+    plt.subplot(121)
+    graph_linear_vs_polynomial_regression(X, y, X_test, Ridge, polynomial=False, alphas=(0, 10, 100), random_state=42)
+    plt.ylabel("$y$", rotation=0, fontsize=18)
+    plt.subplot(122)
+    graph_linear_vs_polynomial_regression(X, y, X_test, Ridge, polynomial=True, alphas=(0, 10 ** -5, 1), random_state=42)
+    plt.show()
+
+    # Ridge Regression built-in closed form solution
+    ridge_reg = Ridge(alpha=1, solver="cholesky", random_state=42)
+    ridge_reg.fit(X, y)
+    print(ridge_reg.predict([[1.5]]))
+
+    # Ridge Regression built-in Stochastic Gradient Descent
+
 
