@@ -255,6 +255,23 @@ def do_manual_early_stop(X_train, X_val, y_train, y_val):
     plt.ylabel("RMSE", fontsize=14)
     plt.show()
 
+    # clone best model
+    from sklearn.base import clone
+    sgd_reg = SGDRegressor(max_iter=1, tol=-np.infty, warm_start=True, penalty=None, learning_rate="constant",
+                           eta0=0.0005, random_state=42)
+    minimum_val_error = float("inf")
+    best_epoch = None
+    best_model = None
+    for epoch in range(1000):
+        sgd_reg.fit(X_train_poly_scaled, y_train)
+        y_val_predict = sgd_reg.predict(X_val_poly_scaled)
+        val_error = mean_squared_error(y_val, y_val_predict)
+        if val_error < minimum_val_error:
+            minimum_val_error = val_error
+            best_epoch = epoch
+            best_model = clone(sgd_reg)
+    print(best_epoch, best_model)
+
 
 def run():
     X, y = generate_data()
@@ -408,7 +425,6 @@ def run():
     y = 2 + X + 0.5*X**2 + np.random.randn(m, 1)
     X_train, X_val, y_train, y_val = train_test_split(X[:50], y[:50].ravel(), test_size=0.5, random_state=10)
     do_manual_early_stop(X_train=X_train, y_train=y_train, X_val=X_val, y_val=y_val)
-
 
 
 
