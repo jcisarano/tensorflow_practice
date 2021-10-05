@@ -9,10 +9,10 @@ def generate_data(random_seed=42):
     return X, y
 
 
-def plot_data(X, y, X_pred=None, y_pred=None, axis=[0, 2, 0, 15]):
-    plt.plot(X, y, "b.")
-    if X_pred is not None and y_pred is not None:
-        plt.plot(X_pred, y_pred, "r-", label="Predictions")
+def plot_data(X_train, y_train, X_test=None, y_pred=None, axis=[0, 2, 0, 15]):
+    plt.plot(X_train, y_train, "b.")
+    if X_test is not None and y_pred is not None:
+        plt.plot(X_test, y_pred, "r-", label="Predictions")
         plt.legend(loc="upper left", fontsize=14)
     plt.xlabel("$X_1$", fontsize=18)
     plt.ylabel("$y$", rotation=0, fontsize=18)
@@ -207,9 +207,8 @@ def run():
     m = 100
     X = 6 * np.random.rand(m, 1) - 3
     y = 0.5 * X**2 + X + 2 + np.random.randn(m, 1)
-    X_test = np.linspace(-3, 3, 100).reshape(100,1)
-    # plot_data(X, y, axis=[-3, 3, 0, 10])
+    X_test = np.linspace(-3, 3, 100).reshape(100, 1)
 
     y_pred = do_polynomial_regression(X, y, X_test=X_test)
-    plot_data(X, y, y_pred=y_pred, X_pred=X_test, axis=[-3, 3, 0, 10])
+    plot_data(X, y, y_pred=y_pred, X_test=X_test, axis=[-3, 3, 0, 10])
 
