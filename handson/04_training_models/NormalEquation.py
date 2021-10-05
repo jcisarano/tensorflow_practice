@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
 def generate_data(random_seed=42):
     np.random.seed(random_seed)
     X = 2 * np.random.rand(100, 1)
@@ -164,6 +168,27 @@ def do_polynomial_regression_compare(X_train, y_train, X_test):
     plt.show()
 
 
+def plot_learning_curves(model, X, y, axis=[0, 80, 0, 3]):
+    from sklearn.metrics import mean_squared_error
+    from sklearn.model_selection import train_test_split
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=10)
+    train_errors, val_errors = [], []
+    for m in range(1, len(X_train)):
+        model.fit(X_train[:m], y_train[:m])
+        y_train_predict = model.predict(X_train[:m])
+        y_val_predict = model.predict(X_val)
+        train_errors.append(mean_squared_error(y_train[:m], y_train_predict))
+        val_errors.append(mean_squared_error(y_val, y_val_predict))
+
+    plt.plot(np.sqrt(train_errors), "r-+", linewidth=2, label="train")
+    plt.plot(np.sqrt(val_errors), "b-", linewidth=3, label="val")
+    plt.legend(loc="upper right", fontsize=14)
+    plt.xlabel("Training set size", fontsize=14)
+    plt.ylabel("RMSE", fontsize=14)
+    plt.axis(axis)
+    plt.show()
+
+
 def run():
     X, y = generate_data()
     # plot_data(X, y)
@@ -238,5 +263,22 @@ def run():
     y_pred = do_polynomial_regression(X, y, X_test=X_test)
     plot_data(X, y, y_pred=y_pred, X_test=X_test, axis=[-3, 3, 0, 10])
 
+    # examine performance of different polynomial values on same data set:
     do_polynomial_regression_compare(X, y, X_test)
+
+    # compare learning curves on subset of data to determine performance
+    # standard linear regression underfits the polynomial curve:
+    # the errors on the train and test sets are close and high
+    lin_reg = LinearRegression()
+    plot_learning_curves(lin_reg, X, y)
+
+    # learning curve of polynomial regression shows better fit:
+    # error rate is much lower than linear regression
+    # however, the error rates are farther apart. Training error is lower, so it is overfitting.
+    # Using more training data should fix this
+    polynomial_regression = Pipeline([
+        ("poly_features", PolynomialFeatures(degree=10, include_bias=False)),
+        ("lin_reg", LinearRegression()),
+    ])
+    plot_learning_curves(polynomial_regression, X, y)
 
