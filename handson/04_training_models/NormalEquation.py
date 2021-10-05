@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, SGDRegressor
+from sklearn.model_selection import train_test_split
 
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import StandardScaler
@@ -209,6 +210,51 @@ def graph_linear_vs_polynomial_regression(X, y, X_test, model_class, polynomial,
     plt.axis([0, 3, 0, 4])
 
 
+def do_manual_early_stop(X_train, X_val, y_train, y_val):
+    from sklearn.metrics import mean_squared_error
+    poly_scaler = Pipeline([
+        ("poly_features", PolynomialFeatures(degree=90, include_bias=False)),
+        ("std_scaler", StandardScaler()),
+    ])
+    X_train_poly_scaled = poly_scaler.fit_transform(X_train)
+    X_val_poly_scaled = poly_scaler.transform(X_val)
+
+    sgd_reg = SGDRegressor(max_iter=1,
+                           tol=-np.infty,
+                           penalty=None,
+                           eta0=0.0005,
+                           warm_start=True,
+                           learning_rate="constant",
+                           random_state=42)
+    n_epochs = 500
+    train_errors, val_errors = [], []
+    for epoc in range(n_epochs):
+        sgd_reg.fit(X_train_poly_scaled, y_train)
+        y_train_predict = sgd_reg.predict(X_train_poly_scaled)
+        y_val_predict = sgd_reg.predict(X_val_poly_scaled)
+        train_errors.append(mean_squared_error(y_train, y_train_predict))
+        val_errors.append(mean_squared_error(y_val, y_val_predict))
+
+    best_epoch = np.argmin(val_errors)
+    best_val_rmse = np.sqrt(val_errors[best_epoch])
+
+    plt.annotate("Best model:",
+                 xy=(best_epoch, best_val_rmse),
+                 xytext=(best_epoch, best_val_rmse + 1),
+                 ha="center",
+                 arrowprops=dict(facecolor="black", shrink=0.05),
+                 fontsize=16,
+                 )
+
+    best_val_rmse -= 0.03  # improves the look of the graph
+    plt.plot([0, n_epochs], [best_val_rmse, best_val_rmse], "k:", linewidth=2)
+    plt.plot(np.sqrt(val_errors), "b-", linewidth=3, label="Validation set")
+    plt.plot(np.sqrt(train_errors), "r--", linewidth=2, label="Training set")
+    plt.legend(loc="upper right", fontsize=14)
+    plt.xlabel("Epoch", fontsize=14)
+    plt.ylabel("RMSE", fontsize=14)
+    plt.show()
+
 
 def run():
     X, y = generate_data()
@@ -326,5 +372,44 @@ def run():
     print(ridge_reg.predict([[1.5]]))
 
     # Ridge Regression built-in Stochastic Gradient Descent
+    # setting penalty="l2" makes this Ridge Regression
+    sgd_reg = SGDRegressor(max_iter=50, tol=-np.infty, penalty="l2", random_state=42)
+    sgd_reg.fit(X, y.ravel())
+    print(sgd_reg.predict([[1.5]]))
+
+    # solver=sag, Stochastic Average Gradient descent,
+    ridge_reg = Ridge(alpha=1, solver="sag", random_state=42)
+    ridge_reg.fit(X, y)
+    print(ridge_reg.predict([[1.5]]))
+
+    """Lasso Regression"""
+    from sklearn.linear_model import Lasso
+    plt.figure(figsize=(8, 4))
+    plt.subplot(121)
+    graph_linear_vs_polynomial_regression(X, y, X_test, Lasso, polynomial=False, alphas=(0, 0.1, 1), random_state=42)
+    plt.ylabel("$y$", rotation=0, fontsize=18)
+    plt.subplot(122)
+    graph_linear_vs_polynomial_regression(X, y, X_test, Lasso, polynomial=True, alphas=(0, 10**-7, 1), tol=1, random_state=42)
+    plt.show()
+
+    lasso_reg = Lasso(alpha=0.1)
+    lasso_reg.fit(X, y)
+    print(lasso_reg.predict([[1.5]]))
+
+    """Elastic net"""
+    from sklearn.linear_model import ElasticNet
+    elastic_net = ElasticNet(alpha=0.1, l1_ratio=0.5, random_state=42)
+    elastic_net.fit(X, y)
+    print(elastic_net.predict([[1.5]]))
+
+    np.random.seed(42)
+    m = 100
+    X = 6*np.random.rand(m, 1) - 3
+    y = 2 + X + 0.5*X**2 + np.random.randn(m, 1)
+    X_train, X_val, y_train, y_val = train_test_split(X[:50], y[:50].ravel(), test_size=0.5, random_state=10)
+    do_manual_early_stop(X_train=X_train, y_train=y_train, X_val=X_val, y_val=y_val)
+
+
+
 
 
