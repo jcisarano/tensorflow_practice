@@ -9,14 +9,14 @@ def generate_data(random_seed=42):
     return X, y
 
 
-def plot_data(X, y, X_pred=None, y_pred=None):
+def plot_data(X, y, X_pred=None, y_pred=None, axis=[0, 2, 0, 15]):
     plt.plot(X, y, "b.")
     if X_pred is not None and y_pred is not None:
         plt.plot(X_pred, y_pred, "r-", label="Predictions")
         plt.legend(loc="upper left", fontsize=14)
     plt.xlabel("$X_1$", fontsize=18)
     plt.ylabel("$y$", rotation=0, fontsize=18)
-    plt.axis([0, 2, 0, 15])
+    plt.axis(axis)
     plt.show()
 
 
@@ -124,6 +124,19 @@ def plot_all_gradient_descent(sgd_path, mgd_path, bgd_path):
     plt.show()
 
 
+def do_polynomial_regression(X, y, X_test):
+    from sklearn.preprocessing import PolynomialFeatures
+    m = len(X)
+    poly_features = PolynomialFeatures(degree=2, include_bias=False)
+    X_poly = poly_features.fit_transform(X)
+    # print(X[0])
+    # print(X_poly[0])
+    lin_reg = LinearRegression()
+    lin_reg.fit(X_poly, y)
+    # print(lin_reg.intercept_, lin_reg.coef_)
+    X_test_poly = poly_features.transform(X_test)
+    y_pred = lin_reg.predict(X_test_poly)
+    return y_pred
 
 def run():
     X, y = generate_data()
@@ -188,4 +201,15 @@ def run():
     mgd_path = np.array(theta_path_mgd)
     plot_all_gradient_descent(sgd_path, mgd_path, bgd_path)
 
+    # polynomial regression
+    # modify a polynomial to use linear regression
+    np.random.seed(42)
+    m = 100
+    X = 6 * np.random.rand(m, 1) - 3
+    y = 0.5 * X**2 + X + 2 + np.random.randn(m, 1)
+    X_test = np.linspace(-3, 3, 100).reshape(100,1)
+    # plot_data(X, y, axis=[-3, 3, 0, 10])
+
+    y_pred = do_polynomial_regression(X, y, X_test=X_test)
+    plot_data(X, y, y_pred=y_pred, X_pred=X_test, axis=[-3, 3, 0, 10])
 
