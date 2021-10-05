@@ -138,6 +138,32 @@ def do_polynomial_regression(X, y, X_test):
     y_pred = lin_reg.predict(X_test_poly)
     return y_pred
 
+
+def do_polynomial_regression_compare(X_train, y_train, X_test):
+    from sklearn.preprocessing import PolynomialFeatures
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    for style, width, degree in (("g-", 1, 300), ("b--", 2, 2), ("r-+", 2, 1)):
+        polybig_features = PolynomialFeatures(degree=degree, include_bias=False)
+        std_scaler = StandardScaler()
+        lin_reg = LinearRegression()
+        polynomial_regression = Pipeline([
+            ("poly_features", polybig_features),
+            ("std_scaler", std_scaler),
+            ("lin_reg", lin_reg),
+        ])
+        polynomial_regression.fit(X_train, y_train)
+        y_newbig = polynomial_regression.predict(X_test)
+        plt.plot(X_test, y_newbig, style, label=str(degree), linewidth=width)
+
+    plt.plot(X_train, y_train, "b.", linewidth=3)
+    plt.legend(loc="upper left")
+    plt.xlabel("$x_1$", fontsize=18)
+    plt.ylabel("$y$", rotation=0, fontsize=18)
+    plt.axis([-3, 3, 0, 10])
+    plt.show()
+
+
 def run():
     X, y = generate_data()
     # plot_data(X, y)
@@ -157,7 +183,7 @@ def run():
     X_with_bias_column = np.c_[np.ones((100, 1)), X]
     theta_best_svd, residuals, rank, x = np.linalg.lstsq(X_with_bias_column, y, rcond=1e-6)
     print(theta_best_svd)
-    # listsq() uses this internally::
+    # listsq() uses pinv() internally:
     print(np.linalg.pinv(X_with_bias_column).dot(y))
 
     # linear regression using batch gradient descent
@@ -211,4 +237,6 @@ def run():
 
     y_pred = do_polynomial_regression(X, y, X_test=X_test)
     plot_data(X, y, y_pred=y_pred, X_test=X_test, axis=[-3, 3, 0, 10])
+
+    do_polynomial_regression_compare(X, y, X_test)
 
