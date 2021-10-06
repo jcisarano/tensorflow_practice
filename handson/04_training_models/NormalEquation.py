@@ -7,6 +7,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
+
 def generate_data(random_seed=42):
     np.random.seed(random_seed)
     X = 2 * np.random.rand(100, 1)
@@ -42,7 +43,7 @@ def do_linear_regression_with_batch_gd(X, y, eta=0.1, n_iterations=1000, m=100):
     theta = np.random.randn(2, 1)
     X_b = np.c_[np.ones(X.shape), X]
     for iteration in range(n_iterations):
-        gradients = 2/m * X_b.T.dot(X_b.dot(theta) - y)
+        gradients = 2 / m * X_b.T.dot(X_b.dot(theta) - y)
         theta = theta - eta * gradients
     return theta
 
@@ -56,7 +57,7 @@ def plot_gradient_descent(X_train, y_train, X_train_b, X_test, X_test_b, theta, 
             y_predict = X_test_b.dot(theta)
             style = "b-" if iteration > 0 else "r--"
             plt.plot(X_test, y_predict, style)
-        gradients = 2/m * X_train_b.T.dot(X_train_b.dot(theta) - y_train)
+        gradients = 2 / m * X_train_b.T.dot(X_train_b.dot(theta) - y_train)
         theta = theta - eta * gradients
         if theta_path is not None:
             theta_path.append(theta)
@@ -79,11 +80,11 @@ def stochastic_gradient_descent(X, y, X_test, theta, m, theta_path_sgd, n_epochs
                 style = "b-" if i > 0 else "r--"
                 plt.plot(X_test, y_predict, style)
             random_index = np.random.randint(m)
-            xi = X_b[random_index:random_index+1]
-            yi = y[random_index:random_index+1]
-            gradients = 2*xi.T.dot(xi.dot(theta) - yi)
-            eta = learning_schedule(epoch*m+i, t0, t1)
-            theta = theta - eta*gradients
+            xi = X_b[random_index:random_index + 1]
+            yi = y[random_index:random_index + 1]
+            gradients = 2 * xi.T.dot(xi.dot(theta) - yi)
+            eta = learning_schedule(epoch * m + i, t0, t1)
+            theta = theta - eta * gradients
             theta_path_sgd.append(theta)
     plt.plot(X, y, "b.")
     plt.xlabel("$X_1$", fontsize=18)
@@ -108,14 +109,15 @@ def mini_batch_gradient_descent(X, y, theta, theta_path_mgd, m, n_iterations=50,
         y_shuffled = y[shuffled_indices]
         for i in range(0, m, minibatch_size):
             t += 1
-            xi = X_b_shuffled[i:i+minibatch_size]
-            yi = y_shuffled[i:i+minibatch_size]
-            gradients = 2/minibatch_size * xi.T.dot(xi.dot(theta) - yi)
+            xi = X_b_shuffled[i:i + minibatch_size]
+            yi = y_shuffled[i:i + minibatch_size]
+            gradients = 2 / minibatch_size * xi.T.dot(xi.dot(theta) - yi)
             eta = learning_schedule(t, t0, t1)
-            theta = theta - eta*gradients
+            theta = theta - eta * gradients
             theta_path_mgd.append(theta)
 
     # print(theta)
+
 
 def plot_all_gradient_descent(sgd_path, mgd_path, bgd_path):
     plt.figure(figsize=(10, 7))
@@ -276,8 +278,8 @@ def do_manual_early_stop(X_train, X_val, y_train, y_val):
 def bgd_path(theta, X, y, l1, l2, core=1, eta=0.1, n_iterations=50):
     path = [theta]
     for iteration in range(n_iterations):
-        gradients = core*2/len(X)*X.T.dot(X.dot(theta) -y) + l1*np.sign(theta) + 2*l2*theta
-        theta = theta - eta*gradients
+        gradients = core * 2 / len(X) * X.T.dot(X.dot(theta) - y) + l1 * np.sign(theta) + 2 * l2 * theta
+        theta = theta - eta * gradients
         path.append(theta)
     return np.array(path)
 
@@ -294,9 +296,9 @@ def regularization_plots():
     # ravel() - returns a contiguous, flattened 1-D array
     T = np.c_[t1.ravel(), t2.ravel()]
     Xr = np.array([[-1, 1], [-0.3, -1], [1, 0.1]])
-    yr = 2*Xr[:, :1] + 0.5*Xr[:, 1:]
+    yr = 2 * Xr[:, :1] + 0.5 * Xr[:, 1:]
 
-    J = (1/len(Xr)*np.sum((T.dot(Xr.T) - yr.T)**2, axis=1)).reshape(t1.shape)
+    J = (1 / len(Xr) * np.sum((T.dot(Xr.T) - yr.T) ** 2, axis=1)).reshape(t1.shape)
 
     N1 = np.linalg.norm(T, ord=1, axis=1).reshape(t1.shape)
     N2 = np.linalg.norm(T, ord=2, axis=1).reshape(t1.shape)
@@ -306,9 +308,9 @@ def regularization_plots():
 
     t_init = np.array([[0.25], [-1]])
 
-    plt.figure(figsize=(12,8))
+    plt.figure(figsize=(12, 8))
     for i, N, l1, l2, title in ((0, N1, 0.5, 0, "Lasso"), (1, N2, 0, 0.1, "Ridge")):
-        JR = J + l1*N1 + l2*N2**2
+        JR = J + l1 * N1 + l2 * N2 ** 2
 
         tr_min_idx = np.unravel_index(np.argmin(JR), JR.shape)
         t1r_min, t2r_min = t1[tr_min_idx], t2[tr_min_idx]
@@ -319,9 +321,9 @@ def regularization_plots():
 
         path_J = bgd_path(t_init, Xr, yr, l1=0, l2=0)
         path_JR = bgd_path(t_init, Xr, yr, l1=l1, l2=l2)
-        path_N = bgd_path(t_init, Xr, yr, l1=np.sign(l1)/3, l2=np.sign(l2), core=0)
+        path_N = bgd_path(t_init, Xr, yr, l1=np.sign(l1) / 3, l2=np.sign(l2), core=0)
 
-        plt.subplot(221 + i*2)
+        plt.subplot(221 + i * 2)
         plt.grid(True)
         plt.axhline(y=0, color="k")
         plt.axvline(x=0, color="k")
@@ -335,7 +337,7 @@ def regularization_plots():
         if i == 1:
             plt.xlabel(r"$\theta_1$", fontsize=20)
         plt.ylabel(r"$\theta_2$", fontsize=20, rotation=0)
-        plt.subplot(222 + i*2)
+        plt.subplot(222 + i * 2)
         plt.grid(True)
         plt.axhline(y=0, color='k')
         plt.axvline(x=0, color='k')
@@ -351,7 +353,7 @@ def regularization_plots():
 
 def plot_log_regression():
     t = np.linspace(-10, 10, 100)
-    sig = 1/(1 + np.exp(-t))
+    sig = 1 / (1 + np.exp(-t))
     plt.figure(figsize=(9, 3))
     plt.plot([-10, 10], [0, 0], "k-")
     plt.plot([-10, 10], [0.5, 0.5], "k:")
@@ -534,7 +536,31 @@ def run():
 
     from sklearn import datasets
     iris = datasets.load_iris()
-    print(list(iris.keys()))  # list() returns a python list
+    # print(list(iris.keys()))  # list() returns a python list
+    # print(iris.DESCR)
 
+    X = iris["data"][:, 3:]  # petal widths
+    y = (iris["target"] == 2).astype(np.int)  # 1 if type is Iris-Virginica, otherwise 0
 
+    from sklearn.linear_model import LogisticRegression
+    log_reg = LogisticRegression(solver="liblinear", random_state=42)
+    log_reg.fit(X, y)
 
+    X_new = np.linspace(0, 3, 1000).reshape(-1, 1)
+    y_prob = log_reg.predict_proba(X_new)  # predict_proba() gives the probability of each output, 0 and 1, so (p0, p1)
+    decision_boundary = X_new[y_prob[:, 1] >= 0.5][0]
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(X[y == 0], y[y == 0], "bs")
+    plt.plot([decision_boundary, decision_boundary], [-1, 2], "k:", linewidth=2)
+    plt.plot(X_new, y_prob[:, 1], "g-", linewidth=2, label="Iris-Virginica")
+    plt.plot(X_new, y_prob[:, 0], "b--", linewidth=2, label="Not Iris-Virginica")
+    plt.text(decision_boundary + 0.02, 0.15, "Decision boundary", fontsize=14, color="k", ha="center")
+    plt.arrow(decision_boundary, 0.08, -0.3, 0, head_width=0.05, head_length=0.1, fc="b", ec="b")
+    plt.arrow(decision_boundary, 0.92, 0.3, 0, head_width=0.05, head_length=0.1, fc="g", ec="g")
+    plt.xlabel("Petal width (cm)", fontsize=14)
+    plt.ylabel("Probability", fontsize=14)
+    plt.legend(loc="center left", fontsize=14)
+    plt.axis([0, 3, -0.02, 1.02])
+
+    plt.show()
