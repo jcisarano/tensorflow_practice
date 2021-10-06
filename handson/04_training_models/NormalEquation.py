@@ -273,12 +273,90 @@ def do_manual_early_stop(X_train, X_val, y_train, y_val):
     print(best_epoch, best_model)
 
 
+def bgd_path(theta, X, y, l1, l2, core=1, eta=0.1, n_iterations=50):
+    path = [theta]
+    for iteration in range(n_iterations):
+        gradients = core*2/len(X)*X.T.dot(X.dot(theta) -y) + l1*np.sign(theta) + 2*l2*theta
+        theta = theta - eta*gradients
+        path.append(theta)
+    return np.array(path)
+
+
+def regularization_plots():
+    t1a, t1b, t2a, t2b = -1, 3, -1.5, 1.5
+    t1s = np.linspace(t1a, t1b, 500)  # returns 500 evenly spaced numbers in range [t1a,t1b]
+    t2s = np.linspace(t2a, t2b, 500)  # returns 500 evenly spaced numbers in range [t1a,t1b]
+    t1, t2 = np.meshgrid(t1s, t2s)  # creates rectangular grid of array of x-y values
+    # print(t1.shape, t2.shape)  # result is (500, 500) (500, 500)
+    # print(t1 == t2)  # result is false
+
+    # np.c_ Translates slice objects to concatenation along the second axis.
+    # ravel() - returns a contiguous, flattened 1-D array
+    T = np.c_[t1.ravel(), t2.ravel()]
+    Xr = np.array([[-1, 1], [-0.3, -1], [1, 0.1]])
+    yr = 2*Xr[:, :1] + 0.5*Xr[:, 1:]
+
+    J = (1/len(Xr)*np.sum((T.dot(Xr.T) - yr.T)**2, axis=1)).reshape(t1.shape)
+
+    N1 = np.linalg.norm(T, ord=1, axis=1).reshape(t1.shape)
+    N2 = np.linalg.norm(T, ord=2, axis=1).reshape(t1.shape)
+
+    t_min_idx = np.unravel_index(np.argmin(J), J.shape)
+    t1_min, t2_min = t1[t_min_idx], t2[t_min_idx]
+
+    t_init = np.array([[0.25], [-1]])
+
+    plt.figure(figsize=(12,8))
+    for i, N, l1, l2, title in ((0, N1, 0.5, 0, "Lasso"), (1, N2, 0, 0.1, "Ridge")):
+        JR = J + l1*N1 + l2*N2**2
+
+        tr_min_idx = np.unravel_index(np.argmin(JR), JR.shape)
+        t1r_min, t2r_min = t1[tr_min_idx], t2[tr_min_idx]
+
+        levelsJ = (np.exp(np.linspace(0, 1, 20)) - 1) * (np.max(J) - np.min(J)) + np.min(J)
+        levelsJR = (np.exp(np.linspace(0, 1, 20)) - 1) * (np.max(JR) - np.min(JR)) + np.min(JR)
+        levelsN = np.linspace(0, np.max(N), 10)
+
+        path_J = bgd_path(t_init, Xr, yr, l1=0, l2=0)
+        path_JR = bgd_path(t_init, Xr, yr, l1=l1, l2=l2)
+        path_N = bgd_path(t_init, Xr, yr, l1=np.sign(l1)/3, l2=np.sign(l2), core=0)
+
+        plt.subplot(221 + i*2)
+        plt.grid(True)
+        plt.axhline(y=0, color="k")
+        plt.axvline(x=0, color="k")
+        plt.contourf(t1, t2, J, levels=levelsJ, alpha=0.9)
+        plt.contour(t1, t2, N, levels=levelsN)
+        plt.plot(path_J[:, 0], path_J[:, 1], "w-o")
+        plt.plot(path_N[:, 0], path_N[:, 1], "y-^")
+        plt.plot(t1_min, t2_min, "rs")
+        plt.title(r"$\ell_{}$ penalty".format(i + 1), fontsize=16)
+        plt.axis([t1a, t1b, t2a, t2b])
+        if i == 1:
+            plt.xlabel(r"$\theta_1$", fontsize=20)
+        plt.ylabel(r"$\theta_2$", fontsize=20, rotation=0)
+        plt.subplot(222 + i*2)
+        plt.grid(True)
+        plt.axhline(y=0, color='k')
+        plt.axvline(x=0, color='k')
+        plt.contourf(t1, t2, JR, levels=levelsJR, alpha=0.9)
+        plt.plot(path_JR[:, 0], path_JR[:, 1], "w-o")
+        plt.plot(t1r_min, t2r_min, "rs")
+        plt.title(title, fontsize=16)
+        plt.axis([t1a, t1b, t2a, t2b])
+        if i == 1:
+            plt.xlabel(r"$\theta_1$", fontsize=20)
+    plt.show()
+
+
+
 def run():
     X, y = generate_data()
     # plot_data(X, y)
     t_b = calc_theta_best(X, y)
     # print(t_b)
 
+    """
     # make predictions using theta best
     X_new = np.array([[0], [2]])
     X_new_b = np.c_[np.ones((2, 1)), X_new]
@@ -313,7 +391,8 @@ def run():
     plt.subplot(133)
     plot_gradient_descent(X, y, X_with_bias_column, X_new, X_new_b, theta, eta=0.5)
     plt.show()
-
+    
+    
     # stochastic gradient descent
     theta_path_sgd = []
     m = len(X_with_bias_column)
@@ -322,6 +401,7 @@ def run():
 
     stochastic_gradient_descent(X, y, X_new, theta, m, theta_path_sgd, n_epochs=50, t0=5, t1=50)
     do_sgd(X, y)
+    
 
     # mini-batch gradient descent
     np.random.seed(42)
@@ -335,7 +415,9 @@ def run():
     sgd_path = np.array(theta_path_sgd)
     mgd_path = np.array(theta_path_mgd)
     plot_all_gradient_descent(sgd_path, mgd_path, bgd_path)
+    """
 
+    """
     # polynomial regression
     # modify a polynomial to use linear regression
     np.random.seed(42)
@@ -365,8 +447,10 @@ def run():
         ("lin_reg", LinearRegression()),
     ])
     plot_learning_curves(polynomial_regression, X, y)
+    """
 
     """Regularized Models"""
+    """
     # Ridge regularization with linear regression vs polynomial regression
     from sklearn.linear_model import Ridge
     np.random.seed(42)
@@ -398,8 +482,10 @@ def run():
     ridge_reg = Ridge(alpha=1, solver="sag", random_state=42)
     ridge_reg.fit(X, y)
     print(ridge_reg.predict([[1.5]]))
+    """
 
     """Lasso Regression"""
+    """
     from sklearn.linear_model import Lasso
     plt.figure(figsize=(8, 4))
     plt.subplot(121)
@@ -412,6 +498,7 @@ def run():
     lasso_reg = Lasso(alpha=0.1)
     lasso_reg.fit(X, y)
     print(lasso_reg.predict([[1.5]]))
+    """
 
     """Elastic net"""
     from sklearn.linear_model import ElasticNet
@@ -426,6 +513,7 @@ def run():
     X_train, X_val, y_train, y_val = train_test_split(X[:50], y[:50].ravel(), test_size=0.5, random_state=10)
     do_manual_early_stop(X_train=X_train, y_train=y_train, X_val=X_val, y_val=y_val)
 
+    regularization_plots()
 
 
 
