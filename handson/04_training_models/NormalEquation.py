@@ -349,6 +349,20 @@ def regularization_plots():
     plt.show()
 
 
+def plot_log_regression():
+    t = np.linspace(-10, 10, 100)
+    sig = 1/(1 + np.exp(-t))
+    plt.figure(figsize=(9, 3))
+    plt.plot([-10, 10], [0, 0], "k-")
+    plt.plot([-10, 10], [0.5, 0.5], "k:")
+    plt.plot([-10, 10], [1, 1], "k:")
+    plt.plot([-0, 0], [-1.1, 1.1], "k:")
+    plt.plot(t, sig, "b-", linewidth=2, label=r"$\sigma(t) = \frac{1}{1 + e^{-t}}$")
+    plt.xlabel("t")
+    plt.legend(loc="upper left", fontsize=20)
+    plt.axis([-10, 10, -0.1, 1.1])
+    plt.show()
+
 
 def run():
     X, y = generate_data()
@@ -514,6 +528,7 @@ def run():
     do_manual_early_stop(X_train=X_train, y_train=y_train, X_val=X_val, y_val=y_val)
 
     regularization_plots()
+    plot_log_regression()
 
 
 
