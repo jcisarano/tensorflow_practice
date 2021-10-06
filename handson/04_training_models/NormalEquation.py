@@ -515,6 +515,7 @@ def run():
     """
 
     """Elastic net"""
+    """
     from sklearn.linear_model import ElasticNet
     elastic_net = ElasticNet(alpha=0.1, l1_ratio=0.5, random_state=42)
     elastic_net.fit(X, y)
@@ -526,9 +527,14 @@ def run():
     y = 2 + X + 0.5*X**2 + np.random.randn(m, 1)
     X_train, X_val, y_train, y_val = train_test_split(X[:50], y[:50].ravel(), test_size=0.5, random_state=10)
     do_manual_early_stop(X_train=X_train, y_train=y_train, X_val=X_val, y_val=y_val)
+    """
 
-    regularization_plots()
-    plot_log_regression()
+    # regularization_plots()
+    # plot_log_regression()
+
+    from sklearn import datasets
+    iris = datasets.load_iris()
+    print(list(iris.keys()))  # list() returns a python list
 
 
 
