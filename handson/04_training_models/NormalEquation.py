@@ -419,7 +419,6 @@ def logistic_regression_plot(iris):
     plt.ylabel("Petal width", fontsize=14)
     plt.axis([2.9, 7, 0.8, 2.7])
     plt.show()
-    plt.show()
 
 
 def run():
