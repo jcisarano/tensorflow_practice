@@ -20,7 +20,7 @@ def softmax(logits):
 def run():
     iris = datasets.load_iris()
 
-    np.random.seed(42)
+    np.random.seed(2042)
     X = iris["data"][:, (2, 3)]  # petal length and width
     y = iris["target"]
     X_b = np.c_[np.ones((len(X), 1)), X]
@@ -44,6 +44,9 @@ def run():
     y_train_one_hot = to_one_hot(y_train)
     y_validation_one_hot = to_one_hot(y_validation)
     y_test_one_hot = to_one_hot(y_test)
+
+    print(y_train[:10])
+    print(y_train_one_hot[:10])
 
     n_inputs = X_train.shape[1]  # == 3 (petal width, petal length, and bias term)
     n_outputs = len(np.unique(y_train))  # == 3 (three types of iris)
