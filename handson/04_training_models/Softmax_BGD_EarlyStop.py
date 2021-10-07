@@ -176,3 +176,10 @@ def run():
     plt.ylabel("Petal width", fontsize=14)
     plt.legend(loc="upper left", fontsize=14)
     plt.show()
+
+    logits = X_test.dot(Theta)
+    Y_proba = softmax(logits)
+    y_predict = np.argmax(Y_proba, axis=1)
+    accuracy_score = np.mean(y_predict == y_test)
+    print(accuracy_score)
+
