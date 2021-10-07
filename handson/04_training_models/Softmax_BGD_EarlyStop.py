@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import datasets
 
@@ -138,4 +139,40 @@ def run():
             print(iteration, loss, "early stopping")
             break
 
+    # now evaluate:
+    logits = X_validation.dot(Theta)
+    y_proba = softmax(logits)
+    y_predict = np.argmax(y_proba, axis=1)
+    accuracy_score = np.mean(y_predict == y_validation)
+    print(accuracy_score)
 
+    x0, x1 = np.meshgrid(
+        np.linspace(0, 8, 500).reshape(-1, 1),
+        np.linspace(0, 3.5, 200).reshape(-1, 1),
+    )
+
+    X_new = np.c_[x0.ravel(), x1.ravel()]
+    X_new_with_bias = np.c_[np.ones([len(X_new), 1]), X_new]
+
+    logits = X_new_with_bias.dot(Theta)
+    y_proba = softmax(logits)
+    y_predict = np.argmax(y_proba, axis=1)
+
+    zz1 = y_proba[:, 1].reshape(x0.shape)
+    zz = y_predict.reshape(x0.shape)
+
+    plt.figure(figsize=(10, 5))
+    plt.plot(X[y == 2, 0], X[y == 2, 1], "g^", label="Iris virginica")
+    plt.plot(X[y == 1, 0], X[y == 1, 1], "bs", label="Iris versicolor")
+    plt.plot(X[y == 0, 0], X[y == 0, 1], "yo", label="Iris setosa")
+
+    from matplotlib.colors import ListedColormap
+    custom_cmap = ListedColormap(['#fafab0', '#9898ff', '#a0faa0'])
+
+    plt.contourf(x0, x1, zz, cmap=custom_cmap)
+    contour = plt.contour(x0, x1, zz1, cmap=plt.cm.brg)
+    plt.clabel(contour, inline=1, fontsize=12)
+    plt.xlabel("Petal length", fontsize=14)
+    plt.ylabel("Petal width", fontsize=14)
+    plt.legend(loc="upper left", fontsize=14)
+    plt.show()
