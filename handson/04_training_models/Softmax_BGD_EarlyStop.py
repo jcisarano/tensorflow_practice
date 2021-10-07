@@ -60,9 +60,9 @@ def run():
         logits = X_train.dot(Theta)
         y_proba = softmax(logits)
         loss = -np.mean(np.sum(y_train_one_hot * np.log(y_proba + epsilon), axis=1))
-        error = y_proba - y_train_one_hot
         if iteration % 500 == 0:
             print(iteration, loss)
+        error = y_proba - y_train_one_hot
         gradients = 1/m * X_train.T.dot(error)
         Theta = Theta - eta * gradients
 
