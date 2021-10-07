@@ -1,6 +1,14 @@
 import numpy as np
-from sklearn import  datasets
+from sklearn import datasets
 
+
+def to_one_hot(y):
+    n_classes = y.max() + 1
+    m = len(y)
+    y_one_hot = np.zeros((m, n_classes))
+    y_one_hot[np.arange(m), y] = 1
+    # print(y_one_hot[:10])
+    return y_one_hot
 
 
 def run():
@@ -24,6 +32,11 @@ def run():
     y_train = y_shuffle[:train_split_index]
     y_validation = y_shuffle[train_split_index:test_split_index]
     y_test = y_shuffle[test_split_index:]
+    # print(len(X_train), len(X_validation), len(X_test))
+    # print(len(y_train), len(y_validation), len(y_test))
 
-    print(len(X_train), len(X_validation), len(X_test))
-    print(len(y_train), len(y_validation), len(y_test))
+    y_train_one_hot = to_one_hot(y_train)
+    y_validation_one_hot = to_one_hot(y_validation)
+    y_test_one_hot = to_one_hot(y_test)
+    
+
