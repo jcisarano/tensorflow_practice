@@ -76,4 +76,31 @@ def run():
     accuracy_score = np.mean(y_predict == y_validation)
     print(accuracy_score)
 
+    # same training function, but with l2 regularization and faster learning rate
+    eta = 0.1
+    n_iterations = 5001
+    m = len(X_train)
+    epsilon = 1e-7
+    alpha = 0.1  # regularization hyperparameter
+
+    Theta = np.random.randn(n_inputs, n_outputs)
+
+    for iteration in range(n_iterations):
+        logits = X_train.dot(Theta)
+        y_proba = softmax(logits)
+        xentropy_loss = -np.mean(np.sum(y_train_one_hot * np.log(y_proba + epsilon), axis=1))
+        l2_loss = 1/2 * np.sum(np.square(Theta[1:]))
+        loss = xentropy_loss + alpha * l2_loss
+        error = y_proba - y_train_one_hot
+        if iteration % 500 == 0:
+            print(iteration, loss)
+        gradients = 1/m * X_train.T.dot(error) + np.r_[np.zeros([1, n_outputs]), alpha*Theta[1:]]
+        Theta = Theta - eta * gradients
+
+    # now check against validation data:
+    logits = X_validation.dot(Theta)
+    y_proba = softmax(logits)
+    y_predict = np.argmax(y_proba, axis=1)
+    accuracy_score = np.mean(y_predict == y_validation)
+    print(accuracy_score)
 
