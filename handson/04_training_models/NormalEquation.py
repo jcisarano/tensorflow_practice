@@ -634,15 +634,18 @@ def run():
     # print(list(iris.keys()))  # list() returns a python list
     # print(iris.DESCR)
 
-    X = iris["data"][:, 3:]  # petal widths
-    y = (iris["target"] == 2).astype(np.int)  # 1 if type is Iris-Virginica, otherwise 0
+    # X = iris["data"][:, 3:]  # petal widths
+    # y = (iris["target"] == 2).astype(np.int)  # 1 if type is Iris-Virginica, otherwise 0
 
-    from sklearn.linear_model import LogisticRegression
-    log_reg = LogisticRegression(solver="liblinear", random_state=42)
-    log_reg.fit(X, y)
+    # from sklearn.linear_model import LogisticRegression
+    # log_reg = LogisticRegression(solver="liblinear", random_state=42)
+    # log_reg.fit(X, y)
 
     # iris_virginica_fancy_plot(log_reg, X, y)
-    print(log_reg.predict([[1.7], [1.5]]))
+    # print(log_reg.predict([[1.7], [1.5]]))
 
     #logistic_regression_plot(iris)
     plot_softmax(iris)
+
+
+
