@@ -66,6 +66,11 @@ def run():
         gradients = 1/m * X_train.T.dot(error)
         Theta = Theta - eta * gradients
 
-
+    # print(Theta)
+    logits = X_validation.dot(Theta)
+    y_proba = softmax(logits)
+    y_predict = np.argmax(y_proba, axis=1)
+    accuracy_score = np.mean(y_predict == y_validation)
+    print(accuracy_score)
 
 
