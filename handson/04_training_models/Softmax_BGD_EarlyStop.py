@@ -11,6 +11,12 @@ def to_one_hot(y):
     return y_one_hot
 
 
+def softmax(logits):
+    exp = np.exp(logits)
+    sum_exp = np.sum(exp, axis=1, keepdims=True)
+    return exp / sum_exp
+
+
 def run():
     iris = datasets.load_iris()
 
@@ -38,5 +44,28 @@ def run():
     y_train_one_hot = to_one_hot(y_train)
     y_validation_one_hot = to_one_hot(y_validation)
     y_test_one_hot = to_one_hot(y_test)
-    
+
+    n_inputs = X_train.shape[1]  # == 3 (petal width, petal length, and bias term)
+    n_outputs = len(np.unique(y_train))  # == 3 (three types of iris)
+
+    # training
+    eta = 0.01
+    n_iterations = 5001
+    m = len(X_train)
+    epsilon = 1e-7
+
+    Theta = np.random.randn(n_inputs, n_outputs)
+
+    for iteration in range(n_iterations):
+        logits = X_train.dot(Theta)
+        y_proba = softmax(logits)
+        loss = -np.mean(np.sum(y_train_one_hot * np.log(y_proba + epsilon), axis=1))
+        error = y_proba - y_train_one_hot
+        if iteration % 500 == 0:
+            print(iteration, loss)
+        gradients = 1/m * X_train.T.dot(error)
+        Theta = Theta - eta * gradients
+
+
+
 
