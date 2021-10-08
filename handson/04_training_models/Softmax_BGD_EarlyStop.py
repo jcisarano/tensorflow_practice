@@ -21,7 +21,7 @@ def softmax(logits):
 def run():
     iris = datasets.load_iris()
 
-    np.random.seed(2042)
+    np.random.seed(100)
     X = iris["data"][:, (2, 3)]  # petal length and width
     y = iris["target"]
     X_b = np.c_[np.ones((len(X), 1)), X]
@@ -146,6 +146,7 @@ def run():
     accuracy_score = np.mean(y_predict == y_validation)
     print(accuracy_score)
 
+    # plot
     x0, x1 = np.meshgrid(
         np.linspace(0, 8, 500).reshape(-1, 1),
         np.linspace(0, 3.5, 200).reshape(-1, 1),
@@ -177,6 +178,7 @@ def run():
     plt.legend(loc="upper left", fontsize=14)
     plt.show()
 
+    # check accuracy against test set
     logits = X_test.dot(Theta)
     Y_proba = softmax(logits)
     y_predict = np.argmax(Y_proba, axis=1)
