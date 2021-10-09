@@ -12,11 +12,13 @@ import tensorflow as tf
 
 import examine_circles_data
 
+import simple_model as sm
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # make 1000 examples
     X, y = examine_circles_data.generate_circles()
-    examine_circles_data.examine_data(X, y)
+    # examine_circles_data.examine_data(X, y)
 
     # Steps to build NN model
     # 1. Prepare the data
@@ -24,7 +26,7 @@ if __name__ == '__main__':
     # 3. Compile the model: loss function, optimizer, metrics
     # 4. Fit the model to the training data
     # 5. Evaluate and improve through experimentation
-
+    sm.run(X, y)
 
 
 
