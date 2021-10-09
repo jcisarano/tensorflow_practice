@@ -27,5 +27,14 @@ if __name__ == '__main__':
     plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdYlBu)
     plt.show()
 
+    print(X.shape, y.shape)
+
+    # Steps to build NN model
+    # 1. Prepare the data
+    # 2. Build the model: inputs, outputs, layers
+    # 3. Compile the model: loss function, optimizer, metrics
+    # 4. Fit the model to the training data
+    # 5. Improve through experimentation
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
