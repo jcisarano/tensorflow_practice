@@ -8,33 +8,24 @@
 from sklearn.datasets import make_circles
 import pandas as pd
 import matplotlib.pyplot as plt
+import tensorflow as tf
 
+import examine_circles_data
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # make 1000 examples
-    n_samples = 1000
-    X, y = make_circles(n_samples,
-                        noise=0.03,
-                        random_state=42)
-    # Check out features and labels:
-    print(X[:10])
-    print(y[:10])
-
-    circles = pd.DataFrame({"X0:": X[:, 0], "X1": X[:, 1], "label": y})
-    print(circles)
-
-    plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdYlBu)
-    plt.show()
-
-    print(X.shape, y.shape)
+    X, y = examine_circles_data.generate_circles()
+    examine_circles_data.examine_data(X, y)
 
     # Steps to build NN model
     # 1. Prepare the data
     # 2. Build the model: inputs, outputs, layers
     # 3. Compile the model: loss function, optimizer, metrics
     # 4. Fit the model to the training data
-    # 5. Improve through experimentation
+    # 5. Evaluate and improve through experimentation
+
+
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
