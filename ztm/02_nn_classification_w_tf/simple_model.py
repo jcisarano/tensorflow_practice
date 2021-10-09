@@ -28,6 +28,7 @@ def run(X, y):
     print(model.evaluate(X, y))
     """
 
+    """
     tf.random.set_seed(42)
     model_1 = tf.keras.Sequential([
         tf.keras.layers.Dense(1),
@@ -35,6 +36,31 @@ def run(X, y):
     ])
 
     model_1.compile(loss=tf.keras.losses.BinaryCrossentropy(), optimizer=tf.keras.optimizers.SGD(), metrics=["accuracy"])
-    model_1.fit(X, y, epochs=100, verbose=0)
-    model_1.evaluate(X,y)
+    model_1.fit(X, y, epochs=100, verbose=0, workers=-1)
+    print(model_1.evaluate(X, y))
+    """
 
+
+    """
+    Common ways to improve model performance:
+        Adding layers
+        Increase the number of hidden units in the layers
+        Change the activation functions of the layers
+        Change the optimization function of the model
+        Change the learning rate of the optimization function
+        Fit on more data
+        Fit for longer    
+    """
+
+    tf.random.set_seed(42)
+    model_2 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(100),
+        tf.keras.layers.Dense(10),
+        tf.keras.layers.Dense(1),
+    ])
+
+    model_2.compile(loss=tf.keras.losses.BinaryCrossentropy(),
+                    optimizer=tf.keras.optimizers.Adam(),
+                    metrics=["accuracy"])
+    model_2.fit(X, y, epochs=100, verbose=0, workers=-1)
+    print(model_2.evaluate(X, y))
