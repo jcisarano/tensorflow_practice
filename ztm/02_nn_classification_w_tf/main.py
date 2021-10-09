@@ -7,6 +7,8 @@
 
 from sklearn.datasets import make_circles
 import pandas as pd
+import matplotlib.pyplot as plt
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -21,5 +23,9 @@ if __name__ == '__main__':
 
     circles = pd.DataFrame({"X0:": X[:, 0], "X1": X[:, 1], "label": y})
     print(circles)
+
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdYlBu)
+    plt.show()
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
