@@ -100,7 +100,7 @@ def run(X, y):
         Fit for longer    
     """
 
-    tf.random.set_seed(42)
+    """    tf.random.set_seed(42)
     model_2 = tf.keras.models.Sequential([
         tf.keras.layers.Dense(100),
         tf.keras.layers.Dense(10),
@@ -127,7 +127,7 @@ def run(X, y):
     ])
     model_2.compile(loss=tf.keras.losses.mae,
                     optimizer=tf.keras.optimizers.Adam(),
-                    metrics=["mae"])
+                    metrics=["mae"])"""
 
     X_regression = tf.range(0, 1000, 5)
     y_regression = tf.range(100, 1100, 5)  # y = x + 100
@@ -135,7 +135,7 @@ def run(X, y):
     # split into training and test sets
     X_reg_train, X_reg_test = X_regression[:150], X_regression[150:]
     y_reg_train, y_reg_test = y_regression[:150], y_regression[150:]
-    model_2.fit(X_reg_train, y_reg_train, epochs=100)
+    """    model_2.fit(X_reg_train, y_reg_train, epochs=100)
 
     # make predictions with this model and plot them
     y_reg_pred = model_2.predict(X_reg_test)
@@ -145,4 +145,34 @@ def run(X, y):
     plt.scatter(X_reg_test, y_reg_pred, c="r", label="Predictions")
     plt.legend()
 
+    plt.show()"""
+
+    # turns out that this model is linear and great at plotting straight lines,
+    # but that does not fit the circle data at all
+
+    """    tf.random.set_seed(42)
+    model_3 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(1, activation="linear"),
+    ])
+    model_3.compile(loss=tf.keras.losses.binary_crossentropy,
+                    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+                    metrics=["accuracy"])
+    history = model_3.fit(X, y, epochs=100)
+    plt.scatter(X[:, 0], X[:, 1], c=y, cmap=plt.cm.RdYlBu)
     plt.show()
+
+    plot_decision_boundary(model_3, X, y)"""
+
+    # nonlinear activation
+    tf.random.set_seed(42)
+    model_4 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(1, activation=tf.keras.activations.relu),
+    ])
+    model_4.compile(loss=tf.keras.losses.BinaryCrossentropy(),
+                    optimizer=tf.keras.optimizers.Adam(),
+                    metrics=["accuracy"])
+    history = model_4.fit(X, y, epochs=100)
+
+    
+
+
