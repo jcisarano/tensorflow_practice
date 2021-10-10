@@ -116,3 +116,33 @@ def run(X, y):
     # visualize predictions:
     plot_decision_boundary(model_2, X, y)
 
+    # test this model with regression data
+    tf.random.set_seed(42)
+
+    #need a model that uses regression loss and metrics types
+    model_2 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(100),
+        tf.keras.layers.Dense(10),
+        tf.keras.layers.Dense(1),
+    ])
+    model_2.compile(loss=tf.keras.losses.mae,
+                    optimizer=tf.keras.optimizers.Adam(),
+                    metrics=["mae"])
+
+    X_regression = tf.range(0, 1000, 5)
+    y_regression = tf.range(100, 1100, 5)  # y = x + 100
+
+    # split into training and test sets
+    X_reg_train, X_reg_test = X_regression[:150], X_regression[150:]
+    y_reg_train, y_reg_test = y_regression[:150], y_regression[150:]
+    model_2.fit(X_reg_train, y_reg_train, epochs=100)
+
+    # make predictions with this model and plot them
+    y_reg_pred = model_2.predict(X_reg_test)
+    plt.figure(figsize=(10, 7))
+    plt.scatter(X_reg_train, y_reg_train, c="b", label="Training data")
+    plt.scatter(X_reg_test, y_reg_test, c="g", label="Test data")
+    plt.scatter(X_reg_test, y_reg_pred, c="r", label="Predictions")
+    plt.legend()
+
+    plt.show()
