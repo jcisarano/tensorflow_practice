@@ -164,17 +164,17 @@ def run(X, y):
     plot_decision_boundary(model_3, X, y)"""
 
     # nonlinear activation
-    tf.random.set_seed(42)
+    """    tf.random.set_seed(42)
     model_4 = tf.keras.models.Sequential([
         tf.keras.layers.Dense(1, activation=tf.keras.activations.relu),
     ])
     model_4.compile(loss=tf.keras.losses.BinaryCrossentropy(),
                     optimizer=tf.keras.optimizers.Adam(),
                     metrics=["accuracy"])
-    history = model_4.fit(X, y, epochs=100)
+    history = model_4.fit(X, y, epochs=100)"""
 
     # replicate successful model from tensorflow playground
-    tf.random.set_seed(42)
+    """    tf.random.set_seed(42)
     model_5 = tf.keras.models.Sequential([
         tf.keras.layers.Dense(3, activation="relu"),
         tf.keras.layers.Dense(1, activation="relu"),
@@ -184,5 +184,20 @@ def run(X, y):
                     optimizer=tf.keras.optimizers.Adam(),
                     metrics=["accuracy"])
     model_5.fit(X, y, epochs=300)
-    plot_decision_boundary(model_5, X, y)
+    plot_decision_boundary(model_5, X, y)"""
+
+    # last one didn't work, needs an activation function on the output layer, probably sigmoid or softmax
+    # sigmoid is typical for binary classification
+    tf.random.set_seed(42)
+    model_6 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ])
+    model_6.compile(loss=tf.keras.losses.BinaryCrossentropy(),
+                    optimizer=tf.keras.optimizers.Adam(),
+                    metrics=["accuracy"])
+    model_6.fit(X, y, epochs=300, workers=-1, verbose=0)
+    model_6.evaluate(X, y)
+    plot_decision_boundary(model_6, X, y)
 
