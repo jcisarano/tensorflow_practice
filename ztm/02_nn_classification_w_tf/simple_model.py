@@ -173,6 +173,16 @@ def run(X, y):
                     metrics=["accuracy"])
     history = model_4.fit(X, y, epochs=100)
 
-    
-
+    # replicate successful model from tensorflow playground
+    tf.random.set_seed(42)
+    model_5 = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(3, activation="relu"),
+        tf.keras.layers.Dense(1, activation="relu"),
+        tf.keras.layers.Dense(1),
+    ])
+    model_5.compile(loss=tf.keras.losses.BinaryCrossentropy(),
+                    optimizer=tf.keras.optimizers.Adam(),
+                    metrics=["accuracy"])
+    model_5.fit(X, y, epochs=300)
+    plot_decision_boundary(model_5, X, y)
 
