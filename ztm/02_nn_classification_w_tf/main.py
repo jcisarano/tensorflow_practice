@@ -14,6 +14,8 @@ import examine_circles_data
 
 import simple_model as sm
 
+import evaluation as eval
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # make 1000 examples
@@ -26,8 +28,12 @@ if __name__ == '__main__':
     # 3. Compile the model: loss function, optimizer, metrics
     # 4. Fit the model to the training data
     # 5. Evaluate and improve through experimentation
-    sm.run(X, y)
+    # sm.run(X, y)
 
+    # Remember the three datasets:
+    # training
+    # validation
+    eval.run(X, y)
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
