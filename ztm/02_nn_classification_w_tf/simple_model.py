@@ -20,7 +20,7 @@ create meshgrid of X values
 make predictions across meshgrid
 plot predictions along with lines along decision zone boundaries
 """
-def plot_decision_boundary(model, X, y):
+def plot_decision_boundary(model, X, y, do_show=True):
     """
     Plots the decision boundary created by model predicting on X
     :param model:
@@ -58,7 +58,8 @@ def plot_decision_boundary(model, X, y):
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
 
-    plt.show()
+    if do_show:
+        plt.show()
 
 
 def sigmoid(x):
