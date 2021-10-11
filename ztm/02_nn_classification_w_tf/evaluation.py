@@ -1,6 +1,7 @@
 # Set up proper datasets for training and testing
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import tensorflow as tf
 
 from simple_model import plot_decision_boundary
@@ -30,7 +31,7 @@ def run(X, y):
     model.compile(loss=tf.keras.losses.BinaryCrossentropy(),
                   optimizer=tf.keras.optimizers.Adam(learning_rate=0.01),
                   metrics=["accuracy"])
-    model.fit(X_train, y_train, epochs=25, workers=-1)
+    history = model.fit(X_train, y_train, epochs=25, workers=-1, verbose=0)
 
     # evaluate on test data
     print(model.evaluate(X_test, y_test))
@@ -43,3 +44,10 @@ def run(X, y):
     plt.subplot(1, 2, 2)
     plt.title("Test")
     plot_decision_boundary(model, X=X_test, y=y_test)
+
+    # plot history object
+    # shows accuracy increase to nearly 1 and loss decrease to nearly 0
+    # print(pd.DataFrame(history.history))
+    pd.DataFrame(history.history).plot()
+    plt.title("Loss curves")
+    plt.show()
