@@ -61,6 +61,21 @@ def plot_decision_boundary(model, X, y):
     plt.show()
 
 
+def sigmoid(x):
+    return 1 / (1 + tf.exp(-x))
+
+
+def relu(x):
+    return tf.maximum(x, 0)
+
+
+def linear(x):
+    return x
+
+
+def softmax(x):
+    return tf.exp(x) / np.sum(tf.exp(x))
+
 def run(X, y):
     """
     tf.random.set_seed(42)
@@ -129,12 +144,13 @@ def run(X, y):
                     optimizer=tf.keras.optimizers.Adam(),
                     metrics=["mae"])"""
 
-    X_regression = tf.range(0, 1000, 5)
+    """    X_regression = tf.range(0, 1000, 5)
     y_regression = tf.range(100, 1100, 5)  # y = x + 100
 
     # split into training and test sets
     X_reg_train, X_reg_test = X_regression[:150], X_regression[150:]
-    y_reg_train, y_reg_test = y_regression[:150], y_regression[150:]
+    y_reg_train, y_reg_test = y_regression[:150], y_regression[150:]"""
+
     """    model_2.fit(X_reg_train, y_reg_train, epochs=100)
 
     # make predictions with this model and plot them
@@ -188,7 +204,7 @@ def run(X, y):
 
     # last one didn't work, needs an activation function on the output layer, probably sigmoid or softmax
     # sigmoid is typical for binary classification
-    tf.random.set_seed(42)
+    """tf.random.set_seed(42)
     model_6 = tf.keras.models.Sequential([
         tf.keras.layers.Dense(4, activation="relu"),
         tf.keras.layers.Dense(4, activation="relu"),
@@ -199,5 +215,24 @@ def run(X, y):
                     metrics=["accuracy"])
     model_6.fit(X, y, epochs=300, workers=-1, verbose=0)
     model_6.evaluate(X, y)
-    plot_decision_boundary(model_6, X, y)
+    plot_decision_boundary(model_6, X, y)"""
 
+    # toy linear tensor
+    A = tf.cast(tf.range(-10, 10), tf.float32)
+    plt.plot(A)
+    plt.show()
+
+    # use custom sigmoid function on toy tensor
+    print(sigmoid(A))
+
+    # plot sigmoid output
+    # it converts linear data to sigmoid curve
+    plt.plot(sigmoid(A))
+    plt.show()
+
+
+    plt.plot(relu(A))
+    plt.show()
+
+    plt.plot(softmax(A))
+    plt.show()
