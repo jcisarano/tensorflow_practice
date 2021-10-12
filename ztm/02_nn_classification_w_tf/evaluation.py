@@ -111,4 +111,19 @@ def run(X, y):
     plt.title("Test")
     plot_decision_boundary(model, X=X_test, y=y_test)
 
+    # More classification evaluation metrics:
+    # Accuracy, Precision, Recall, F1-score, Confusion matrix, classification report (sklearn)
 
+    # check accuracy of model
+    loss, accuracy = model.evaluate(X_test, y_test)
+    print(f"Model loss on the test set: {loss}")
+    print(f"Model accuracy on the test set: {(accuracy*100):.2f}%")
+
+    # confusion matrix
+    from sklearn.metrics import confusion_matrix
+    y_preds = model.predict(X_test)
+    # sigmoid output is prediction probability (range 0-1), but x_test is 0/1 binary values
+    # confusion_matrix requires the data to be the same,
+    # so convert the predictions to binary format by rounding
+    y_preds = tf.round(y_preds)
+    print(confusion_matrix(y_test, y_preds))
