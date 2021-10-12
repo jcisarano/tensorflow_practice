@@ -76,3 +76,14 @@ def run(X, y):
     # plot history
     pd.DataFrame(history.history).plot(figsize=(10, 7), xlabel="epochs")
     plt.show()
+
+    # plot learning rate vs loss
+    # create range of learning rate values
+    lrs = 1e-4 * (10**(tf.range(100)/20))
+    plt.figure(figsize=(10, 7))
+    plt.semilogx(lrs, history.history["loss"])
+    plt.xlabel("Learning rate")
+    plt.ylabel("Loss")
+    plt.title("Learning rate vs loss")
+    plt.show()
+
