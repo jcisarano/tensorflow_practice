@@ -15,6 +15,53 @@ def split(X, y, train_set_percent=0.8):
     test_y = y[train_index:]
     return train_x, train_y, test_x, test_y
 
+def plot_confusion_matrix(y_test, y_preds):
+    import itertools
+    from sklearn.metrics import confusion_matrix
+    figsize = (10, 10)
+    cm = confusion_matrix(y_test, tf.round(y_preds))
+    cm_norm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
+    n_classes = cm.shape[0]
+    fig, ax = plt.subplots(figsize=figsize)
+    # creates a matrix plot
+    cax = ax.matshow(cm, cmap=plt.cm.Blues)
+    fig.colorbar(cax)
+
+    # create classes
+    classes = False
+
+    if classes:
+        labels = classes
+    else:
+        labels = np.arange(cm.shape[0])
+
+    ax.set(title="Confusion Matrix",
+           xlabel="Predicted Label",
+           ylabel="True Label",
+           xticks=np.arange(n_classes),
+           yticks=np.arange(n_classes),
+           yticklabels=labels,
+           xticklabels=labels)
+
+    # set x-axis labels at bottom
+    ax.xaxis.set_label_position("bottom")
+    ax.xaxis.tick_bottom()
+
+    ax.yaxis.label.set_size(20)
+    ax.xaxis.label.set_size(20)
+
+    # threshold for colors
+    threshold = (cm.max() + cm.min()) / 2.
+
+    # plot text in each cell
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, f"{cm[i, j]} ({cm_norm[i, j]*100:.1f}%)",
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > threshold else "black",
+                 size=15)
+
+    plt.show()
+
 
 def run(X, y):
     # print(len(X))
@@ -125,5 +172,8 @@ def run(X, y):
     # sigmoid output is prediction probability (range 0-1), but x_test is 0/1 binary values
     # confusion_matrix requires the data to be the same,
     # so convert the predictions to binary format by rounding
-    y_preds = tf.round(y_preds)
-    print(confusion_matrix(y_test, y_preds))
+    # y_preds = tf.round(y_preds)
+    # print(confusion_matrix(y_test, y_preds))
+
+
+    plot_confusion_matrix(y_test, y_preds)
