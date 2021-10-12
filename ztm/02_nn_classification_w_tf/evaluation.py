@@ -54,7 +54,7 @@ def run(X, y):
 
     # finding ideal learning rate
     # using learning rate callback to monitor lr during training
-    tf.random.set_seed(42)
+    """tf.random.set_seed(42)
     model = tf.keras.models.Sequential([
         tf.keras.layers.Dense(4, activation="relu"),
         tf.keras.layers.Dense(4, activation="relu"),
@@ -85,5 +85,30 @@ def run(X, y):
     plt.xlabel("Learning rate")
     plt.ylabel("Loss")
     plt.title("Learning rate vs loss")
-    plt.show()
+    plt.show()"""
+
+    # another model, using the optimal learning rate discovered above: 0.02
+    tf.random.set_seed(42)
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ])
+    model.compile(loss=tf.keras.losses.BinaryCrossentropy(),
+                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.02),
+                  metrics=["accuracy"])
+    history = model.fit(X_train, y_train, epochs=20, workers=-1)
+
+    # evaluate with test dataset
+    # turns out its accuracy is a little lower than earlier model (which had 1.0 accuracy)
+    print(model.evaluate(X_test, y_test))
+
+    plt.figure(figsize=(12, 6))
+    plt.subplot(1, 2, 1)
+    plt.title("Train")
+    plot_decision_boundary(model, X=X_train, y=y_train, do_show=False)
+    plt.subplot(1, 2, 2)
+    plt.title("Test")
+    plot_decision_boundary(model, X=X_test, y=y_test)
+
 
