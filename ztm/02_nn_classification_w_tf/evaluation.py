@@ -17,12 +17,12 @@ def split(X, y, train_set_percent=0.8):
 
 
 def run(X, y):
-    print(len(X))
+    # print(len(X))
     X_train, y_train, X_test, y_test = split(X, y)
-    print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
+    # print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
     # now create a model to train/eval with train/test data
-    tf.random.set_seed(42)
+    """tf.random.set_seed(42)
     model = tf.keras.models.Sequential([
         tf.keras.layers.Dense(4, activation="relu"),
         tf.keras.layers.Dense(4, activation="relu"),
@@ -50,4 +50,29 @@ def run(X, y):
     # print(pd.DataFrame(history.history))
     pd.DataFrame(history.history).plot()
     plt.title("Loss curves")
+    plt.show()"""
+
+    # finding ideal learning rate
+    # using learning rate callback to monitor lr during training
+    tf.random.set_seed(42)
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ])
+
+    model.compile(loss=tf.keras.losses.BinaryCrossentropy(),
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    # create the learning rate callback
+    lr_scheduler = tf.keras.callbacks.LearningRateScheduler(lambda epoch: 1e-4 * 10**(epoch/20))
+
+    # model with lr_scheduler
+    history = model.fit(X_train, y_train,
+                        epochs=100,
+                        callbacks=[lr_scheduler],
+                        workers=-1)
+
+    # plot history
+    pd.DataFrame(history.history).plot(figsize=(10, 7), xlabel="epochs")
     plt.show()
