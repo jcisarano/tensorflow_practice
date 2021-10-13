@@ -40,8 +40,29 @@ def run():
     class_names = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
                    "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot", ]
 
-    index = 440
-    plot_one_data_sample(train_data[index], class_names[train_labels[index]])
+    # index = 440
+    # plot_one_data_sample(train_data[index], class_names[train_labels[index]])
 
     # plot multiple random images to help visualize data
-    plot_multiple_random_samples(t_data=train_data, t_labels=train_labels, c_names=class_names)
+    # plot_multiple_random_samples(t_data=train_data, t_labels=train_labels, c_names=class_names)
+
+    # multiclass classifier
+    # input shape: 28x28, the image size
+    # output shape: 10, one per type of clothing
+    # Loss function for one-hot encoded labels: tf.keras.losses.CategoricalCrossentropy
+    # Loss function for integer labels: SparseCategoricalCrossentropy
+
+    tf.random.set_seed(42)
+    model = tf.keras.Sequential([
+        tf.keras.layers.Flatten(input_shape=(28, 28)),  # converts 28x28 image data into one long vector (None,784)
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(10, activation="softmax"),
+    ])
+    model.compile(loss=tf.keras.losses.CategoricalCrossentropy(),  # used when labels are not one-hot encoded
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    non_norm_history = model.fit(train_data,
+                                 tf.one_hot(train_labels, depth=10),
+                                 epochs=10, validation_data=(test_data, tf.one_hot(test_labels, depth=10)),
+                                 workers=-1)
