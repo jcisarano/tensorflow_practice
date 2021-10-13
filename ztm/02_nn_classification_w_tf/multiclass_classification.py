@@ -53,7 +53,7 @@ def run():
     # Loss function for one-hot encoded labels: tf.keras.losses.CategoricalCrossentropy
     # Loss function for integer labels: SparseCategoricalCrossentropy
 
-    tf.random.set_seed(42)
+    """tf.random.set_seed(42)
     model = tf.keras.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),  # converts 28x28 image data into one long vector (None,784)
         tf.keras.layers.Dense(4, activation="relu"),
@@ -70,7 +70,7 @@ def run():
                                  workers=-1)
 
     # check the model summary
-    print(model.summary())
+    print(model.summary())"""
 
     # check size of data
     print(train_data.min(), train_data.max())
@@ -80,7 +80,7 @@ def run():
     print(train_data_norm.min(), train_data_norm.max())
 
     # new model that uses the normalized data
-    tf.random.set_seed(42)
+    """tf.random.set_seed(42)
     model_norm = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),
         tf.keras.layers.Dense(4, activation="relu"),
@@ -95,11 +95,55 @@ def run():
                                   tf.one_hot(train_labels, depth=10),
                                   epochs=10,
                                   validation_data=(test_data_norm, tf.one_hot(test_labels, depth=10)),
-                                  workers=-1)
+                                  workers=-1)"""
     # normalization improved accuracy to about 80%, from 35% when not normalized
 
     # plot loss curves
-    pd.DataFrame(norm_history.history).plot(title="Non normalized data")
-    pd.DataFrame(non_norm_history.history).plot(title="Normalized data")
+    # pd.DataFrame(norm_history.history).plot(title="Non normalized data")
+    # pd.DataFrame(non_norm_history.history).plot(title="Normalized data")
+    # plt.show()
+
+    # work on finding ideal learning rate (where loss decreases the most)
+    tf.random.set_seed(42)
+    model_lr = tf.keras.models.Sequential([
+        tf.keras.layers.Flatten(input_shape=(28, 28)),
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(10, activation="softmax"),
+    ])
+    model_lr.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
+                     optimizer=tf.keras.optimizers.Adam(),
+                     metrics=["accuracy"])
+
+    lr_scheduler = tf.keras.callbacks.LearningRateScheduler(lambda epoch: 1e-3 * 10**(epoch/20))
+    history_find_lr = model_lr.fit(train_data_norm,
+                                   tf.one_hot(train_labels, depth=10),
+                                   epochs=40,
+                                   validation_data=(test_data_norm, tf.one_hot(test_labels, depth=10)),
+                                   workers=-1,
+                                   callbacks=[lr_scheduler])
+
+    # plot learning rate decay curve
+    lrs = 1e-3 * (10 ** (tf.range(40) / 20))
+    plt.semilogx(lrs, history_find_lr.history["loss"])
+    plt.xlabel("Learning rate")
+    plt.ylabel("Loss")
+    plt.title("Finding the ideal learning rate")
     plt.show()
+
+    #ideal learning rate appearst to be 0.001
+    tf.random.set_seed(42)
+    model_ideal_lr = tf.keras.models.Sequential([
+        tf.keras.layers.Flatten(input_shape=(28, 28)),
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(10, activation="softmax"),
+    ])
+    model_ideal_lr.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
+                           optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+                           metrics=["accuracy"])
+    history_ideal_lr = model_ideal_lr.fit(train_data_norm,
+                                          tf.one_hot(train_labels, depth=10),
+                                          epochs=20,
+                                          validation_data=(test_data_norm, tf.one_hot(test_labels, depth=10)))
 
