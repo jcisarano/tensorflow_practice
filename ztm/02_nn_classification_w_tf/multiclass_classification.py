@@ -104,7 +104,7 @@ def run():
     # plt.show()
 
     # work on finding ideal learning rate (where loss decreases the most)
-    tf.random.set_seed(42)
+    """tf.random.set_seed(42)
     model_lr = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),
         tf.keras.layers.Dense(4, activation="relu"),
@@ -121,17 +121,17 @@ def run():
                                    epochs=40,
                                    validation_data=(test_data_norm, tf.one_hot(test_labels, depth=10)),
                                    workers=-1,
-                                   callbacks=[lr_scheduler])
+                                   callbacks=[lr_scheduler])"""
 
     # plot learning rate decay curve
-    lrs = 1e-3 * (10 ** (tf.range(40) / 20))
+    """lrs = 1e-3 * (10 ** (tf.range(40) / 20))
     plt.semilogx(lrs, history_find_lr.history["loss"])
     plt.xlabel("Learning rate")
     plt.ylabel("Loss")
     plt.title("Finding the ideal learning rate")
-    plt.show()
+    plt.show()"""
 
-    #ideal learning rate appearst to be 0.001
+    # ideal learning rate appearst to be 0.001
     tf.random.set_seed(42)
     model_ideal_lr = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),
@@ -147,3 +147,14 @@ def run():
                                           epochs=20,
                                           validation_data=(test_data_norm, tf.one_hot(test_labels, depth=10)))
 
+    y_pred_probabilities = model_ideal_lr.predict(test_data_norm)
+    y_preds = y_pred_probabilities.argmax(axis=1)
+
+    from sklearn.metrics import confusion_matrix
+    print(confusion_matrix(y_true=test_labels, y_pred=y_preds))
+
+    # assess outputs
+    # create a confusion matrix
+    from evaluation import plot_confusion_matrix
+    plot_confusion_matrix(test_labels, y_preds,
+                          classes=class_names, figsize=(15, 15), text_size=10)

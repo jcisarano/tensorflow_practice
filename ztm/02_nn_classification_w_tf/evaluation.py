@@ -15,20 +15,17 @@ def split(X, y, train_set_percent=0.8):
     test_y = y[train_index:]
     return train_x, train_y, test_x, test_y
 
-def plot_confusion_matrix(y_test, y_preds):
+
+def plot_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_size=20):
     import itertools
     from sklearn.metrics import confusion_matrix
-    figsize = (10, 10)
-    cm = confusion_matrix(y_test, tf.round(y_preds))
+    cm = confusion_matrix(y_true, tf.round(y_pred))
     cm_norm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
     n_classes = cm.shape[0]
     fig, ax = plt.subplots(figsize=figsize)
     # creates a matrix plot
     cax = ax.matshow(cm, cmap=plt.cm.Blues)
     fig.colorbar(cax)
-
-    # create classes
-    classes = False
 
     if classes:
         labels = classes
@@ -47,8 +44,9 @@ def plot_confusion_matrix(y_test, y_preds):
     ax.xaxis.set_label_position("bottom")
     ax.xaxis.tick_bottom()
 
-    ax.yaxis.label.set_size(20)
-    ax.xaxis.label.set_size(20)
+    ax.yaxis.label.set_size(text_size)
+    ax.xaxis.label.set_size(text_size)
+    ax.title.set_size(text_size)
 
     # threshold for colors
     threshold = (cm.max() + cm.min()) / 2.
@@ -58,7 +56,7 @@ def plot_confusion_matrix(y_test, y_preds):
         plt.text(j, i, f"{cm[i, j]} ({cm_norm[i, j]*100:.1f}%)",
                  horizontalalignment="center",
                  color="white" if cm[i, j] > threshold else "black",
-                 size=15)
+                 size=text_size)
 
     plt.show()
 
