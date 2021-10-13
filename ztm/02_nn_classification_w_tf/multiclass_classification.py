@@ -3,6 +3,7 @@
 # using tf fashion_mnist dataset
 # 10 classes, 60k examples, test set 10k, 28x28 image
 import matplotlib.pyplot as plt
+import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.datasets import fashion_mnist
 
@@ -52,7 +53,7 @@ def run():
     # Loss function for one-hot encoded labels: tf.keras.losses.CategoricalCrossentropy
     # Loss function for integer labels: SparseCategoricalCrossentropy
 
-    """tf.random.set_seed(42)
+    tf.random.set_seed(42)
     model = tf.keras.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),  # converts 28x28 image data into one long vector (None,784)
         tf.keras.layers.Dense(4, activation="relu"),
@@ -69,7 +70,7 @@ def run():
                                  workers=-1)
 
     # check the model summary
-    print(model.summary())"""
+    print(model.summary())
 
     # check size of data
     print(train_data.min(), train_data.max())
@@ -95,3 +96,10 @@ def run():
                                   epochs=10,
                                   validation_data=(test_data_norm, tf.one_hot(test_labels, depth=10)),
                                   workers=-1)
+    # normalization improved accuracy to about 80%, from 35% when not normalized
+
+    # plot loss curves
+    pd.DataFrame(norm_history.history).plot(title="Non normalized data")
+    pd.DataFrame(non_norm_history.history).plot(title="Normalized data")
+    plt.show()
+
