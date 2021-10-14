@@ -32,6 +32,34 @@ def plot_multiple_random_samples(t_data, t_labels, c_names):
     plt.show()
 
 
+def plot_random_image(model, images, true_labels, classes):
+    import random
+    """
+    picks a random image, plots it and labels it with a prediction and truth label.
+    :param model: 
+    :param images: 
+    :param true_labels: 
+    :param classes: 
+    :return: 
+    """
+    i = random.randint(0, len(images))
+    target_image = images[i]
+    pred_probs = model.predict(target_image.reshape(1, 28, 28))
+    pred_label = classes[pred_probs.argmax()]
+    true_label = classes[true_labels[i]]
+    plt.imshow(target_image, cmap=plt.cm.binary)
+    if pred_label == true_label:
+        color = "green"
+    else:
+        color = "red"
+
+    plt.xlabel("Pred: {} {:2.0f}% (True: {})".format(pred_label,
+                                                     100*tf.reduce_max(pred_probs),
+                                                     true_label),
+               color=color)
+    plt.show()
+
+
 def run():
     (train_data, train_labels), (test_data, test_labels) = load_data()
     # print(f"Training sample:\n {train_data[0]}")
@@ -158,3 +186,5 @@ def run():
     from evaluation import plot_confusion_matrix
     plot_confusion_matrix(test_labels, y_preds,
                           classes=class_names, figsize=(15, 15), text_size=10)
+
+    plot_random_image(model=model_ideal_lr, images=test_data_norm, true_labels=test_labels, classes=class_names)
