@@ -199,3 +199,6 @@ def run():
     print(weights, weights.shape)
 
     print(biases, biases.shape)
+
+    # from tensorflow.keras.utils import plot_model
+    # plot_model(model_ideal_lr, show_shapes=True)
