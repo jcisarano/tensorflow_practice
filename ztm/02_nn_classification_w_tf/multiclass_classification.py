@@ -172,7 +172,7 @@ def run():
                            metrics=["accuracy"])
     history_ideal_lr = model_ideal_lr.fit(train_data_norm,
                                           tf.one_hot(train_labels, depth=10),
-                                          epochs=20,
+                                          epochs=10,
                                           validation_data=(test_data_norm, tf.one_hot(test_labels, depth=10)))
 
     y_pred_probabilities = model_ideal_lr.predict(test_data_norm)
@@ -187,4 +187,15 @@ def run():
     plot_confusion_matrix(test_labels, y_preds,
                           classes=class_names, figsize=(15, 15), text_size=10)
 
-    plot_random_image(model=model_ideal_lr, images=test_data_norm, true_labels=test_labels, classes=class_names)
+    for i in range(10):
+        plot_random_image(model=model_ideal_lr, images=test_data_norm, true_labels=test_labels, classes=class_names)
+
+    # What patterns is the model learning?
+    # Layers of most recent model. Each layer has specific role in finding data features.
+    print(model_ideal_lr.layers)
+    print(model_ideal_lr.layers[0])
+
+    weights, biases = model_ideal_lr.layers[1].get_weights()
+    print(weights, weights.shape)
+
+    print(biases, biases.shape)
