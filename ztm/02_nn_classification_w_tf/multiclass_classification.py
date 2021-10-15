@@ -163,8 +163,8 @@ def run():
     tf.random.set_seed(42)
     model_ideal_lr = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),
-        tf.keras.layers.Dense(4, activation="relu"),
-        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(8, activation="relu"),
+        tf.keras.layers.Dense(8, activation="relu"),
         tf.keras.layers.Dense(10, activation="softmax"),
     ])
     model_ideal_lr.compile(loss=tf.keras.losses.CategoricalCrossentropy(),

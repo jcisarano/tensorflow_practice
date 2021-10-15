@@ -4,6 +4,7 @@
 import tensorflow as tf
 import simple_model as sm
 
+
 def run(X,y):
     tf.random.set_seed(42)
     model = tf.keras.models.Sequential([
