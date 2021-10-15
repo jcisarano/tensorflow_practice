@@ -18,10 +18,12 @@ import evaluation as eval
 
 import multiclass_classification as mc
 
+import playground_copy as pc
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # make 1000 examples
-    # X, y = examine_circles_data.generate_circles()
+    X, y = examine_circles_data.generate_circles()
     # examine_circles_data.examine_data(X, y)
 
     # Steps to build NN model
@@ -37,6 +39,7 @@ if __name__ == '__main__':
     # validation
     # eval.run(X, y)
 
-    mc.run()
+    # mc.run()
+    pc.run(X, y)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
