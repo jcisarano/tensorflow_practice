@@ -26,7 +26,7 @@ def run():
     tf.random.set_seed(42)
     model = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),
-        tf.keras.layers.Dense(20, activation="relu"),
+        tf.keras.layers.Dense(40, activation="relu"),
         tf.keras.layers.Dense(20, activation="relu"),
         tf.keras.layers.Dense(10, activation="softmax"),
     ])
