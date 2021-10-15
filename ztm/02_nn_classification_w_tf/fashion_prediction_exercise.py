@@ -9,12 +9,15 @@ def softmax(x):
 
 
 def run():
+    class_names = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
+                   "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot", ]
     (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
-    print(x_train.shape, y_train.shape)
+    # print(x_train.shape, y_train.shape)
 
     x_train_norm = x_train / x_train.max()
-    print(x_train[0])
-    print(x_train_norm[0])
+    x_test_norm = x_test / x_test.max()
+    # print(x_train[0])
+    # print(x_train_norm[0])
     y_train_one_hot = tf.one_hot(y_train, depth=10)
     # print(y_train_one_hot.shape)
     # print(y_train_one_hot[0])
@@ -24,7 +27,7 @@ def run():
     model = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),
         tf.keras.layers.Dense(20, activation="relu"),
-        tf.keras.layers.Dense(5, activation="relu"),
+        tf.keras.layers.Dense(20, activation="relu"),
         tf.keras.layers.Dense(10, activation="softmax"),
     ])
 
@@ -34,3 +37,11 @@ def run():
 
     model.fit(x_train_norm, y_train_one_hot, epochs=100, workers=-1)
 
+    y_pred_probabilities = model.predict(x_test_norm)
+    y_preds = y_pred_probabilities.argmax(axis=1)
+
+    from sklearn.metrics import confusion_matrix
+    print(confusion_matrix(y_true=y_test, y_pred=y_preds))
+    from evaluation import plot_confusion_matrix
+    plot_confusion_matrix(y_test, y_preds,
+                          classes=class_names, figsize=(15, 15), text_size=10)
