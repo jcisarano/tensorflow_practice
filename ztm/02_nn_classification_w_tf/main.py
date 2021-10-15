@@ -22,6 +22,8 @@ import playground_copy as pc
 
 import moon_data as md
 
+import fashion_prediction_exercise as fpe
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # make 1000 examples
@@ -43,7 +45,8 @@ if __name__ == '__main__':
 
     # mc.run()
     # pc.run(X, y)
-    md.run()
+    # md.run()
 
+    fpe.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
