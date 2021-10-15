@@ -20,6 +20,8 @@ import multiclass_classification as mc
 
 import playground_copy as pc
 
+import moon_data as md
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # make 1000 examples
@@ -40,6 +42,8 @@ if __name__ == '__main__':
     # eval.run(X, y)
 
     # mc.run()
-    pc.run(X, y)
+    # pc.run(X, y)
+    md.run()
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
