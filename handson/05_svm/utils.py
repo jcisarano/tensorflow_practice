@@ -16,6 +16,7 @@ def save_fig(fig_id, tight_layout=True, fig_extension="png", resolution=300):
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
 
+
 def load_iris_setosa_or_versicolor():
     iris = load_iris()
     X = iris["data"][:, (2, 3)]
@@ -27,6 +28,17 @@ def load_iris_setosa_or_versicolor():
 
     return X, y
 
+
+def load_iris_data_width_length(iris_type=2):
+    """
+    :param iris_type: flower type to select for, 0 = setosa, 1 = versicolor, 2 = virginica
+    :return: petal width/length data, with given type==1, all others 0
+    """
+    iris = load_iris()
+    X = iris["data"][:, (2, 3)]
+    y = (iris["target"] == iris_type).astype(np.float64)
+
+    return X, y
 
 def plot_svc_decision_boundary(svm_clf, xmin, xmax):
     w = svm_clf.coef_[0]

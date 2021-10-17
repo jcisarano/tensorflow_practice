@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 # from sklearn.datasets import load_iris
 from sklearn.svm import SVC
+from sklearn.pipeline import Pipeline
 
 import utils
 
@@ -62,7 +63,19 @@ def plot_hard_sensitivity_examples(X, y):
     plt.show()
 
 
+def soft_margin_example():
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.svm import LinearSVC
+
+    X, y = utils.load_iris_data_width_length()
+    svm_clf = Pipeline([
+        ("scaler", StandardScaler()),
+        ("linear_svc", LinearSVC(C=1, loss="hinge", random_state=42)),
+    ])
+    svm_clf.fit(X, y)
+
 def run():
     X, y = utils.load_iris_setosa_or_versicolor()
 
     plot_hard_sensitivity_examples(X, y)
+    soft_margin_example()
