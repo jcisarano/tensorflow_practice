@@ -58,3 +58,13 @@ def plot_svc_decision_boundary(svm_clf, xmin, xmax):
     plt.plot(x0, decision_boundary, "k-", linewidth=2)
     plt.plot(x0, gutter_up, "k--", linewidth=2)
     plt.plot(x0, gutter_down, "k--", linewidth=2)
+
+
+def plot_dataset(X, y, axes):
+    plt.plot(X[:, 0][y == 0], X[:, 1][y == 0], "bs")
+    plt.plot(X[:, 0][y == 1], X[:, 1][y == 1], "g^")
+    plt.axis(axes)
+    plt.grid(True, which="both")
+    plt.xlabel(r"$x_1$", fontsize=20)
+    plt.ylabel(r"$x_2$", fontsize=20, rotation=0)
+    plt.show()

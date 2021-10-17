@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 # from sklearn.datasets import load_iris
-from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC, LinearSVC
 from sklearn.pipeline import Pipeline
 
 import utils
@@ -10,6 +11,8 @@ import utils
 def adding_features_to_dataset():
     """
     add features to the dataset to make it linearly classifiable
+    the plot on the left is not linearly separable
+    so the plot on the right adds one feature to the same data to make it so
     :return:
     """
     X1D = np.linspace(-4, 4, 9).reshape(-1, 1)
@@ -43,5 +46,28 @@ def adding_features_to_dataset():
     plt.show()
 
 
+def get_and_plot_moon_dataset(do_plot=True):
+    from sklearn.datasets import make_moons
+    X, y = make_moons(n_samples=100, noise=0.15, random_state=42)
+    if do_plot:
+        utils.plot_dataset(X, y, [-1.5, 2.5, -1, 1.5])
+
+    return X, y
+
+
+def nonlinear_svm_w_polynomial_features(X, y):
+    from sklearn.preprocessing import PolynomialFeatures
+    clf = Pipeline([
+        ("poly_features", PolynomialFeatures()),
+        ("scaler", StandardScaler()),
+        ("svm_clf", LinearSVC(C=10, loss="hinge", random_state=42, max_iter=10000)),
+    ])
+    clf.fit(X, y)
+
+    return clf
+
+
 def run():
     adding_features_to_dataset()
+    X, y = get_and_plot_moon_dataset()
+    polynomial_clf = nonlinear_svm_w_polynomial_features(X, y)
