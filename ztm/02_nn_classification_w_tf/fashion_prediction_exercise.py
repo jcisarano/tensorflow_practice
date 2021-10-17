@@ -20,7 +20,7 @@ def plot_multiple_images(images, labels, class_names, predictions=None, pred_pro
         plt.imshow(images[index], cmap=plt.cm.binary)
         color = "black"
         if predictions is not None:
-            label = "{} ({}%)".format(class_names[predictions[index]], pred_probs[index].argmax())
+            label = "{} ({:.0f}%)".format(class_names[predictions[index]], np.amax(pred_probs[index]) * 100)
             if predictions[index] != labels[index]:
                 color = "red"
         else:
@@ -58,9 +58,10 @@ def run():
                   optimizer=tf.keras.optimizers.Adam(),
                   metrics=["accuracy"])
 
-    model.fit(x_train_norm, y_train_one_hot, epochs=20, workers=-1)
+    model.fit(x_train_norm, y_train_one_hot, epochs=1, workers=-1)
 
     y_pred_probabilities = model.predict(x_test_norm)
+    print(y_pred_probabilities)
     y_preds = y_pred_probabilities.argmax(axis=1)
 
     from sklearn.metrics import confusion_matrix
