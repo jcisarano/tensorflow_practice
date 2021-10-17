@@ -63,6 +63,10 @@ def plot_hard_sensitivity_examples(X, y):
     plt.show()
 
 
+#def plot_large_margin_vs_fewer_margin_violations():
+
+
+
 def soft_margin_example():
     from sklearn.preprocessing import StandardScaler
     from sklearn.svm import LinearSVC
@@ -73,9 +77,28 @@ def soft_margin_example():
         ("linear_svc", LinearSVC(C=1, loss="hinge", random_state=42)),
     ])
     svm_clf.fit(X, y)
+    return svm_clf
+
+
+def soft_margin_svc_example():
+    from sklearn.preprocessing import StandardScaler
+
+    X, y = utils.load_iris_data_width_length()
+    svc_clf = Pipeline([
+        ("scaler", StandardScaler()),
+        ("svc_linear_kernel", SVC(kernel="linear", C=1)),
+    ])
+
+    svc_clf.fit(X, y)
+    return svc_clf
+
 
 def run():
     X, y = utils.load_iris_setosa_or_versicolor()
 
     plot_hard_sensitivity_examples(X, y)
-    soft_margin_example()
+    soft_marg_clf = soft_margin_example()
+    print(soft_marg_clf.predict([[5.5, 1.7]]))
+
+    soft_marg_svc_clf = soft_margin_svc_example()
+    print(soft_marg_svc_clf.predict([[5.5, 1.7]]))
