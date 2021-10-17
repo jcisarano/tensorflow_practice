@@ -2,7 +2,6 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.datasets import load_iris
 from sklearn.svm import SVC
 
 import utils
@@ -84,13 +83,7 @@ def plot_sensitivity_to_scales():
 
 
 def run():
-    iris = load_iris()
-    X = iris["data"][:, (2, 3)]
-    y = iris["target"]
-
-    setosa_or_versicolor = (y == 0) | (y == 1)
-    X = X[setosa_or_versicolor]
-    y = y[setosa_or_versicolor]
+    X, y = utils.load_iris_setosa_or_versicolor()
 
     plot_bad_models(X, y)
     plot_sensitivity_to_scales()

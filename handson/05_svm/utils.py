@@ -2,6 +2,7 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.datasets import load_iris
 
 PROJECT_ROOT_DIR = "."
 IMAGE_SAVE_PATH = os.path.join(PROJECT_ROOT_DIR, "images")
@@ -14,6 +15,17 @@ def save_fig(fig_id, tight_layout=True, fig_extension="png", resolution=300):
     if tight_layout:
         plt.tight_layout()
     plt.savefig(path, format=fig_extension, dpi=resolution)
+
+def load_iris_setosa_or_versicolor():
+    iris = load_iris()
+    X = iris["data"][:, (2, 3)]
+    y = iris["target"]
+
+    setosa_or_versicolor = (y == 0) | (y == 1)
+    X = X[setosa_or_versicolor]
+    y = y[setosa_or_versicolor]
+
+    return X, y
 
 
 def plot_svc_decision_boundary(svm_clf, xmin, xmax):
