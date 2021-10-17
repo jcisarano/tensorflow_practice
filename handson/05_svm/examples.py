@@ -1,3 +1,5 @@
+# first examples of SVM, comparison to standard linear regression models, show sensitivity to feature scales
+
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import load_iris
@@ -43,6 +45,42 @@ def plot_bad_models(X, y):
     plt.show()
 
 
+def plot_sensitivity_to_scales():
+    """
+    Shows SVM sensitivity to feature scaling.
+    The left plot is unscaled, and the margins are narrow, but wide.
+    The right plot is scaled and the decision boundaries have much more room.
+    :return:
+    """
+    Xs = np.array([[1, 50], [5, 20], [3, 80], [5, 60]]).astype(np.float64)
+    ys = np.array([0, 0, 1, 1])
+    svm_clf = SVC(kernel="linear", C=100)
+    svm_clf.fit(Xs, ys)
+
+    plt.figure(figsize=(9, 2.7))
+    plt.subplot(121)
+    plt.plot(Xs[:, 0][ys == 1], Xs[:, 1][ys == 1], "bo")
+    plt.plot(Xs[:, 0][ys == 0], Xs[:, 1][ys == 0], "ms")
+    utils.plot_svc_decision_boundary(svm_clf=svm_clf, xmin=0, xmax=6)
+    plt.xlabel("$x_0$", fontsize=20)
+    plt.xlabel("$x_1$", fontsize=20, rotation=0)
+    plt.title("Unscaled", fontsize=16)
+    plt.axis([0, 6, 0, 90])
+
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(Xs)
+    svm_clf.fit(X_scaled, ys)
+
+    plt.subplot(122)
+    plt.plot(X_scaled[:, 0][ys == 1], X_scaled[:, 1][ys == 1], "bo")
+    plt.plot(X_scaled[:, 0][ys == 0], X_scaled[:, 1][ys == 0], "ms")
+    utils.plot_svc_decision_boundary(svm_clf=svm_clf, xmin=-2, xmax=2)
+    plt.xlabel("$x'_0$", fontsize=20)
+    plt.ylabel("$x'_1$", fontsize=20, rotation=0)
+    plt.title("Scaled", fontsize=16)
+    plt.axis([-2, 2, -2, 2])
+    plt.show()
 
 
 def run():
@@ -55,4 +93,4 @@ def run():
     y = y[setosa_or_versicolor]
 
     plot_bad_models(X, y)
-
+    plot_sensitivity_to_scales()
