@@ -58,7 +58,7 @@ def get_and_plot_moon_dataset(do_plot=True):
 def nonlinear_svm_w_polynomial_features(X, y):
     from sklearn.preprocessing import PolynomialFeatures
     clf = Pipeline([
-        ("poly_features", PolynomialFeatures()),
+        ("poly_features", PolynomialFeatures(degree=3)),
         ("scaler", StandardScaler()),
         ("svm_clf", LinearSVC(C=10, loss="hinge", random_state=42, max_iter=10000)),
     ])
@@ -71,3 +71,6 @@ def run():
     adding_features_to_dataset()
     X, y = get_and_plot_moon_dataset()
     polynomial_clf = nonlinear_svm_w_polynomial_features(X, y)
+    utils.plot_predictions(clf=polynomial_clf, axes=[-1.5, 2.5, -1, 1.5], show=False)
+    utils.plot_dataset(X=X, y=y, axes=[-1.5, 2.5, -1, 1.5])
+
