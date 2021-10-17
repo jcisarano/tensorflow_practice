@@ -91,7 +91,7 @@ def plot_large_margin_vs_fewer_margin_violations():
     scaled_svm_clf1.fit(X, y)
     scaled_svm_clf2.fit(X, y)
 
-    # convert to unscaled params
+    # convert to unscaled params (for plotting purposes?)
     b1 = svm_clf1.decision_function([-scaler.mean_ / scaler.scale_])
     b2 = svm_clf2.decision_function([-scaler.mean_ / scaler.scale_])
     w1 = svm_clf1.coef_[0] / scaler.scale_
