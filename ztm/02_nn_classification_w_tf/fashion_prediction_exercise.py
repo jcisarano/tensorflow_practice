@@ -29,6 +29,8 @@ def plot_multiple_images(images, labels, class_names, predictions=None, pred_pro
     plt.show()
 
 
+
+
 def run():
     class_names = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
                    "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot", ]
