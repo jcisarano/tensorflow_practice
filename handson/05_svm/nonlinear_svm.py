@@ -170,6 +170,24 @@ def plot_similarity_features_():
     plt.show()
 
 
+def similarity_features_example():
+    gamma = 0.3
+    X1D = np.linspace(-4, 4, 9).reshape(-1, 1)  # generate 9 values between -4 and 4, then reshape to column
+    x1_example = X1D[3, 0]
+
+    for landmark in (-2, 1):
+        k = gaussian_rbf(np.array([[x1_example]]), np.array([[landmark]]), gamma)
+        print("Phi({}, {}) = {}.".format(x1_example, landmark, k))
+
+
+def gaussian_rbf_kernel(X, y):
+    clf = Pipeline([
+        ("scaler", StandardScaler()),
+        ("svm_clf", SVC(kernel="rbf", gamma=5, C=0.001)),
+    ])
+    clf.fit(X, y)
+
+
 def run():
     # adding_features_to_dataset()
     X, y = get_and_plot_moon_dataset(do_plot=False)
@@ -181,4 +199,7 @@ def run():
     # poly100_kernel_svm_clf = nonlinear_svm_w_polynomial_kernel(X=X, y=y, coef0=100, degree=10)
     # plot_poly_kernel_clfs(poly_clf=poly_kernel_svm_clf, poly100_clf=poly100_kernel_svm_clf, X=X, y=y)
 
-    plot_similarity_features_()
+    # plot_similarity_features_()
+    # similarity_features_example()
+
+    gaussian_rbf_kernel(X=X, y=y)
