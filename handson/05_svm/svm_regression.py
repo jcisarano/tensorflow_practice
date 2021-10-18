@@ -34,6 +34,12 @@ def plot_svm_regression(svm_reg, X, y, axes):
 
 
 def do_svm_regression(X, y):
+    """
+    svm regression using kernel trick on linear data
+    :param X:
+    :param y:
+    :return:
+    """
     svm_reg1 = create_linear_svr(X=X, y=y)
     svm_reg2 = create_linear_svr(X=X, y=y, epsilon=0.5)
     svm_reg1.support_ = find_support_vectors(svm_reg1, X, y)
