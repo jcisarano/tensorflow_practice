@@ -16,7 +16,7 @@ def adding_features_to_dataset():
     :return:
     """
     X1D = np.linspace(-4, 4, 9).reshape(-1, 1)
-    X2D = np.c_[X1D, X1D**2]
+    X2D = np.c_[X1D, X1D ** 2]
     y = np.array([0, 0, 1, 1, 1, 1, 1, 0, 0])
 
     plt.figure(figsize=(10, 3))
@@ -103,15 +103,82 @@ def plot_poly_kernel_clfs(poly_clf, poly100_clf, X, y):
     plt.show()
 
 
+def gaussian_rbf(x, landmark, gamma):
+    """
+    similarity function, Gaussian Radial Bias function
+    :param x:
+    :param landmark:
+    :param gamma:
+    :return:
+    """
+    return np.exp(-gamma * np.linalg.norm(x - landmark, axis=1) ** 2)
+
+
+def plot_similarity_features_():
+    gamma = 0.3
+    X1D = np.linspace(-4, 4, 9).reshape(-1, 1)  # generate 9 values between -4 and 4, then reshape to column
+
+    x1s = np.linspace(-4.5, 4.5, 200).reshape(-1, 1)
+    x2s = gaussian_rbf(x1s, -2, gamma)  # pass linear data and new landmark (-2) into gaussian_rbf to get X2 curve
+    x3s = gaussian_rbf(x1s, 1, gamma)  # pass linear data and new landmark (1) into gaussian_rbf to get X3 curve
+
+    XK = np.c_[gaussian_rbf(X1D, -2, gamma), gaussian_rbf(X1D, 1, gamma)]  # converts X1D to use similarity features
+    yk = np.array([0, 0, 1, 1, 1, 1, 1, 0, 0])
+
+    plt.figure(figsize=(10.5, 4))
+
+    plt.subplot(121)
+    plt.grid(True, which="both")
+    plt.axhline(y=0, color="k")
+    plt.scatter(x=[-2, 1], y=[0, 0], s=150, alpha=0.5, c="red")
+    plt.plot(X1D[:, 0][yk == 0], np.zeros(4), "bs")
+    plt.plot(X1D[:, 0][yk == 1], np.zeros(5), "bs")
+    plt.plot(x1s, x2s, "g--")
+    plt.plot(x1s, x3s, "b:")
+    plt.gca().get_yaxis().set_ticks([0, 0.25, 0.5, 0.75, 1])
+    plt.xlabel(r"$x_1$", fontsize=20)
+    plt.ylabel(r"Similarity", fontsize=14)
+    plt.annotate(r"$\mathbf{x}$",
+                 xy=(X1D[3, 0], 0),
+                 xytext=(-0.5, 0.20),
+                 ha="center",
+                 arrowprops=dict(facecolor="black", shrink=0.1),
+                 fontsize=18,
+                 )
+    plt.text(-2, 0.9, "$x_2$", ha="center", fontsize=20)
+    plt.text(1, 0.9, "$x_3$", ha="center", fontsize=20)
+    plt.axis([-4.5, 4.5, -0.1, 1.1])
+
+    plt.subplot(122)
+    plt.grid(True, which="both")
+    plt.axhline(y=0, color="k")
+    plt.axvline(x=0, color="k")
+    plt.plot(XK[:, 0][yk == 0], XK[:, 1][yk == 0], "bs")
+    plt.plot(XK[:, 0][yk == 1], XK[:, 1][yk == 1], "g^")
+    plt.xlabel(r"$x_2$", fontsize=20)
+    plt.ylabel(r"$x_3$", fontsize=20, rotation=0)
+    plt.annotate(r"$\phi\left(\mathbf{x}\right)$",
+                 xy=(XK[3, 0], XK[3, 1]),
+                 xytext=(0.65, 0.5),
+                 ha="center",
+                 arrowprops=dict(facecolor="black", shrink=0.1),
+                 fontsize=18,
+                 )
+    plt.plot([-0.1, 1.1], [0.57, -0.1], "r--", linewidth=3)
+    plt.axis([-0.1, 1.1, -0.1, 1.1])
+    # plt.subplots_adjust(right=1)
+    plt.show()
+
+
 def run():
     # adding_features_to_dataset()
-    X, y = get_and_plot_moon_dataset()
+    X, y = get_and_plot_moon_dataset(do_plot=False)
     # polynomial_clf = nonlinear_svm_w_polynomial_features(X, y)
     # utils.plot_predictions(clf=polynomial_clf, axes=[-1.5, 2.5, -1, 1.5], show=False)
     # utils.plot_dataset(X=X, y=y, axes=[-1.5, 2.5, -1, 1.5])
 
-    poly_kernel_svm_clf = nonlinear_svm_w_polynomial_kernel(X=X, y=y)
-    poly100_kernel_svm_clf = nonlinear_svm_w_polynomial_kernel(X=X, y=y, coef0=100, degree=10)
-    plot_poly_kernel_clfs(poly_clf=poly_kernel_svm_clf, poly100_clf=poly100_kernel_svm_clf, X=X, y=y)
+    # poly_kernel_svm_clf = nonlinear_svm_w_polynomial_kernel(X=X, y=y)
+    # poly100_kernel_svm_clf = nonlinear_svm_w_polynomial_kernel(X=X, y=y, coef0=100, degree=10)
+    # plot_poly_kernel_clfs(poly_clf=poly_kernel_svm_clf, poly100_clf=poly100_kernel_svm_clf, X=X, y=y)
 
-
+    plot_similarity_features_()
