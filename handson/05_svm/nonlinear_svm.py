@@ -188,6 +188,35 @@ def gaussian_rbf_kernel(X, y):
     clf.fit(X, y)
 
 
+def create_and_plot_svm_w_rbf_kernel(X, y):
+    gamma1, gamma2 = 0.1, 5
+    C1, C2 = 0.001, 1000
+    hyperparams = (gamma1, C1), (gamma1, C2), (gamma2, C1), (gamma2, C2)
+
+    svm_clfs = []
+    for gamma, C in hyperparams:
+        rbf_kernal_svm_clf = Pipeline([
+            ("scaler", StandardScaler()),
+            ("svm_clf", SVC(kernel="rbf", gamma=gamma, C=C)),
+        ])
+        rbf_kernal_svm_clf.fit(X, y)
+        svm_clfs.append(rbf_kernal_svm_clf)
+
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(10.5, 7), sharex=True, sharey=True)
+
+    for i, svm_clf in enumerate(svm_clfs):
+        plt.sca(axes[i // 2, i % 2])
+        utils.plot_predictions(svm_clf, [-1.5, 2.45, -1, 1.5], show=False)
+        utils.plot_dataset(X, y, [-1.5, 2.45, -1, 1.5], show=False)
+        gamma, C = hyperparams[i]
+        plt.title(r"$\gamma = {}, C = {}$".format(gamma, C), fontsize=16)
+        if i in (0, 1):
+            plt.xlabel("")
+        if i in (1, 3):
+            plt.ylabel("")
+    plt.show()
+
+
 def run():
     # adding_features_to_dataset()
     X, y = get_and_plot_moon_dataset(do_plot=False)
@@ -202,4 +231,5 @@ def run():
     # plot_similarity_features_()
     # similarity_features_example()
 
-    gaussian_rbf_kernel(X=X, y=y)
+    # gaussian_rbf_kernel(X=X, y=y)
+    create_and_plot_svm_w_rbf_kernel(X=X, y=y)
