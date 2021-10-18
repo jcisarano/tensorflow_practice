@@ -3,10 +3,12 @@
 import examples as ex
 import soft_margin_classification as smc
 import nonlinear_svm as nl_svm
+import svm_regression as svmr
 
 if __name__ == '__main__':
     # ex.run()
     # smc.run()
-    nl_svm.run()
+    #nl_svm.run()
+    svmr.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
