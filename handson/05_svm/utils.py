@@ -40,7 +40,7 @@ def load_iris_data_width_length(iris_type=2):
 
     return X, y
 
-def plot_svc_decision_boundary(svm_clf, xmin, xmax):
+def plot_svc_decision_boundary(svm_clf, xmin, xmax, show_support_vectors=True, show_gutters=True):
     w = svm_clf.coef_[0]
     b = svm_clf.intercept_[0]
 
@@ -53,11 +53,13 @@ def plot_svc_decision_boundary(svm_clf, xmin, xmax):
     gutter_up = decision_boundary + margin
     gutter_down = decision_boundary - margin
 
-    svs = svm_clf.support_vectors_
-    plt.scatter(svs[:, 0], svs[:, 1], s=180, facecolors="#FFAAAA")
+    if show_support_vectors:
+        svs = svm_clf.support_vectors_
+        plt.scatter(svs[:, 0], svs[:, 1], s=180, facecolors="#FFAAAA")
     plt.plot(x0, decision_boundary, "k-", linewidth=2)
-    plt.plot(x0, gutter_up, "k--", linewidth=2)
-    plt.plot(x0, gutter_down, "k--", linewidth=2)
+    if show_gutters:
+        plt.plot(x0, gutter_up, "k--", linewidth=2)
+        plt.plot(x0, gutter_down, "k--", linewidth=2)
 
 
 def plot_dataset(X, y, axes, show=True):
