@@ -40,6 +40,7 @@ def load_iris_data_width_length(iris_type=2):
 
     return X, y
 
+
 def plot_svc_decision_boundary(svm_clf, xmin, xmax, show_support_vectors=True, show_gutters=True):
     w = svm_clf.coef_[0]
     b = svm_clf.intercept_[0]
