@@ -9,6 +9,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import LinearSVC, SVC
 
+from scipy.stats import reciprocal, uniform
+from sklearn.model_selection import RandomizedSearchCV
 
 def run():
     digits = load_digits(as_frame=False)
@@ -47,10 +49,13 @@ def run():
     # print(accuracy_score(y_train,y_pred_train_scaled))
 
     svc = SVC(kernel="rbf", gamma="scale")
-    svc.fit(X_test_scaled[:10000], y_train[:10000])
-    y_pred = svc.predict(X_test_scaled)
+    svc.fit(X_train_scaled[:10000], y_train[:10000])
+    y_pred = svc.predict(X_train_scaled)
     print(accuracy_score(y_train, y_pred))
 
+    params = {"gamma": reciprocal(0.001, 0.1), "C": uniform(1, 10)}
+    rnd_search_cv = RandomizedSearchCV(svc, params, n_iter=10, verbose=2, cv=3, n_jobs=-1)
+    rnd_search_cv.fit(X_train_scaled[:1000], y_train[:1000])
 
 
 
