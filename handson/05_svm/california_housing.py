@@ -1,11 +1,10 @@
 # Exercise: train an SVM regressor on the California housing dataset.
 import numpy as np
 from sklearn.datasets import fetch_california_housing
-from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import LinearSVR, SVR
-import matplotlib.pyplot as plt
 
 from scipy.stats import reciprocal, uniform
 from sklearn.model_selection import RandomizedSearchCV
@@ -15,15 +14,6 @@ def create_svm_linear_regressor(X, y, epsilon=1.5):
     svm_reg = LinearSVR(epsilon=epsilon, random_state=42)
     svm_reg.fit(X, y)
     return svm_reg
-
-
-def plot_regressor(regressor, X, y):
-    x1s = np.linspace(-1, 1, 800).reshape(100, 8)
-    plt.figure(figsize=(10, 7))
-    plt.scatter(X, y)
-    y_pred = regressor.predict(x1s)
-    plt.plot(x1s, y_pred, "k-", linewidth=2, label=r"$\hat{y}$")
-    plt.show()
 
 
 def run():
@@ -40,7 +30,7 @@ def run():
     reg = create_svm_linear_regressor(X=X_train_scaled, y=y_train, epsilon=0.0)
     y_pred = reg.predict(X_train_scaled)
     mse = mean_squared_error(y_train, y_pred)
-    print("LinearSVC RMSE:", mse)
+    print("LinearSVC MSE:", mse)
     print("LinearSVC RMSE:", np.sqrt(mse))
 
     rbf_reg = SVR(kernel="rbf", gamma="scale")
@@ -49,10 +39,15 @@ def run():
     rnd_search_cv.fit(X_train_scaled, y_train)
     y_pred = rnd_search_cv.best_estimator_.predict(X_train_scaled)
     mse = mean_squared_error(y_train, y_pred)
-    print("SVC rbf RMSE:", mse)
+    print("SVC rbf MSE:", mse)
     print("SVC rbf RMSE:", np.sqrt(mse))
 
-    # plot_regressor(reg, med, y_train)
+    y_pred = rnd_search_cv.best_estimator_.predict(X_test_scaled)
+    mse = mean_squared_error(y_test, y_pred)
+    print("SVC rbf TEST MSE:", mse)
+    print("SVC rbf TEST RMSE:", np.sqrt(mse))
+
+
 
 
 
