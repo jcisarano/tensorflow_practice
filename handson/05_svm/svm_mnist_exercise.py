@@ -1,6 +1,8 @@
 # Exercise: Train an SVM classifier on the MNIST dataset.
 # Since SVM classifiers are binary classifiers, you will need to use one-versus-all to classify all 10 digits.
 # You may want to tune the hyperparameters using small validation sets to speed up the process. What accuracy can you reach?
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import svm
@@ -49,13 +51,21 @@ def run():
     # print(accuracy_score(y_train,y_pred_train_scaled))
 
     svc = SVC(kernel="rbf", gamma="scale")
-    svc.fit(X_train_scaled[:10000], y_train[:10000])
-    y_pred = svc.predict(X_train_scaled)
-    print(accuracy_score(y_train, y_pred))
+    # svc.fit(X_train_scaled[:10000], y_train[:10000])
+    # y_pred = svc.predict(X_train_scaled)
+    # print(accuracy_score(y_train, y_pred))
 
     params = {"gamma": reciprocal(0.001, 0.1), "C": uniform(1, 10)}
     rnd_search_cv = RandomizedSearchCV(svc, params, n_iter=10, verbose=2, cv=3, n_jobs=-1)
     rnd_search_cv.fit(X_train_scaled[:1000], y_train[:1000])
+
+    print(rnd_search_cv.best_estimator_)
+    print(rnd_search_cv.best_score_)
+
+    # now train best estimator on whole training set, do predictions, and check the results
+    rnd_search_cv.best_estimator_.fit(X_train_scaled, y_train)
+    y_pred = rnd_search_cv.best_estimator_.predict(X_train_scaled)
+    print(accuracy_score(y_train, y_pred))
 
 
 
