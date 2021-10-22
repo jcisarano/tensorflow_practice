@@ -67,5 +67,11 @@ def run():
     y_pred = rnd_search_cv.best_estimator_.predict(X_train_scaled)
     print(accuracy_score(y_train, y_pred))
 
+    # evaluate test set
+    y_pred_test = rnd_search_cv.best_estimator_.predict(X_test_scaled)
+    print(accuracy_score(y_test, y_pred_test))
+
+    # training set accuracy was .9996, but test was 0.9711, so overfitting?
+
 
 
