@@ -4,8 +4,11 @@ from sklearn.datasets import fetch_california_housing
 from sklearn.metrics import accuracy_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import LinearSVR
+from sklearn.svm import LinearSVR, SVR
 import matplotlib.pyplot as plt
+
+from scipy.stats import reciprocal, uniform
+from sklearn.model_selection import RandomizedSearchCV
 
 
 def create_svm_linear_regressor(X, y, epsilon=1.5):
@@ -37,8 +40,17 @@ def run():
     reg = create_svm_linear_regressor(X=X_train_scaled, y=y_train, epsilon=0.0)
     y_pred = reg.predict(X_train_scaled)
     mse = mean_squared_error(y_train, y_pred)
-    print(mse)
-    print(np.sqrt(mse))
+    print("LinearSVC RMSE:", mse)
+    print("LinearSVC RMSE:", np.sqrt(mse))
+
+    rbf_reg = SVR(kernel="rbf", gamma="scale")
+    params = {"gamma": reciprocal(0.001, 0.1), "C": uniform(1, 10)}
+    rnd_search_cv = RandomizedSearchCV(rbf_reg, params, n_iter=10, verbose=2, cv=3, n_jobs=-1, random_state=42)
+    rnd_search_cv.fit(X_train_scaled, y_train)
+    y_pred = rnd_search_cv.best_estimator_.predict(X_train_scaled)
+    mse = mean_squared_error(y_train, y_pred)
+    print("SVC rbf RMSE:", mse)
+    print("SVC rbf RMSE:", np.sqrt(mse))
 
     # plot_regressor(reg, med, y_train)
 
