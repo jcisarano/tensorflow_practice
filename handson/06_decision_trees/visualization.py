@@ -44,3 +44,14 @@ def plot_decision_boundary(clf, X, y, axes=[0, 7.5, 0, 3], iris=True, legend=Fal
         plt.ylabel("$x_2$", fontsize=18)
     if legend:
         plt.legend(loc="lower right", fontsize=14)
+
+
+def plot_regression_predictions(tree_reg, X, y, axes=[0, 1, -0.2, 1], ylabel="$y$"):
+    x1 = np.linspace(axes[0], axes[1], 500).reshape(-1, 1)
+    y_pred = tree_reg.predict(x1)
+    plt.axis(axes)
+    plt.xlabel("$X_1$", fontsize=18)
+    if ylabel:
+        plt.ylabel(ylabel=ylabel, fontsize=18, rotation=0)
+    plt.plot(X, y, "b.")
+    plt.plot(x1, y_pred, "r.-", linewidth=2, label=r"$\hat{y}$")
