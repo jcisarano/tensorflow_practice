@@ -28,3 +28,6 @@ def run():
     plt.text(3.2, 1.80, "Depth=1", fontsize=13)
     plt.text(4.05, 0.5, "Depth=2", fontsize=11)
     plt.show()
+
+    print(tree_clf.predict_proba([[5, 1.5]]))
+    print(tree_clf.predict([[5, 1.5]]))
