@@ -49,6 +49,7 @@ def compare_reg_models(X, y):
     plt.title("max_depth=3", fontsize=14)
     plt.show()
 
+    vv.graphviz_regression_image(tree_reg1)
 
 def run():
     X, y = gen_quad_training_set()

@@ -21,6 +21,19 @@ def graphviz_image(clf, iris):
     graph.render(filename="iris_tree_render", directory="./images/", view=True)
 
 
+def graphviz_regression_image(clf):
+    export_graphviz(
+        clf,
+        out_file=os.path.join("./images/", "regression_tree.dot"),
+        feature_names=["x1"],
+        rounded=True,
+        filled=True
+    )
+    graph = Source.from_file(os.path.join("./images/", "regression_tree.dot"))
+    graph.format = "png"
+    graph.render(filename="regression_tree_render", directory="./images/", view=True)
+
+
 def plot_decision_boundary(clf, X, y, axes=[0, 7.5, 0, 3], iris=True, legend=False, plot_training=True):
     x1s = np.linspace(axes[0], axes[1], 100)
     x2s = np.linspace(axes[2], axes[3], 100)
