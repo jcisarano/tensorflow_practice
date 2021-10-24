@@ -12,6 +12,7 @@ def graphviz_image(clf, iris):
         clf,
         out_file=os.path.join("./images/", "iris_tree.dot"),
         feature_names=iris.feature_names[2:],
+        class_names=iris.target_names,
         rounded=True,
         filled=True
     )
@@ -33,8 +34,8 @@ def plot_decision_boundary(clf, X, y, axes=[0, 7.5, 0, 3], iris=True, legend=Fal
         plt.contour(x1, x2, y_pred, cmap=custom_cmap2, alpha=0.8)
     if plot_training:
         plt.plot(X[:, 0][y == 0], X[:, 1][y == 0], "yo", label="Iris setosa")
-        plt.plot(X[:, 0][y == 1], X[:, 1][y == 1], "yo", label="Iris versicolor")
-        plt.plot(X[:, 0][y == 2], X[:, 1][y == 2], "yo", label="Iris virginica")
+        plt.plot(X[:, 0][y == 1], X[:, 1][y == 1], "bs", label="Iris versicolor")
+        plt.plot(X[:, 0][y == 2], X[:, 1][y == 2], "g^", label="Iris virginica")
     if iris:
         plt.xlabel("Petal width", fontsize=14)
         plt.ylabel("Petal height", fontsize=14)
