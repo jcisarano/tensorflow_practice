@@ -1,3 +1,4 @@
+import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
 import matplotlib.pyplot as plt
@@ -41,6 +42,20 @@ def plt_min_samples_leaf_example():
     plt.ylabel("")
     plt.show()
 
+
+def plt_rotated_iris(X, y):
+    angle = np.pi / 180 * 20
+    rotation_matrix = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
+    Xr = X.dot(rotation_matrix)
+
+    tree_clrf_rotated = DecisionTreeClassifier(random_state=42)
+    tree_clrf_rotated.fit(Xr, y)
+
+    plt.figure(figsize=(8, 3))
+    vv.plot_decision_boundary(tree_clrf_rotated, Xr, y, axes=[0.5, 7.5, -1.0, 1], iris=False)
+    plt.show()
+
+
 def run():
     iris = load_iris()
 
@@ -48,5 +63,6 @@ def run():
     y = iris.target
 
     # plt_seeded_tree_example(X=X, y=y)
-    plt_min_samples_leaf_example()
+    # plt_min_samples_leaf_example()
+    plt_rotated_iris(X, y)
 
