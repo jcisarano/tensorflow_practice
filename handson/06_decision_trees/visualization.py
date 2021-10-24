@@ -1,6 +1,23 @@
+import os
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+from graphviz import Source
+from sklearn.tree import export_graphviz
+
+
+def graphviz_image(clf, iris):
+    export_graphviz(
+        clf,
+        out_file=os.path.join("./images/", "iris_tree.dot"),
+        feature_names=iris.feature_names[2:],
+        rounded=True,
+        filled=True
+    )
+    graph = Source.from_file(os.path.join("./images/", "iris_tree.dot"))
+    graph.format = "png"
+    graph.render(filename="iris_tree_render", directory="./images/", view=True)
 
 
 def plot_decision_boundary(clf, X, y, axes=[0, 7.5, 0, 3], iris=True, legend=False, plot_training=True):
