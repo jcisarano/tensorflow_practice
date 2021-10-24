@@ -1,5 +1,3 @@
-import os
-
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier
 import matplotlib.pyplot as plt
