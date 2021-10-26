@@ -32,10 +32,15 @@ def run():
     # data set has 10000 items, so create train set of 100 items with 20% test set
     split = ShuffleSplit(n_splits=1000, train_size=0.0125, test_size=0.0025, random_state=42)
 
+    forest = []
     for train_index, test_index in split.split(X_train):
         print("TRAIN", len(train_index), "TEST", len(test_index))
-        # tree = DecisionTreeClassifier(max_leaf_nodes=max_leaf_nodes,
-        #                               min_samples_split=min_samples_split,
-        #                               random_state=42)
-        # tree.fit(X[train_index], y[train_index])
-        # tree.predict(y)
+        tree = DecisionTreeClassifier(max_leaf_nodes=max_leaf_nodes,
+                                      min_samples_split=min_samples_split,
+                                      random_state=42)
+        tree.fit(X_train[train_index], y_train[train_index])
+        forest.append(tree)
+
+    for tree in forest:
+        y_pred = tree.predict(X_test)
+        print(accuracy_score(y_test, y_pred))
