@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeRegressor
 import matplotlib.pyplot as plt
 
