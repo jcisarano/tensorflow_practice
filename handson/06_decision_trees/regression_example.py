@@ -70,17 +70,15 @@ def plot_regularization_example(X, y):
     plt.xlabel("$x_1$", fontsize=18)
     plt.ylabel("$y$", fontsize=18, rotation=0)
     plt.legend(loc="upper center", fontsize=18)
-    plt.title("No restrictions", fontsize=14)
+    plt.title("No restrictions, depth {}".format(tree_reg1.get_depth()), fontsize=14)
 
     plt.sca(axes[1])
     plt.plot(X, y, "b.")
     plt.plot(x1, y_pred2, "r.-", linewidth=2, label=r"$\hat{y}$")
     plt.axis([0, 1, -0.2, 1.1])
     plt.xlabel("$x_1$", fontsize=18)
-    plt.title("min_samples_leaf = {}".format(tree_reg2.min_samples_leaf), fontsize=14)
+    plt.title("min_samples_leaf = {}, depth = {}".format(tree_reg2.min_samples_leaf, tree_reg2.get_depth()), fontsize=14)
     plt.show()
-
-
 
 
 def run():
