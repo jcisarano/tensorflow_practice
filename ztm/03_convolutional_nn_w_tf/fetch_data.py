@@ -16,6 +16,7 @@ def examine_files(dir):
     for dirpath, dirnames, filenames in os.walk(dir):
         print(f"There are {len(dirnames)} directories and {len(filenames)} images in {dirpath}")
 
+
 def load_data(path, filename):
     csv_path = os.path.join(path, filename)
     return pd.read_csv(csv_path)
