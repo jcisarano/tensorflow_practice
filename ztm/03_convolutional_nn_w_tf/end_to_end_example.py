@@ -59,4 +59,5 @@ def run():
                             epochs=5,
                             steps_per_epoch=len(train_data),
                             validation_data=valid_data,
-                            validation_steps=len(valid_data))
+                            validation_steps=len(valid_data),
+                            workers=-1, use_multiprocessing=True)
