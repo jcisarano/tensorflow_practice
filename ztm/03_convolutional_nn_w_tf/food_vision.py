@@ -9,6 +9,9 @@ import numpy as np
 
 import fetch_data as fd
 
+import tensorflow as tf
+
+
 # images are from food 101 dataset, but reduced to include only images of pizza and steak for now
 # Starting with a smaller dataset allows quicker experimentation
 DATA_PATH: str = "https://storage.googleapis.com/ztm_tf_course/food_vision/pizza_steak.zip"
@@ -41,4 +44,8 @@ def run():
     fd.examine_files(os.path.join(LOCAL_SAVE_PATH, "pizza_steak"))
     get_class_names()
 
-    view_random_image(os.path.join(LOCAL_SAVE_PATH, "pizza_steak/train"), "pizza")
+    img = view_random_image(os.path.join(LOCAL_SAVE_PATH, "pizza_steak/train"), "pizza")
+    t_img = tf.constant(img)
+    print(t_img[0]/255)
+    print(t_img[0])
+
