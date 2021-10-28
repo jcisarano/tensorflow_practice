@@ -53,18 +53,20 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH):
 
 def create_and_compile_baseline_model():
     model = Sequential([
-        Conv2D(filters=10,
-               kernel_size=3,
-               strides=1,
-               padding="valid",
+        Conv2D(filters=10,  # how many filters will pass over the input tensor (e.g. sliding windows on an image), higher = more complex model
+               kernel_size=3,  # determines shape of the filter (sliding window) over the output, lower vals learn smaller features,
+               strides=1,  # number of steps the filter will take at a time
+               padding="valid",  # "same" will pad tensor so that output shape is same as input, "valid" will not pad
                activation="relu",
-               input_shape=(244, 244, 3)),  # input layer (specify input shape)
+               input_shape=(224, 224, 3)),  # input layer (specify input shape)
         Conv2D(10, 3, activation="relu"),
         Conv2D(10, 3, activation="relu"),
         Flatten(),
         Dense(1, activation="sigmoid")  # output layer, binary classification, so only 1 output neuron
     ])
-    model.compile(loss="binary_crossentropy", optimizer=Adam(), metrics=["accuracy"])
+    model.compile(loss="binary_crossentropy",
+                  optimizer=Adam(),
+                  metrics=["accuracy"])
 
     return model
 
@@ -75,3 +77,11 @@ def run():
 
     # create a simple model as comparison/baseline for future experimentation
     baseline_model = create_and_compile_baseline_model()
+    print(baseline_model.summary())
+
+    baseline_history = baseline_model.fit(train_data,
+                                          epochs=5,
+                                          steps_per_epoch=len(train_data),  # total steps in an epoch, defaults to dataset size
+                                          validation_data=test_data,
+                                          validation_steps=len(test_data)
+                                          )
