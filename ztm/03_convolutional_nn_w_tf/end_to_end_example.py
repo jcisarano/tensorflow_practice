@@ -1,10 +1,13 @@
 # CNN image processing end-to-end example
 # Steps:
-# Load images
-# Preprocess images
+# Load images, visualize the data
+# Preprocess images (scaling/normalization)
 # Build CNN to find patterns in images
 # Compile CNN
 # Fit CNN to training data
+# Evaluate
+# Adjust parameters, improve, repeat
+
 import os
 
 import tensorflow as tf

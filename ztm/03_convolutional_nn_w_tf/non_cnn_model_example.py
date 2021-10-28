@@ -52,9 +52,9 @@ def run():
     tf.random.set_seed(42)
     model_1 = tf.keras.models.Sequential([
         tf.keras.layers.Flatten(input_shape=(224, 224, 3)),
-        tf.keras.layers.Dense(10, activation="relu"),
-        tf.keras.layers.Dense(7, activation="relu"),
-        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(100, activation="relu"),
+        tf.keras.layers.Dense(100, activation="relu"),
+        tf.keras.layers.Dense(100, activation="relu"),
         tf.keras.layers.Dense(1, activation="sigmoid"),
     ])
 
@@ -67,3 +67,6 @@ def run():
 
     print(model.summary())
     print(model_1.summary())
+
+    # These models do not work as well as CNN for image recognition, even though they have MANY more learnable
+    # parameters than a similar CNN. The best model here had about 78% accuracy, where a simple CNN was over 85%.

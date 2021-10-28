@@ -26,7 +26,7 @@ def get_class_names():
     print(class_names)
 
 
-def view_random_image(target_dir, target_class):
+def view_random_image(target_dir, target_class, show=True):
     target_folder = os.path.join(target_dir, target_class)
     random_image = random.sample(os.listdir(target_folder), 1)
     img = mpimg.imread(os.path.join(target_folder, random_image[0]))
@@ -34,7 +34,8 @@ def view_random_image(target_dir, target_class):
     plt.title(target_class)
     plt.axis("off")
     print(f"Image shape: {img.shape}")
-    plt.show()
+    if show:
+        plt.show()
 
     return img
 
