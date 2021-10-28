@@ -5,6 +5,12 @@ import food_vision as fv
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Flatten, Conv2D, Dense, MaxPool2D, Activation
+from tensorflow.keras.optimizers import Adam
+
+
+
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "images")
 TRAIN_DATA_PATH: str = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/train")
 TEST_DATA_PATH: str = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/test")
@@ -45,6 +51,27 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH):
     return train_data, test_data
 
 
+def create_and_compile_baseline_model():
+    model = Sequential([
+        Conv2D(filters=10,
+               kernel_size=3,
+               strides=1,
+               padding="valid",
+               activation="relu",
+               input_shape=(244, 244, 3)),  # input layer (specify input shape)
+        Conv2D(10, 3, activation="relu"),
+        Conv2D(10, 3, activation="relu"),
+        Flatten(),
+        Dense(1, activation="sigmoid")  # output layer, binary classification, so only 1 output neuron
+    ])
+    model.compile(loss="binary_crossentropy", optimizer=Adam(), metrics=["accuracy"])
+
+    return model
+
+
 def run():
     # visualize_random_image()
     train_data, test_data = load_minibatch_data()
+
+    # create a simple model as comparison/baseline for future experimentation
+    baseline_model = create_and_compile_baseline_model()
