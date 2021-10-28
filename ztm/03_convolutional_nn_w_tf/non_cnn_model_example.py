@@ -47,3 +47,23 @@ def run():
               validation_data=valid_data,
               validation_steps=len(valid_data),
               workers=-1)
+
+    # try to improve using different params
+    tf.random.set_seed(42)
+    model_1 = tf.keras.models.Sequential([
+        tf.keras.layers.Flatten(input_shape=(224, 224, 3)),
+        tf.keras.layers.Dense(10, activation="relu"),
+        tf.keras.layers.Dense(7, activation="relu"),
+        tf.keras.layers.Dense(4, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid"),
+    ])
+
+    model_1.compile(loss="binary_crossentropy",
+                    optimizer=tf.keras.optimizers.Adam(),
+                    metrics=["accuracy"])
+
+    model_1.fit(train_data, epochs=5, steps_per_epoch=len(train_data),
+                validation_data=valid_data, workers=-1)
+
+    print(model.summary())
+    print(model_1.summary())
