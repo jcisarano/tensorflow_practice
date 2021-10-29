@@ -14,6 +14,8 @@ LOCAL_SAVE_PATH: str = os.path.join("datasets", "images")
 TRAIN_DATA_PATH: str = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/train")
 TEST_DATA_PATH: str = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/test")
 
+IMG_SIZE: tuple = (224, 224)
+
 
 def visualize_random_image():
     """
@@ -27,7 +29,7 @@ def visualize_random_image():
     pizza_img = fv.view_random_image(TRAIN_DATA_PATH, "pizza")
 
 
-def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH):
+def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_size=IMG_SIZE):
     """
     load data, regularize it, and split into mini batches
     split data into batches to make sure it fits into memory
@@ -40,17 +42,17 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH):
     test_datagen = ImageDataGenerator(rescale=1 / 255.)
 
     train_data = train_datagen.flow_from_directory(directory=train_dir,
-                                                   target_size=(224, 224),
+                                                   target_size=img_size,
                                                    class_mode="binary",
                                                    batch_size=32)
     test_data = test_datagen.flow_from_directory(directory=test_dir,
-                                                 target_size=(224, 224),
+                                                 target_size=img_size,
                                                  class_mode="binary",
                                                  batch_size=32)
     return train_data, test_data
 
 
-def load_minibatch_data_with_augmentation(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH):
+def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_size=IMG_SIZE):
     train_datagen_augmented = ImageDataGenerator(rescale=1 / 255.,
                                                  rotation_range=0.2,
                                                  shear_range=0.2,
@@ -63,16 +65,16 @@ def load_minibatch_data_with_augmentation(train_dir=TRAIN_DATA_PATH, test_dir=TE
     test_datagen = ImageDataGenerator(rescale=1 / 255.)
 
     train_data_augmented = train_datagen_augmented.flow_from_directory(directory=train_dir,
-                                                                       target_size=(224, 224),
+                                                                       target_size=img_size,
                                                                        class_mode="binary",
                                                                        batch_size=32)
 
     train_data = train_datagen.flow_from_directory(directory=train_dir,
-                                                   target_size=(224, 224),
+                                                   target_size=img_size,
                                                    class_mode="binary",
                                                    batch_size=32)
-    test_data = test_datagen.flow_from_directory(directory=train_dir,
-                                                 target_size=(224, 224),
+    test_data = test_datagen.flow_from_directory(directory=test_dir,
+                                                 target_size=img_size,
                                                  class_mode="binary",
                                                  batch_size=32)
 
@@ -194,3 +196,4 @@ def run():
     # max pooling not only improves accuracy, it it reduces overfitting: the curves look better
 
     # DATA AUGMENTATION
+    train_data, train_data_augmented, test_data = load_minibatch_data_augmented()
