@@ -1,4 +1,5 @@
 import os
+import random
 
 import matplotlib.pyplot as plt
 import food_vision as fv
@@ -54,11 +55,11 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_
 
 def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_size=IMG_SIZE):
     train_datagen_augmented = ImageDataGenerator(rescale=1 / 255.,
-                                                 rotation_range=0.2,
-                                                 shear_range=0.2,
-                                                 zoom_range=0.2,
-                                                 width_shift_range=0.2,
-                                                 height_shift_range=0.3,
+                                                 rotation_range=0.2,  # how much to rotate image
+                                                 shear_range=0.2,  #
+                                                 zoom_range=0.2,  # how much to enlarge/shrink
+                                                 width_shift_range=0.2,  # left/right movement
+                                                 height_shift_range=0.2,  # up/down movement
                                                  horizontal_flip=True)
 
     train_datagen = ImageDataGenerator(rescale=1 / 255.)
@@ -67,16 +68,19 @@ def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_
     train_data_augmented = train_datagen_augmented.flow_from_directory(directory=train_dir,
                                                                        target_size=img_size,
                                                                        class_mode="binary",
-                                                                       batch_size=32)
+                                                                       batch_size=32,
+                                                                       shuffle=False)  # for training purposes only, usually shuffle is good
 
     train_data = train_datagen.flow_from_directory(directory=train_dir,
                                                    target_size=img_size,
                                                    class_mode="binary",
-                                                   batch_size=32)
+                                                   batch_size=32,
+                                                   shuffle=False)  # for training purposes only, usually shuffle is good
     test_data = test_datagen.flow_from_directory(directory=test_dir,
                                                  target_size=img_size,
                                                  class_mode="binary",
-                                                 batch_size=32)
+                                                 batch_size=32,
+                                                 shuffle=False)  # for training purposes only, usually shuffle is good
 
     return train_data, train_data_augmented, test_data
 
@@ -121,9 +125,24 @@ def create_and_compile_better_baseline_model():
     return model
 
 
-def fit_model(model, train_data, val_data):
+def create_and_compile_w_aug_data(img_size=(224, 224, 3)):
+    model = Sequential([
+        Conv2D(filters=10, kernel_size=3, activation="relu", input_shape=img_size),
+        MaxPool2D(pool_size=2),
+        Conv2D(filters=10, kernel_size=3, activation="relu"),
+        MaxPool2D(),
+        Conv2D(filters=10, kernel_size=3, activation="relu"),
+        MaxPool2D(),
+        Flatten(),
+        Dense(1, activation="sigmoid"),
+    ])
+    model.compile(loss="binary_crossentropy", optimizer=Adam(), metrics=["accuracy"])
+    return model
+
+
+def fit_model(model, train_data, val_data, n_epochs=5):
     return model.fit(train_data,
-                     epochs=5,
+                     epochs=n_epochs,
                      steps_per_epoch=len(train_data),
                      validation_data=val_data,
                      validation_steps=len(val_data))
@@ -163,6 +182,22 @@ def plot_loss_curve(history):
     plt.show()
 
 
+def show_random_images(train_data, train_data_augmented):
+    # get some data for visualization
+    # note that the labels are not augmented, only the images
+    images, labels = train_data.next()
+    aug_images, aug_labels = train_data_augmented.next()
+
+    # show original image and augmented image
+    random_number = random.randint(0, 32)
+    plt.imshow(images[random_number])
+    plt.title("Original image {}".format(random_number))
+    plt.figure()
+    plt.imshow(aug_images[random_number])
+    plt.title("Augmented image {}".format(random_number))
+    plt.show()
+
+
 def run():
     # visualize_random_image()
     train_data, test_data = load_minibatch_data()
@@ -189,11 +224,14 @@ def run():
     # train more data
 
     # new baseline to reduce overfitting
-    baseline_model_1 = create_and_compile_better_baseline_model()
-    print(baseline_model_1.summary())
-    baseline_history_1 = fit_model(model=baseline_model_1, train_data=train_data, val_data=test_data)
-    plot_loss_curve(baseline_history_1)
+    # baseline_model_1 = create_and_compile_better_baseline_model()
+    # print(baseline_model_1.summary())
+    # baseline_history_1 = fit_model(model=baseline_model_1, train_data=train_data, val_data=test_data)
+    # plot_loss_curve(baseline_history_1)
     # max pooling not only improves accuracy, it it reduces overfitting: the curves look better
 
     # DATA AUGMENTATION
     train_data, train_data_augmented, test_data = load_minibatch_data_augmented()
+    model_aug_data = create_and_compile_w_aug_data()
+    history_aug = fit_model(model_aug_data, train_data=train_data_augmented, val_data=test_data)
+    plot_loss_curve(history_aug)
