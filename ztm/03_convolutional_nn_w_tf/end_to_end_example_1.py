@@ -50,6 +50,35 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH):
     return train_data, test_data
 
 
+def load_minibatch_data_with_augmentation(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH):
+    train_datagen_augmented = ImageDataGenerator(rescale=1 / 255.,
+                                                 rotation_range=0.2,
+                                                 shear_range=0.2,
+                                                 zoom_range=0.2,
+                                                 width_shift_range=0.2,
+                                                 height_shift_range=0.3,
+                                                 horizontal_flip=True)
+
+    train_datagen = ImageDataGenerator(rescale=1 / 255.)
+    test_datagen = ImageDataGenerator(rescale=1 / 255.)
+
+    train_data_augmented = train_datagen_augmented.flow_from_directory(directory=train_dir,
+                                                                       target_size=(224, 224),
+                                                                       class_mode="binary",
+                                                                       batch_size=32)
+
+    train_data = train_datagen.flow_from_directory(directory=train_dir,
+                                                   target_size=(224, 224),
+                                                   class_mode="binary",
+                                                   batch_size=32)
+    test_data = test_datagen.flow_from_directory(directory=train_dir,
+                                                 target_size=(224, 224),
+                                                 class_mode="binary",
+                                                 batch_size=32)
+
+    return train_data, train_data_augmented, test_data
+
+
 def create_and_compile_baseline_model():
     model = Sequential([
         Conv2D(filters=10,
@@ -75,7 +104,8 @@ def create_and_compile_baseline_model():
 def create_and_compile_better_baseline_model():
     model = Sequential([
         Conv2D(10, 3, activation="relu", input_shape=(224, 224, 3)),
-        MaxPool2D(pool_size=2),  # max pooling keeps highest val in small grid, e.g. 4x4, reduces size and keeps most important
+        MaxPool2D(pool_size=2),
+        # max pooling keeps highest val in small grid, e.g. 4x4, reduces size and keeps most important
         Conv2D(10, 3, activation="relu", ),
         MaxPool2D(),
         Conv2D(10, 3, activation="relu", ),
@@ -162,3 +192,5 @@ def run():
     baseline_history_1 = fit_model(model=baseline_model_1, train_data=train_data, val_data=test_data)
     plot_loss_curve(baseline_history_1)
     # max pooling not only improves accuracy, it it reduces overfitting: the curves look better
+
+    # DATA AUGMENTATION
