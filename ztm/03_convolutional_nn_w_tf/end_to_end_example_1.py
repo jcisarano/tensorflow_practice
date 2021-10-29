@@ -75,7 +75,7 @@ def create_and_compile_baseline_model():
 def create_and_compile_better_baseline_model():
     model = Sequential([
         Conv2D(10, 3, activation="relu", input_shape=(224, 224, 3)),
-        MaxPool2D(pool_size=2),
+        MaxPool2D(pool_size=2),  # max pooling keeps highest val in small grid, e.g. 4x4, reduces size and keeps most important
         Conv2D(10, 3, activation="relu", ),
         MaxPool2D(),
         Conv2D(10, 3, activation="relu", ),
@@ -136,13 +136,13 @@ def run():
     train_data, test_data = load_minibatch_data()
 
     # create a simple model as comparison/baseline for future experimentation
-    baseline_model = create_and_compile_baseline_model()
-    print(baseline_model.summary())
+    # baseline_model = create_and_compile_baseline_model()
+    # print(baseline_model.summary())
 
-    baseline_history = fit_model(model=baseline_model, train_data=train_data, val_data=test_data)
-    
+    # baseline_history = fit_model(model=baseline_model, train_data=train_data, val_data=test_data)
+
     # plot_training_curve(baseline_history)
-    plot_loss_curve(baseline_history)
+    # plot_loss_curve(baseline_history)
     # baseline model seems to be overfitting the data: the training loss decreases, while the validation loss increases
     # loss curves for training and validation should have similar shapes showing improvement
 
@@ -158,3 +158,7 @@ def run():
 
     # new baseline to reduce overfitting
     baseline_model_1 = create_and_compile_better_baseline_model()
+    print(baseline_model_1.summary())
+    baseline_history_1 = fit_model(model=baseline_model_1, train_data=train_data, val_data=test_data)
+    plot_loss_curve(baseline_history_1)
+    # max pooling not only improves accuracy, it it reduces overfitting: the curves look better
