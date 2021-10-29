@@ -53,7 +53,7 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_
     return train_data, test_data
 
 
-def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_size=IMG_SIZE):
+def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_size=IMG_SIZE, shuffle_data=True):
     train_datagen_augmented = ImageDataGenerator(rescale=1 / 255.,
                                                  rotation_range=0.2,  # how much to rotate image
                                                  shear_range=0.2,  #
@@ -69,18 +69,18 @@ def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_
                                                                        target_size=img_size,
                                                                        class_mode="binary",
                                                                        batch_size=32,
-                                                                       shuffle=False)  # for training purposes only, usually shuffle is good
+                                                                       shuffle=shuffle_data)  # for training purposes only, usually shuffle is good
 
     train_data = train_datagen.flow_from_directory(directory=train_dir,
                                                    target_size=img_size,
                                                    class_mode="binary",
                                                    batch_size=32,
-                                                   shuffle=False)  # for training purposes only, usually shuffle is good
+                                                   shuffle=shuffle_data)  # for training purposes only, usually shuffle is good
     test_data = test_datagen.flow_from_directory(directory=test_dir,
                                                  target_size=img_size,
                                                  class_mode="binary",
                                                  batch_size=32,
-                                                 shuffle=False)  # for training purposes only, usually shuffle is good
+                                                 shuffle=shuffle_data)  # for training purposes only, usually shuffle is good
 
     return train_data, train_data_augmented, test_data
 
@@ -166,13 +166,15 @@ def plot_loss_curve(history):
     epochs = range(len(history.history["loss"]))
 
     # plot loss
+    _, axes = plt.subplots(ncols=2, figsize=(10, 4), sharey=True)
+    plt.sca(axes[0])
     plt.plot(epochs, loss, label="training_loss")
     plt.plot(epochs, val_loss, label="val_loss")
     plt.title("loss")
     plt.xlabel("epochs")
     plt.legend()
 
-    plt.figure()
+    plt.sca(axes[1])
     # plot accuracy
     plt.plot(epochs, accuracy, label="training_accuracy")
     plt.plot(epochs, val_accuracy, label="val_accuracy")
@@ -231,7 +233,15 @@ def run():
     # max pooling not only improves accuracy, it it reduces overfitting: the curves look better
 
     # DATA AUGMENTATION
-    train_data, train_data_augmented, test_data = load_minibatch_data_augmented()
+    train_data, train_data_augmented, test_data = load_minibatch_data_augmented(shuffle_data=False)
     model_aug_data = create_and_compile_w_aug_data()
     history_aug = fit_model(model_aug_data, train_data=train_data_augmented, val_data=test_data)
     plot_loss_curve(history_aug)
+
+    # train with shuffled, augmented data
+    # shuffling is important so the training does not first train all data of one type then another
+    # much better when it is mixed up
+    train_data, train_data_augmented_shuffled, test_data = load_minibatch_data_augmented(shuffle_data=True)
+    model_aug_data_shuff = create_and_compile_w_aug_data()
+    history_aug_shuff = fit_model(model_aug_data_shuff, train_data=train_data_augmented_shuffled, val_data=test_data)
+    plot_loss_curve(history_aug_shuff)
