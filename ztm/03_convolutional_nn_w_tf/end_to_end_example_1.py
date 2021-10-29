@@ -2,14 +2,13 @@ import os
 
 import matplotlib.pyplot as plt
 import food_vision as fv
-import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Flatten, Conv2D, Dense, MaxPool2D, Activation
 from tensorflow.keras.optimizers import Adam
 
-
+import pandas as pd
 
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "images")
 TRAIN_DATA_PATH: str = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/train")
@@ -53,8 +52,10 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH):
 
 def create_and_compile_baseline_model():
     model = Sequential([
-        Conv2D(filters=10,  # how many filters will pass over the input tensor (e.g. sliding windows on an image), higher = more complex model
-               kernel_size=3,  # determines shape of the filter (sliding window) over the output, lower vals learn smaller features,
+        Conv2D(filters=10,
+               # how many filters will pass over the input tensor (e.g. sliding windows on an image), higher = more complex model
+               kernel_size=3,
+               # determines shape of the filter (sliding window) over the output, lower vals learn smaller features,
                strides=1,  # number of steps the filter will take at a time
                padding="valid",  # "same" will pad tensor so that output shape is same as input, "valid" will not pad
                activation="relu",
@@ -71,6 +72,65 @@ def create_and_compile_baseline_model():
     return model
 
 
+def create_and_compile_better_baseline_model():
+    model = Sequential([
+        Conv2D(10, 3, activation="relu", input_shape=(224, 224, 3)),
+        MaxPool2D(pool_size=2),
+        Conv2D(10, 3, activation="relu", ),
+        MaxPool2D(),
+        Conv2D(10, 3, activation="relu", ),
+        MaxPool2D(),
+        Flatten(),
+        Dense(1, activation="sigmoid"),
+    ])
+
+    model.compile(loss="binary_crossentropy", optimizer=Adam(), metrics=["accuracy"])
+
+    return model
+
+
+def fit_model(model, train_data, val_data):
+    return model.fit(train_data,
+                     epochs=5,
+                     steps_per_epoch=len(train_data),
+                     validation_data=val_data,
+                     validation_steps=len(val_data))
+
+
+def plot_training_curve(history):
+    pd.DataFrame(history.history).plot(figsize=(10, 7))
+    plt.show()
+
+
+def plot_loss_curve(history):
+    """
+    Returns separate loss curves for training and validation metrics
+    :param history:
+    :return:
+    """
+    loss = history.history["loss"]
+    val_loss = history.history["val_loss"]
+    accuracy = history.history["accuracy"]
+    val_accuracy = history.history["val_accuracy"]
+    epochs = range(len(history.history["loss"]))
+
+    # plot loss
+    plt.plot(epochs, loss, label="training_loss")
+    plt.plot(epochs, val_loss, label="val_loss")
+    plt.title("loss")
+    plt.xlabel("epochs")
+    plt.legend()
+
+    plt.figure()
+    # plot accuracy
+    plt.plot(epochs, accuracy, label="training_accuracy")
+    plt.plot(epochs, val_accuracy, label="val_accuracy")
+    plt.title("accuracy")
+    plt.xlabel("epochs")
+    plt.legend()
+    plt.show()
+
+
 def run():
     # visualize_random_image()
     train_data, test_data = load_minibatch_data()
@@ -79,9 +139,22 @@ def run():
     baseline_model = create_and_compile_baseline_model()
     print(baseline_model.summary())
 
-    baseline_history = baseline_model.fit(train_data,
-                                          epochs=5,
-                                          steps_per_epoch=len(train_data),  # total steps in an epoch, defaults to dataset size
-                                          validation_data=test_data,
-                                          validation_steps=len(test_data)
-                                          )
+    baseline_history = fit_model(model=baseline_model, train_data=train_data, val_data=test_data)
+    
+    # plot_training_curve(baseline_history)
+    plot_loss_curve(baseline_history)
+    # baseline model seems to be overfitting the data: the training loss decreases, while the validation loss increases
+    # loss curves for training and validation should have similar shapes showing improvement
+
+    # ways to cause overfitting:
+    # increase number of conv layers
+    # increase number of filters per layer
+    # add another dense layer to output of flattened layer
+
+    # ways to reduce overfitting:
+    # add data augmentation
+    # add regularization layers (e.g. MaxPool2D)
+    # train more data
+
+    # new baseline to reduce overfitting
+    baseline_model_1 = create_and_compile_better_baseline_model()
