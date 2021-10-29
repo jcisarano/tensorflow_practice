@@ -85,6 +85,21 @@ def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_
     return train_data, train_data_augmented, test_data
 
 
+def create_and_compile_challenge_model(num_filters=10, num_kernels=3):
+    model = Sequential([
+        Conv2D(filters=num_filters, kernel_size=num_kernels, activation="relu", input_shape=(224, 224, 3)),
+        MaxPool2D(pool_size=2),
+        Conv2D(filters=num_filters, kernel_size=num_kernels, activation="relu"),
+        MaxPool2D(),
+        Conv2D(filters=num_filters, kernel_size=num_kernels, activation="relu"),
+        MaxPool2D,
+        Flatten(),
+        Dense(1, activation="sigmoid"),
+    ])
+    model.compile(loss="binary_crossentropy", optimizer=Adam(), metrics=["accuracy"])
+    return model
+
+
 def create_and_compile_baseline_model():
     model = Sequential([
         Conv2D(filters=10,
@@ -233,10 +248,10 @@ def run():
     # max pooling not only improves accuracy, it it reduces overfitting: the curves look better
 
     # DATA AUGMENTATION
-    train_data, train_data_augmented, test_data = load_minibatch_data_augmented(shuffle_data=False)
-    model_aug_data = create_and_compile_w_aug_data()
-    history_aug = fit_model(model_aug_data, train_data=train_data_augmented, val_data=test_data)
-    plot_loss_curve(history_aug)
+    # train_data, train_data_augmented, test_data = load_minibatch_data_augmented(shuffle_data=False)
+    # model_aug_data = create_and_compile_w_aug_data()
+    # history_aug = fit_model(model_aug_data, train_data=train_data_augmented, val_data=test_data)
+    # plot_loss_curve(history_aug)
 
     # train with shuffled, augmented data
     # shuffling is important so the training does not first train all data of one type then another
@@ -245,3 +260,19 @@ def run():
     model_aug_data_shuff = create_and_compile_w_aug_data()
     history_aug_shuff = fit_model(model_aug_data_shuff, train_data=train_data_augmented_shuffled, val_data=test_data)
     plot_loss_curve(history_aug_shuff)
+
+    # tweak model until satisfied with performance
+    # common ways to improve performance:
+    # add layers
+    # increase num of filters / kernel size
+    # change activation function
+    # change optimization function
+    # change learning rate (i.e. Adam() learning rate, though default is very good)
+    # fit on more data
+    # use transfer learning (training from another image recognition model)
+    # fit for longer
+
+    model_challenge = create_and_compile_challenge_model()
+    history_challenge = fit_model(model_challenge, train_data=train_data_augmented_shuffled, val_data=test_data)
+
+
