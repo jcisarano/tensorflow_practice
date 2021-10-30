@@ -92,7 +92,7 @@ def create_and_compile_challenge_model(num_filters=10, num_kernels=3):
         Conv2D(filters=num_filters, kernel_size=num_kernels, activation="relu"),
         MaxPool2D(),
         Conv2D(filters=num_filters, kernel_size=num_kernels, activation="relu"),
-        MaxPool2D,
+        MaxPool2D(),
         Flatten(),
         Dense(1, activation="sigmoid"),
     ])
