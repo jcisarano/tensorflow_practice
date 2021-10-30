@@ -15,7 +15,7 @@ LOCAL_SAVE_PATH: str = os.path.join("datasets", "images")
 TRAIN_DATA_PATH: str = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/train")
 TEST_DATA_PATH: str = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/test")
 
-IMG_SIZE: tuple[int] = (224, 224)
+IMG_SIZE: tuple = (224, 224)
 
 
 def visualize_random_image():
@@ -257,9 +257,9 @@ def run():
     # shuffling is important so the training does not first train all data of one type then another
     # much better when it is mixed up
     train_data, train_data_augmented_shuffled, test_data = load_minibatch_data_augmented(shuffle_data=True)
-    model_aug_data_shuff = create_and_compile_w_aug_data()
-    history_aug_shuff = fit_model(model_aug_data_shuff, train_data=train_data_augmented_shuffled, val_data=test_data)
-    plot_loss_curve(history_aug_shuff)
+    # model_aug_data_shuff = create_and_compile_w_aug_data()
+    # history_aug_shuff = fit_model(model_aug_data_shuff, train_data=train_data_augmented_shuffled, val_data=test_data)
+    # plot_loss_curve(history_aug_shuff)
 
     # tweak model until satisfied with performance
     # common ways to improve performance:
@@ -274,5 +274,6 @@ def run():
 
     model_challenge = create_and_compile_challenge_model()
     history_challenge = fit_model(model_challenge, train_data=train_data_augmented_shuffled, val_data=test_data)
+    plot_loss_curve(history_challenge)
 
 
