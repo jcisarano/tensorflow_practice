@@ -15,7 +15,7 @@ LOCAL_SAVE_PATH: str = os.path.join("datasets", "images")
 TRAIN_DATA_PATH: str = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/train")
 TEST_DATA_PATH: str = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/test")
 
-IMG_SIZE: tuple = (224, 224)
+IMG_SIZE: tuple[int] = (224, 224)
 
 
 def visualize_random_image():
