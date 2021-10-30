@@ -2,7 +2,10 @@ import os
 import random
 
 import matplotlib.pyplot as plt
+from matplotlib import image as mpimg
+
 import food_vision as fv
+import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 from tensorflow.keras.models import Sequential
@@ -53,7 +56,8 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_
     return train_data, test_data
 
 
-def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_size=IMG_SIZE, shuffle_data=True):
+def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, img_size=IMG_SIZE,
+                                  shuffle_data=True):
     train_datagen_augmented = ImageDataGenerator(rescale=1 / 255.,
                                                  rotation_range=0.2,  # how much to rotate image
                                                  shear_range=0.2,  #
@@ -215,6 +219,19 @@ def show_random_images(train_data, train_data_augmented):
     plt.show()
 
 
+def load_and_preprocess_img(path, img_shape=224):
+    # load the image
+    img = tf.io.read_file(path)
+    # decode the image into a tensor
+    img = tf.image.decode_image(img)
+    # resize
+    img = tf.image.resize(img, [img_shape, img_shape])
+    # normalize image values
+    img = img / 255.
+
+    return img
+
+
 def run():
     # visualize_random_image()
     train_data, test_data = load_minibatch_data()
@@ -274,6 +291,12 @@ def run():
 
     model_challenge = create_and_compile_challenge_model()
     history_challenge = fit_model(model_challenge, train_data=train_data_augmented_shuffled, val_data=test_data)
-    plot_loss_curve(history_challenge)
+    # plot_loss_curve(history_challenge)
 
+    # load an image to test the model
+    img_path = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/03-steak.jpeg")
 
+    # shape of image has to match what the model expects
+    steak = load_and_preprocess_img(img_path)
+    # print(steak)
+    print(model_challenge.predict(tf.expand_dims(steak, axis=0)))
