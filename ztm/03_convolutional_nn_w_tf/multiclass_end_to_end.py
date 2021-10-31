@@ -20,6 +20,7 @@ import pathlib
 import tensorflow as tf
 from keras_preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import food_vision
 
@@ -82,10 +83,21 @@ def baseline_model(shape=(IMG_SIZE, IMG_SIZE, 3)):
     return model
 
 
-
-def plot_training_curve(history):
-    pd.DataFrame(history.history).plot(figsize=(10, 7))
-    plt.show()
+def simplified_model(shape=(IMG_SIZE,IMG_SIZE,3)):
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(10, 3, input_shape=shape),
+        tf.keras.layers.Activation(activation="relu"),
+        tf.keras.layers.MaxPool2D(),
+        tf.keras.layers.Conv2D(10, 3, activation="relu"),
+        tf.keras.layers.MaxPool2D(),
+        tf.keras.layers.Conv2D(10, 3, activation="relu"),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(10, activation="softmax")
+    ])
+    model.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    return model
 
 
 def plot_loss_curve(history):
@@ -130,7 +142,8 @@ def run():
     train_data, test_data = load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
 
     # Step 3: Create the baseline CNN model
-    model = baseline_model()
+    # model = baseline_model()
+    model = simplified_model()
 
     # Step 4: Fit the model
     baseline_history = model.fit(train_data,
@@ -141,7 +154,18 @@ def run():
                                  workers=-1, use_multiprocessing=True)
 
     # 5. Evaluate the model
-    plot_loss_curve(baseline_history)
-    plot_training_curve(baseline_history)
+    print(model.evaluate(test_data))
 
-    
+    plot_loss_curve(baseline_history)
+
+    # 6. Adjust model hyperparameters to beat the baseline and reduce overfitting
+    """Some methods to prevent overfitting:
+        1. Train more data
+        2. Simplify model, e.g. remove some layers or reduce num of hidden units
+        3. Use data augmentation
+        4. Use transfer learning (uses training from another, similar model/data on your dataset)
+    """
+
+
+
+
