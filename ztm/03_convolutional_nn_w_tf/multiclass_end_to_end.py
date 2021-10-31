@@ -63,6 +63,29 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, do_s
     return train_data, test_data
 
 
+def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, do_shuffle=True, img_size=IMG_SIZE):
+    train_datagen = ImageDataGenerator(rescale=1/255.,
+                                       rotation_range=0.2,
+                                       shear_range=0.2,
+                                       zoom_range=0.2,
+                                       width_shift_range=0.2,
+                                       height_shift_range=0.2,
+                                       horizontal_flip=True)
+    test_datagen = ImageDataGenerator(rescale=1/255.)
+
+    train_data = train_datagen.flow_from_directory(directory=train_dir,
+                                                   target_size=(img_size,img_size),
+                                                   class_mode="categorical",
+                                                   batch_size=32,
+                                                   shuffle=do_shuffle)
+    test_data = test_datagen.flow_from_directory(directory=test_dir,
+                                                 target_size=(img_size,img_size),
+                                                 class_mode="categorical",
+                                                 batch_size=32,
+                                                 shuffle=do_shuffle)
+    return train_data, test_data
+
+
 # baseline model matches the one on CNN Explorer site
 def baseline_model(shape=(IMG_SIZE, IMG_SIZE, 3)):
     model = tf.keras.models.Sequential([
@@ -139,7 +162,7 @@ def run():
                                         target_class=random.choice(class_names))
 
     # Step 2: Preprocess the data
-    train_data, test_data = load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
+    train_data, test_data = load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
 
     # Step 3: Create the baseline CNN model
     # model = baseline_model()
