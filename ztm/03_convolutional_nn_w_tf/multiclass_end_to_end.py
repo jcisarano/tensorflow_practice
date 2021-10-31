@@ -17,6 +17,8 @@ import random
 import numpy as np
 import pathlib
 
+from keras_preprocessing.image import ImageDataGenerator
+
 import food_vision
 
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "images")
@@ -39,8 +41,26 @@ def get_class_names(directory):
     return class_names
 
 
-def run():
+def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, do_shuffle=True, img_size=IMG_SIZE):
+    train_datagen = ImageDataGenerator(rescale=1 / 255.)
+    test_datagen = ImageDataGenerator(rescale=1 / 255.)
 
+    test_data = test_datagen.flow_from_directory(directory=test_dir,
+                                                 target_size=(img_size, img_size),
+                                                 class_mode="categorical",
+                                                 batch_size=32,
+                                                 shuffle=do_shuffle
+                                                 )
+    train_data = train_datagen.flow_from_directory(directory=train_dir,
+                                                   target_size=(img_size, img_size),
+                                                   class_mode="categorical",
+                                                   batch_size=32,
+                                                   shuffle=do_shuffle
+                                                   )
+    return train_data, test_data
+
+
+def run():
     # Step 1: Visualize the data
     walk_the_data()
     class_names = get_class_names(TRAIN_DATA_PATH)
@@ -49,5 +69,6 @@ def run():
                                         target_class=random.choice(class_names))
 
     # Step 2: Preprocess the data
+    train_data, test_data = load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
+    print(train_data)
     
-
