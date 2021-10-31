@@ -232,6 +232,24 @@ def load_and_preprocess_img(path, img_shape=224):
     return img
 
 
+def pred_and_plot(model, filename, class_names):
+    """
+
+    :param model:
+    :param filename:
+    :param class_names:
+    :return:
+    """
+    img = load_and_preprocess_img(filename)
+    pred = model.predict(tf.expand_dims(img, axis=0))
+    pred_class = class_names[int(tf.round(pred))]
+    plt.imshow(img)
+    plt.title(f"Prediction: {pred_class}")
+    plt.axis(False)
+    plt.show()
+
+
+
 def run():
     # visualize_random_image()
     train_data, test_data = load_minibatch_data()
@@ -299,4 +317,15 @@ def run():
     # shape of image has to match what the model expects
     steak = load_and_preprocess_img(img_path)
     # print(steak)
-    print(model_challenge.predict(tf.expand_dims(steak, axis=0)))
+    pred_val = model_challenge.predict(tf.expand_dims(steak, axis=0))
+    print(pred_val)
+
+    # visualize image along with prediction
+    class_names = fv.get_class_names()
+    # pred_class = class_names[int(tf.round(pred_val))]
+    # print(pred_class)
+
+    pred_and_plot(model_challenge, img_path, class_names)
+
+    img_path = os.path.join(LOCAL_SAVE_PATH, "pizza_steak/03-pizza-dad.jpeg")
+    pred_and_plot(model_challenge, img_path, class_names)

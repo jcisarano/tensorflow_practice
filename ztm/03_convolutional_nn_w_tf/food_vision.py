@@ -24,7 +24,7 @@ def get_class_names():
     data_dir = pathlib.Path(path)
     class_names = np.array(sorted([item.name for item in data_dir.glob("*")]))
     print(class_names)
-
+    return class_names
 
 def view_random_image(target_dir, target_class, show=True):
     target_folder = os.path.join(target_dir, target_class)
