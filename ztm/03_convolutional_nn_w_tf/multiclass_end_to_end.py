@@ -248,6 +248,9 @@ def run():
     pred_and_plot_multiclass(model, img_2, class_names)
     pred_and_plot_multiclass(model, img_3, class_names)
 
+    # model.save("models/model_augmented")
+    # loaded_model = tf.keras.models.load_model("models/model_augmented")
+    # print(loaded_model.evaluate(test_data))
 
 
 
