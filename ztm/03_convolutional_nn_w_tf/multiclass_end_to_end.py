@@ -76,12 +76,12 @@ def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_
     train_data = train_datagen.flow_from_directory(directory=train_dir,
                                                    target_size=(img_size,img_size),
                                                    class_mode="categorical",
-                                                   batch_size=32,
+                                                   batch_size=64,
                                                    shuffle=do_shuffle)
     test_data = test_datagen.flow_from_directory(directory=test_dir,
                                                  target_size=(img_size,img_size),
                                                  class_mode="categorical",
-                                                 batch_size=32,
+                                                 batch_size=64,
                                                  shuffle=do_shuffle)
     return train_data, test_data
 
@@ -224,14 +224,13 @@ def run():
 
     # show_random_images(train_data=train_data, train_data_augmented=train_data, class_names=class_names)
 
-
     # Step 3: Create the baseline CNN model
     model = baseline_model()
     # model = simplified_model()
 
     # Step 4: Fit the model
     baseline_history = model.fit(train_data,
-                                 epochs=20,
+                                 epochs=50,
                                  steps_per_epoch=len(train_data),
                                  validation_data=test_data,
                                  validation_steps=len(test_data),
@@ -270,7 +269,7 @@ def run():
     pred_and_plot_multiclass(model, img_2, class_names)
     pred_and_plot_multiclass(model, img_3, class_names)
 
-    # model.save("models/model_augmented")
+    model.save("models/model_mb64_e50")
     # loaded_model = tf.keras.models.load_model("models/model_augmented")
     # print(loaded_model.evaluate(test_data))
 
