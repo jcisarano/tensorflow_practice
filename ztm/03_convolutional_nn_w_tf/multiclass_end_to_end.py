@@ -39,7 +39,6 @@ def walk_the_data():
 
 def get_class_names(directory):
     data_dir = pathlib.Path(directory)
-    # class_names = np.array([item.name for item in data_dir.glob('*')])
     class_names = np.array(sorted([item.name for item in data_dir.glob('*')]))
 
     return class_names
@@ -107,7 +106,7 @@ def baseline_model(shape=(IMG_SIZE, IMG_SIZE, 3)):
     return model
 
 
-def simplified_model(shape=(IMG_SIZE,IMG_SIZE,3)):
+def simplified_model(shape=(IMG_SIZE, IMG_SIZE, 3)):
     model = tf.keras.models.Sequential([
         tf.keras.layers.Conv2D(10, 3, input_shape=shape),
         tf.keras.layers.Activation(activation="relu"),
@@ -174,6 +173,26 @@ def load_and_preprocess_img(path, img_shape=224):
     return img
 
 
+def show_random_images(train_data, train_data_augmented, class_names):
+    # get some data for visualization
+    # note that the labels are not augmented, only the images
+    images, labels = train_data.next()
+    aug_images, aug_labels = train_data_augmented.next()
+
+    # show original image and augmented image
+    random_number = random.randint(0, 32)
+    _, axes = plt.subplots(ncols=2, figsize=(10, 4), sharey=True)
+    plt.sca(axes[0])
+    plt.imshow(images[random_number])
+    name = class_names[tf.argmax(labels[random_number])]
+    aug_name = class_names[tf.argmax(aug_labels[random_number])]
+    plt.title("{} image".format(name))
+    plt.sca(axes[1])
+    plt.imshow(aug_images[random_number])
+    plt.title("{} image".format(aug_name))
+    plt.show()
+
+
 def pred_and_plot_multiclass(model, filename, class_names):
     """
     :param model:
@@ -203,13 +222,16 @@ def run():
     # train_data, test_data = load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
     train_data, test_data = load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
 
+    # show_random_images(train_data=train_data, train_data_augmented=train_data, class_names=class_names)
+
+
     # Step 3: Create the baseline CNN model
     model = baseline_model()
     # model = simplified_model()
 
     # Step 4: Fit the model
     baseline_history = model.fit(train_data,
-                                 epochs=5,
+                                 epochs=20,
                                  steps_per_epoch=len(train_data),
                                  validation_data=test_data,
                                  validation_steps=len(test_data),
