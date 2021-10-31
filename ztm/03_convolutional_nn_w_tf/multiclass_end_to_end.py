@@ -136,12 +136,17 @@ def plot_loss_curve(history):
     epochs = range(len(history.history["loss"]))
 
     # plot loss
+    xmax = max(val_loss + accuracy)
+    xmin = min(val_loss + accuracy)
+    ymin = 0
+    ymax = len(val_loss)
     _, axes = plt.subplots(ncols=2, figsize=(10, 4), sharey=True)
     plt.sca(axes[0])
     plt.plot(epochs, loss, label="training_loss")
     plt.plot(epochs, val_loss, label="val_loss")
     plt.title("loss")
     plt.xlabel("epochs")
+    # plt.axis([xmin, xmax, ymin, ymax])
     plt.legend()
 
     plt.sca(axes[1])
@@ -153,6 +158,7 @@ def plot_loss_curve(history):
     plt.legend()
     plt.show()
 
+
 def run():
     # Step 1: Visualize the data
     walk_the_data()
@@ -162,11 +168,12 @@ def run():
                                         target_class=random.choice(class_names))
 
     # Step 2: Preprocess the data
+    # train_data, test_data = load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
     train_data, test_data = load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
 
     # Step 3: Create the baseline CNN model
-    # model = baseline_model()
-    model = simplified_model()
+    model = baseline_model()
+    # model = simplified_model()
 
     # Step 4: Fit the model
     baseline_history = model.fit(train_data,
