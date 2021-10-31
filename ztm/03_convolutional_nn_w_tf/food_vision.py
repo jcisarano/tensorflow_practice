@@ -26,6 +26,7 @@ def get_class_names():
     print(class_names)
     return class_names
 
+
 def view_random_image(target_dir, target_class, show=True):
     target_folder = os.path.join(target_dir, target_class)
     random_image = random.sample(os.listdir(target_folder), 1)
