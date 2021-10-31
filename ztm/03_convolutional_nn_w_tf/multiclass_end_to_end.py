@@ -12,11 +12,19 @@ Steps in multiclass classification. They are similar to any ML problem.
     6. Repeat.
 """
 import os
+import random
+
+import numpy as np
+import pathlib
+
+import food_vision
 
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "images")
 LOCAL_DATA_PATH: str = os.path.join("datasets", "images/10_food_classes_all_data")
 TRAIN_DATA_PATH: str = os.path.join(LOCAL_DATA_PATH, "train")
 TEST_DATA_PATH: str = os.path.join(LOCAL_DATA_PATH, "test")
+
+IMG_SIZE: int = 244
 
 
 def walk_the_data():
@@ -24,5 +32,22 @@ def walk_the_data():
         print(f"There are {len(dirnames)} directories and {len(filenames)} images in '{dirpath}'")
 
 
+def get_class_names(directory):
+    data_dir = pathlib.Path(directory)
+    class_names = np.array(sorted([item.name for item in data_dir.glob('*')]))
+
+    return class_names
+
+
 def run():
+
+    # Step 1: Visualize the data
     walk_the_data()
+    class_names = get_class_names(TRAIN_DATA_PATH)
+    print(class_names)
+    img = food_vision.view_random_image(target_dir=TRAIN_DATA_PATH,
+                                        target_class=random.choice(class_names))
+
+    # Step 2: Preprocess the data
+    
+
