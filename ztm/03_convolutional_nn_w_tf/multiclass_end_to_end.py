@@ -94,9 +94,13 @@ def run():
 
     # Step 3: Create the baseline CNN model
     model = baseline_model()
-    """baseline_history = model.fit(train_data,
+
+    # Step 4: Fit the model
+    baseline_history = model.fit(train_data,
                                  epochs=5,
                                  steps_per_epoch=len(train_data),
                                  validation_data=test_data,
                                  validation_steps=len(test_data),
-                                 workers=-1, use_multiprocessing=True)"""
+                                 workers=-1, use_multiprocessing=True)
+
+    # 5. Evaluate the model
