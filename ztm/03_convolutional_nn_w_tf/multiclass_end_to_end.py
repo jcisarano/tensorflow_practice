@@ -61,16 +61,18 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, do_s
     return train_data, test_data
 
 
+# baseline model matches the one on CNN Explorer site
 def baseline_model(shape=(IMG_SIZE, IMG_SIZE, 3)):
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Conv2D(filters=10, kernel_size=3, activation="relu", input_shape=shape),
-        tf.keras.layers.MaxPool2D(pool_size=2),
+        tf.keras.layers.Conv2D(filters=10, kernel_size=3, input_shape=shape),
+        tf.keras.layers.Activation(activation="relu"),
         tf.keras.layers.Conv2D(10, 3, activation="relu"),
         tf.keras.layers.MaxPool2D(),
+        tf.keras.layers.Conv2D(10, 3, activation="relu"),
         tf.keras.layers.Conv2D(10, 3, activation="relu"),
         tf.keras.layers.MaxPool2D(),
         tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(1, activation="softmax")
+        tf.keras.layers.Dense(10, activation="softmax")  # 10 because there are 10 categories
     ])
 
     model.compile(loss=tf.keras.losses.CategoricalCrossentropy(), optimizer=tf.keras.optimizers.Adam(),
