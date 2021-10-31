@@ -17,6 +17,7 @@ import random
 import numpy as np
 import pathlib
 
+import tensorflow as tf
 from keras_preprocessing.image import ImageDataGenerator
 
 import food_vision
@@ -26,7 +27,7 @@ LOCAL_DATA_PATH: str = os.path.join("datasets", "images/10_food_classes_all_data
 TRAIN_DATA_PATH: str = os.path.join(LOCAL_DATA_PATH, "train")
 TEST_DATA_PATH: str = os.path.join(LOCAL_DATA_PATH, "test")
 
-IMG_SIZE: int = 244
+IMG_SIZE: int = 224
 
 
 def walk_the_data():
@@ -60,6 +61,24 @@ def load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, do_s
     return train_data, test_data
 
 
+def baseline_model(shape=(IMG_SIZE, IMG_SIZE, 3)):
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(filters=10, kernel_size=3, activation="relu", input_shape=shape),
+        tf.keras.layers.MaxPool2D(pool_size=2),
+        tf.keras.layers.Conv2D(10, 3, activation="relu"),
+        tf.keras.layers.MaxPool2D(),
+        tf.keras.layers.Conv2D(10, 3, activation="relu"),
+        tf.keras.layers.MaxPool2D(),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(1, activation="softmax")
+    ])
+
+    model.compile(loss=tf.keras.losses.CategoricalCrossentropy(), optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+
+    return model
+
+
 def run():
     # Step 1: Visualize the data
     walk_the_data()
@@ -70,5 +89,12 @@ def run():
 
     # Step 2: Preprocess the data
     train_data, test_data = load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
-    print(train_data)
-    
+
+    # Step 3: Create the baseline CNN model
+    model = baseline_model()
+    """baseline_history = model.fit(train_data,
+                                 epochs=5,
+                                 steps_per_epoch=len(train_data),
+                                 validation_data=test_data,
+                                 validation_steps=len(test_data),
+                                 workers=-1, use_multiprocessing=True)"""
