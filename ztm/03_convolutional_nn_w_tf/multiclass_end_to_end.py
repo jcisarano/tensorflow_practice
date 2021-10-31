@@ -19,6 +19,7 @@ import pathlib
 
 import tensorflow as tf
 from keras_preprocessing.image import ImageDataGenerator
+import matplotlib.pyplot as plt
 
 import food_vision
 
@@ -81,6 +82,42 @@ def baseline_model(shape=(IMG_SIZE, IMG_SIZE, 3)):
     return model
 
 
+
+def plot_training_curve(history):
+    pd.DataFrame(history.history).plot(figsize=(10, 7))
+    plt.show()
+
+
+def plot_loss_curve(history):
+    """
+    Returns separate loss curves for training and validation metrics
+    :param history:
+    :return:
+    """
+    loss = history.history["loss"]
+    val_loss = history.history["val_loss"]
+    accuracy = history.history["accuracy"]
+    val_accuracy = history.history["val_accuracy"]
+    epochs = range(len(history.history["loss"]))
+
+    # plot loss
+    _, axes = plt.subplots(ncols=2, figsize=(10, 4), sharey=True)
+    plt.sca(axes[0])
+    plt.plot(epochs, loss, label="training_loss")
+    plt.plot(epochs, val_loss, label="val_loss")
+    plt.title("loss")
+    plt.xlabel("epochs")
+    plt.legend()
+
+    plt.sca(axes[1])
+    # plot accuracy
+    plt.plot(epochs, accuracy, label="training_accuracy")
+    plt.plot(epochs, val_accuracy, label="val_accuracy")
+    plt.title("accuracy")
+    plt.xlabel("epochs")
+    plt.legend()
+    plt.show()
+
 def run():
     # Step 1: Visualize the data
     walk_the_data()
@@ -104,3 +141,7 @@ def run():
                                  workers=-1, use_multiprocessing=True)
 
     # 5. Evaluate the model
+    plot_loss_curve(baseline_history)
+    plot_training_curve(baseline_history)
+
+    
