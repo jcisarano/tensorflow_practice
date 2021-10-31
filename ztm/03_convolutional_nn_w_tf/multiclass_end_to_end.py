@@ -39,6 +39,7 @@ def walk_the_data():
 
 def get_class_names(directory):
     data_dir = pathlib.Path(directory)
+    # class_names = np.array([item.name for item in data_dir.glob('*')])
     class_names = np.array(sorted([item.name for item in data_dir.glob('*')]))
 
     return class_names
@@ -136,26 +137,57 @@ def plot_loss_curve(history):
     epochs = range(len(history.history["loss"]))
 
     # plot loss
-    xmax = max(val_loss + accuracy)
-    xmin = min(val_loss + accuracy)
-    ymin = 0
-    ymax = len(val_loss)
     _, axes = plt.subplots(ncols=2, figsize=(10, 4), sharey=True)
     plt.sca(axes[0])
     plt.plot(epochs, loss, label="training_loss")
     plt.plot(epochs, val_loss, label="val_loss")
     plt.title("loss")
     plt.xlabel("epochs")
-    # plt.axis([xmin, xmax, ymin, ymax])
     plt.legend()
 
-    plt.sca(axes[1])
     # plot accuracy
+
+    xmax = max(val_loss + accuracy)
+    xmin = min(val_loss + accuracy)
+    ymin = 0
+    ymax = len(val_loss)
+    plt.sca(axes[1])
     plt.plot(epochs, accuracy, label="training_accuracy")
     plt.plot(epochs, val_accuracy, label="val_accuracy")
     plt.title("accuracy")
     plt.xlabel("epochs")
+    plt.axis([xmin, xmax, ymin, ymax])
     plt.legend()
+    plt.show()
+
+
+def load_and_preprocess_img(path, img_shape=224):
+    # load the image
+    img = tf.io.read_file(path)
+    # decode the image into a tensor
+    img = tf.image.decode_image(img)
+    # resize
+    img = tf.image.resize(img, [img_shape, img_shape])
+    # normalize image values
+    img = img / 255.
+
+    return img
+
+
+def pred_and_plot_multiclass(model, filename, class_names):
+    """
+    :param model:
+    :param filename:
+    :param class_names:
+    :return:
+    """
+    img = load_and_preprocess_img(filename)
+    pred = model.predict(tf.expand_dims(img, axis=0))
+    pred_class = class_names[tf.argmax(pred[0])]
+
+    plt.imshow(img)
+    plt.title(f"Prediction: {pred_class}")
+    plt.axis(False)
     plt.show()
 
 
@@ -164,8 +196,8 @@ def run():
     walk_the_data()
     class_names = get_class_names(TRAIN_DATA_PATH)
     print(class_names)
-    img = food_vision.view_random_image(target_dir=TRAIN_DATA_PATH,
-                                        target_class=random.choice(class_names))
+    # img = food_vision.view_random_image(target_dir=TRAIN_DATA_PATH,
+    #                                     target_class=random.choice(class_names))
 
     # Step 2: Preprocess the data
     # train_data, test_data = load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
@@ -195,6 +227,26 @@ def run():
         3. Use data augmentation
         4. Use transfer learning (uses training from another, similar model/data on your dataset)
     """
+
+    # 7. Continue to experiment to improve performance
+    """
+        1. Change model architecture (layers, hidden units)
+        2. Adjust learning rate
+        3. Change data augmentation hyperparams
+        4. Train for longer
+        5. Transfer learning (covered in future section)
+    """
+
+    # Test against other images
+    img_0 = os.path.join(LOCAL_DATA_PATH, "03-hamburger.jpeg")
+    img_1 = os.path.join(LOCAL_DATA_PATH, "03-pizza-dad.jpeg")
+    img_2 = os.path.join(LOCAL_DATA_PATH, "03-steak.jpeg")
+    img_3 = os.path.join(LOCAL_DATA_PATH, "03-sushi.jpeg")
+
+    pred_and_plot_multiclass(model, img_0, class_names)
+    pred_and_plot_multiclass(model, img_1, class_names)
+    pred_and_plot_multiclass(model, img_2, class_names)
+    pred_and_plot_multiclass(model, img_3, class_names)
 
 
 
