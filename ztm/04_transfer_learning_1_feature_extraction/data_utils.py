@@ -1,5 +1,7 @@
 import os
+import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import datetime
 
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "images")
 LOCAL_DATA_PATH: str = os.path.join("datasets", "images/10_food_classes_10_percent")
@@ -30,4 +32,18 @@ def load_and_prep_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, batch
                                                  class_mode="categorical")
 
     return train_data, test_data
+
+# Callbacks
+# callbacks are extra functionality you can add to a model to be performed during or after training. Some examples:
+# Tracking experiments with TensorBoard callback
+# Save weights, etc along the way with ModelCheckpoint callback
+# Stopping a model training too long and overfits using EarlyStopping callback
+# see tf.keras.callbacks.Callback
+
+
+def create_tensorboard_callback(save_dir, experiment_name):
+    log_dir = os.path.join(save_dir, experiment_name, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
+    print(f"Saving TensorBoard log files to {log_dir}")
+    return tensorboard_callback
 
