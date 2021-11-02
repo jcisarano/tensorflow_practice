@@ -44,6 +44,6 @@ def load_and_prep_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, batch
 def create_tensorboard_callback(save_dir, experiment_name):
     log_dir = os.path.join(save_dir, experiment_name, datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
-    print(f"Saving TensorBoard log files to {log_dir}")
+    print(f"Will save TensorBoard log files to {log_dir}")
     return tensorboard_callback
 
