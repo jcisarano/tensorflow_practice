@@ -22,10 +22,12 @@ def load_and_prep_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, batch
     train_datagen = ImageDataGenerator(rescale=1/255.)
     test_datagen = ImageDataGenerator(rescale=1/255.)
 
+    print("Train data:")
     train_data = train_datagen.flow_from_directory(train_dir,
                                                    target_size=IMG_SHAPE,
                                                    batch_size=batch_size,
                                                    class_mode="categorical")
+    print("Test data:")
     test_data = test_datagen.flow_from_directory(test_dir,
                                                  target_size=IMG_SHAPE,
                                                  batch_size=batch_size,

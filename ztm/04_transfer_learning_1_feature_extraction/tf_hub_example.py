@@ -33,19 +33,25 @@ def create_model(model_url: str, num_classes: int=10):
     return model
 
 
+def plot_loss_curve(history):
+    print("do stuff")
+
 def run():
-    du.list_filecount_in_dir(dir=du.LOCAL_DATA_PATH)
+    # du.list_filecount_in_dir(dir=du.LOCAL_DATA_PATH)
     train_data, test_data = du.load_and_prep_data()
 
     model_resnet = create_model(model_url=RESNET_URL, num_classes=train_data.num_classes)
     print(model_resnet.summary())
     model_resnet.compile(loss="categorical_crossentropy", optimizer=tf.keras.optimizers.Adam(), metrics=["accuracy"])
 
+    # The bulk of the model, loaded from tf_hub does not change. We only train the layer(s) we added.
     history_resnet = model_resnet.fit(train_data,
                                       epochs=5,
                                       steps_per_epoch=len(train_data),
                                       validation_data=test_data,
                                       validation_steps=len(test_data),
+                                      callbacks=[du.create_tensorboard_callback(save_dir="tensorflow_hub",
+                                                                                experiment_name="resnet50v2")],
                                       workers=-1)
 
 
