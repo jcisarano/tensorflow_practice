@@ -2,6 +2,7 @@ import os
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import datetime
+import matplotlib.pyplot as plt
 
 LOCAL_SAVE_PATH: str = os.path.join("datasets", "images")
 LOCAL_DATA_PATH: str = os.path.join("datasets", "images/10_food_classes_10_percent")
@@ -48,4 +49,29 @@ def create_tensorboard_callback(save_dir, experiment_name):
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir)
     print(f"Will save TensorBoard log files to {log_dir}")
     return tensorboard_callback
+
+
+def plot_loss_curve(history):
+    loss = history.history["loss"]
+    val_loss = history.history["val_loss"]
+    val_accuracy = history.history["val_accuracy"]
+    accuracy = history.history["accuracy"]
+    epochs = range(len(history.history["loss"]))
+
+    _, axes = plt.subplots(ncols=2, figsize=(10, 4), sharey=False)
+    plt.sca(axes[0])
+    plt.plot(epochs, loss, label="training_loss")
+    plt.plot(epochs, val_loss, label="val_loss")
+    plt.title("loss")
+    plt.xlabel("epochs")
+    plt.legend()
+
+    plt.sca(axes[1])
+    plt.plot(epochs, accuracy, label="training_accuracy")
+    plt.plot(epochs, val_accuracy, label="val_accuracy")
+    plt.title("accuracy")
+    plt.xlabel("epochs")
+    plt.legend()
+
+    plt.show()
 
