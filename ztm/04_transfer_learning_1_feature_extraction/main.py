@@ -7,10 +7,13 @@
 
 import data_utils as du
 import tf_hub_example as tfhe
+import tf_hub_mobilenet as mobilenet
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    tfhe.run()
+    mobilenet.run()
+    # tfhe.run()
     # du.list_filecount_in_dir(dir=du.LOCAL_DATA_PATH)
     # du.load_and_prep_data()
 
