@@ -70,3 +70,8 @@ def run():
                                                   workers=-1)
     du.plot_loss_curve(history_efficientnet)
 
+    # Different types of transfer learning:
+    #   As-is: no changes to model
+    #   Feature extraction: use existing model with no changes to underlying layers with new output layer
+    #   Fine tuning: use existing model but retrain underlying layers and add new output layer
+

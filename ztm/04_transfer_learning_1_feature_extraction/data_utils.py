@@ -14,8 +14,8 @@ IMG_SHAPE = (IMG_SIZE, IMG_SIZE)
 BATCH_SIZE: int = 32
 
 
-def list_filecount_in_dir(dir):
-    for dirpath, dirnames, filenames in os.walk(dir):
+def list_filecount_in_dir(data_dir):
+    for dirpath, dirnames, filenames in os.walk(data_dir):
         print(f"There are {len(dirnames)} directories and {len(filenames)} images in {dirpath}.")
 
 
