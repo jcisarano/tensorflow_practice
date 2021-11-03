@@ -30,5 +30,7 @@ def run():
                         epochs=5,
                         steps_per_epoch=len(train_data),
                         validation_data=test_data,
-                        validation_steps=len(test_data))
+                        validation_steps=len(test_data),
+                        callbacks=[du.create_tensorboard_callback("tensorflow_hub", "mobilenet100v2")],
+                        workers=-1)
     du.plot_loss_curve(history)
