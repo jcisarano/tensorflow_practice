@@ -31,11 +31,34 @@ def run():
         estimators=[("lr", log_clf), ("rf", rnd_clf), ("svc", svm_clf)],
         voting="hard"
     )
-    # fits them all together:
+    # fit the voting classifier
     voting_clf.fit(X_train, y_train)
 
+    print("Hard voting ensemble results:")
+    # fit the individual models, make predictions and
     # write the accuracy score of each individual followed by the combined voting classifier
     # the voting classifier should win:
+    for clf in (log_clf, rnd_clf, svm_clf, voting_clf):
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        print(clf.__class__.__name__, accuracy_score(y_test, y_pred))
+
+    # ############
+    # ############
+    # now make a soft voting classifier with essentially the same models
+    log_clf = LogisticRegression(solver="lbfgs", random_state=42)
+    rnd_clf = RandomForestClassifier(n_estimators=100, random_state=42)
+    svm_clf = SVC(gamma="scale", probability=True, random_state=42)
+
+    # Make the soft voting classifier
+    # Adds the (float value) predictions for each class, and the one with the highest total wins
+    voting_clf = VotingClassifier(
+        estimators=[("lr", log_clf), ("rf", rnd_clf), ("svc", svm_clf)],
+        voting="soft"
+    )
+    voting_clf.fit(X_train, y_train)
+
+    print("\nSoft voting ensemble results:")
     for clf in (log_clf, rnd_clf, svm_clf, voting_clf):
         clf.fit(X_train, y_train)
         y_pred = clf.predict(X_test)
