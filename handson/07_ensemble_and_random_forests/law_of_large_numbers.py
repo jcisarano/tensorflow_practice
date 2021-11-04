@@ -10,7 +10,7 @@ def run():
     # np.cumsum along axis 0 adds up cols of 0/1 vals
     # np.arange returns evenly spaced values over range 1, 10001
     # np.reshape makes array shape (10000, 1)
-    # so each row is divided by its index: row 1 divided by 1, row 2 divided by 2, etc
+    # so each row is divided by its index+1: row 0 divided by 1, row 1 divided by 2, etc
     cumulative_heads_ratio = np.cumsum(coin_tosses, axis=0) / np.arange(1, 10001).reshape(-1, 1)
 
     plt.figure(figsize=(8, 4.5))
