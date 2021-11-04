@@ -52,7 +52,7 @@ def load_and_prep_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, batch
 def run():
     train_data, test_data = load_and_prep_data()
 
-    model = create_model(EFFICIENTNET_URL)
+    model = create_model(RESNET_URL)
     print(model.summary())
 
     model.fit(train_data,
