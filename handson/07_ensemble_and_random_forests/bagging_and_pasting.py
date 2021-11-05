@@ -48,9 +48,12 @@ def plot_decision_boundary(clf, X, y, axes=[-1.5, 2.45, -1, 1.5], alpha=0.5, con
 
 
 def plot_decision_tree_v_bagging(X_train, X_test, y_train, y_test):
+    # bagging classifier creates 500 models, each trained on only 100 random instances from the training set
+    # uses soft voting by default, to switch from bagging to pasting (no replacement) set bootstrap=False
     bag_clf = BaggingClassifier(
         DecisionTreeClassifier(), n_estimators=500,
-        max_samples=100, bootstrap=True, random_state=42
+        max_samples=100, bootstrap=True, random_state=42,
+        n_jobs=-1
     )
     bag_clf.fit(X_train, y_train)
     y_pred = bag_clf.predict(X_test)
@@ -73,6 +76,37 @@ def plot_decision_tree_v_bagging(X_train, X_test, y_train, y_test):
     plt.show()
 
 
+def oob_classifier(X, y, X_test, y_test):
+    bag_clf = BaggingClassifier(
+        DecisionTreeClassifier(), n_estimators=500,
+        bootstrap=True, oob_score=True, random_state=40,
+        n_jobs=-1
+    )
+    bag_clf.fit(X, y)
+    print("OOB score:", bag_clf.oob_score_)
+    # print(bag_clf.oob_decision_function_)  # returns the class probabilities for each training instance
+    y_pred = bag_clf.predict(X_test)
+    print(accuracy_score(y_test, y_pred))
+
+
 def run():
     X_train, X_test, y_train, y_test = get_moons()
     plot_decision_tree_v_bagging(X_train, X_test, y_train, y_test)
+
+    """
+    Bagging v pasting notes:
+    Bagging subsets have more diversity than pasting, so there is slightly more bias
+    But the extra diversity means the models are less correlated, so variance is reduced.
+    Bagging is usually preferred because the models are better, but it can be worth doing
+    cross-validation to evaluate both bagging and pasting to pick which one is better in 
+    a given situation.
+    """
+
+    """
+    Out-of-bag evaluation: There are some training instances that the predictor will not see,
+    so these can be used as a validation set, without the need to create a separate set.
+    sklearn has this built in, by setting oob_score=True
+    """
+
+    oob_classifier(X_train, y_train, X_test, y_test)
+
