@@ -5,7 +5,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, mean_squared_error
+from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 
 
@@ -82,6 +83,13 @@ def simple_gradient_boost_eg(X, y):
 
 
 def gradient_boost_regressor(X, y):
+    """
+    number of predictors (estimators) changes based on learning rate
+    need to tune learning rate AND number of predictors
+    :param X:
+    :param y:
+    :return:
+    """
     gbrt = GradientBoostingRegressor(max_depth=2, n_estimators=3, learning_rate=1.0, random_state=42)
     gbrt.fit(X, y)
 
@@ -106,7 +114,22 @@ def gradient_boost_regressor(X, y):
     plt.show()
 
 
+def gb_w_early_stopping(X, y):
+    X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=49)
+    gbrt = GradientBoostingRegressor(max_depth=2, n_estimators=120, random_state=42)
+    gbrt.fit(X_train, y_train)
+
+    errors = [mean_squared_error(y_val, y_pred)
+              for y_pred in gbrt.staged_predict(X_val)]
+    bst_n_estimators = np.argmin(errors) + 1
+
+    gbrt_best = GradientBoostingRegressor(max_depth=2, n_estimators=bst_n_estimators, random_state=42)
+    gbrt_best.fit(X_train, y_train)
+
+
+
 def run():
     X, y = create_quadratic_dataset()
     # simple_gradient_boost_eg(X, y)
-    gradient_boost_regressor(X, y)
+    # gradient_boost_regressor(X, y)
+    gb_w_early_stopping(X, y)
