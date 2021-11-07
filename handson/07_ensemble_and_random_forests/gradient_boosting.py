@@ -4,6 +4,7 @@
 """
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import accuracy_score
 from sklearn.tree import DecisionTreeRegressor
 
@@ -66,8 +67,46 @@ def simple_gradient_boost_eg(X, y):
     plot_predictions([tree_reg1, tree_reg2], X, y, axes=[-0.5, 0.5, -0.1, 0.8], label="$h(x_1) = h_1(x_1) + h_2(x_1)$")
     plt.ylabel("$y$", fontsize=16, rotation=0)
 
+    # plot third tree, which was trained on results of second tree
+    plt.subplot(325)
+    plot_predictions([tree_reg3], X, y3, axes=[-0.5, 0.5, -0.5, 0.5], label="$h_3(x_1)$", style="g-", data_style="k+")
+    plt.ylabel("$y - h_1(x_1) - h_2(x_1)$", fontsize=16)
+
+    # plot ensemble predictions using all three trees
+    plt.subplot(326)
+    plot_predictions([tree_reg1, tree_reg2, tree_reg3], X, y, axes=[-0.5, 0.5, -0.1, 0.8], label="$h(x_1) = h_1(x_1) + h_2(x_1) + h_3(x_1)$")
+    plt.xlabel("$x_1$", fontsize=16)
+    plt.ylabel("$y$", fontsize=16, rotation=0)
+
     plt.show()
+
+
+def gradient_boost_regressor(X, y):
+    gbrt = GradientBoostingRegressor(max_depth=2, n_estimators=3, learning_rate=1.0, random_state=42)
+    gbrt.fit(X, y)
+
+    gbrt_slow = GradientBoostingRegressor(max_depth=2, n_estimators=200, learning_rate=0.1, random_state=42)
+    gbrt_slow.fit(X, y)
+
+    _, axes = plt.subplots(ncols=2, figsize=(10, 4), sharey=True)
+
+    # plot regressor with not enough predictors
+    plt.sca(axes[0])
+    plot_predictions([gbrt], X, y, axes=[-0.5, 0.5, -0.1, 0.8], label="Ensemble predictions")
+    plt.title("learning_rate={}, n_estimators={}".format(gbrt.learning_rate, gbrt.n_estimators), fontsize=14)
+    plt.xlabel("$x_1$", fontsize=16)
+    plt.ylabel("$y$", fontsize=16, rotation=0)
+
+    # plot regressor with too many predictors
+    plt.sca(axes[1])
+    plot_predictions([gbrt_slow], X, y, axes=[-0.5, 0.5, -0.1, 0.8])
+    plt.title("learning_rate={}, n_estimators={}".format(gbrt_slow.learning_rate, gbrt_slow.n_estimators), fontsize=14)
+    plt.xlabel("$x_1$", fontsize=16)
+
+    plt.show()
+
 
 def run():
     X, y = create_quadratic_dataset()
-    simple_gradient_boost_eg(X, y)
+    # simple_gradient_boost_eg(X, y)
+    gradient_boost_regressor(X, y)
