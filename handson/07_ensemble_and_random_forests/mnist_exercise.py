@@ -1,9 +1,9 @@
 import numpy as np
 from sklearn.datasets import fetch_openml
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
-
 
 
 def fetch_mnist_data(size=70000):
@@ -16,24 +16,32 @@ def fetch_mnist_data(size=70000):
     return X, y
 
 
-def train_random_forest(X_train, y_train, X_test):
+def train_random_forest(X_train, y_train, X_test, y_test):
     clf = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, random_state=42)
     clf.fit(X_train, y_train)
-    # y_pred_rf = clf.predict(X_test)
+    y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(accuracy)
 
     return clf
 
 
-def train_svm(X_train, y_train, X_test):
+def train_svm(X_train, y_train, X_test, y_test):
     clf = SVC()
     clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(accuracy)
 
     return clf
 
 
-def train_extra_trees(X_train, y_train, X_test):
+def train_extra_trees(X_train, y_train, X_test, y_test):
     clf = ExtraTreesClassifier()
     clf.fit(X_train, y_train)
+    y_pred = clf.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(accuracy)
 
     return clf
 
@@ -50,4 +58,9 @@ def run():
     X, y = fetch_mnist_data()
     X_train, X_test, X_val, y_train, y_test, y_val = train_val_test_split(X, y)
     print(X_train.shape, X_test.shape, X_val.shape)
+
+    forest_clf = train_random_forest(X_train, y_train, X_val, y_val)
+    etrees_clf = train_extra_trees(X_train, y_train, X_val, y_val)
+    svm_clf = train_svm(X_train, y_train, X_val, y_val)
+
 
