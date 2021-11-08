@@ -115,21 +115,87 @@ def gradient_boost_regressor(X, y):
 
 
 def gb_w_early_stopping(X, y):
+    """
+    One way to do early stopping with GradientBoostRegressor:
+        1. Train GBR with lots of estimators
+        2. Check each stage of prediction using staged_predict() to find the lowest error
+        3. Train another GBR with only that many estimators
+    Note: this requires training a model with lots of estimators, probably many more than you will need.
+    :param X:
+    :param y:
+    :return:
+    """
     X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=49)
     gbrt = GradientBoostingRegressor(max_depth=2, n_estimators=120, random_state=42)
     gbrt.fit(X_train, y_train)
 
+    # checks mse at each stage in prediction to find lowest value, i.e. the best number of predictors
     errors = [mean_squared_error(y_val, y_pred)
               for y_pred in gbrt.staged_predict(X_val)]
     bst_n_estimators = np.argmin(errors) + 1
 
+    # now train another ensemble using only the optimal number of predictors
     gbrt_best = GradientBoostingRegressor(max_depth=2, n_estimators=bst_n_estimators, random_state=42)
     gbrt_best.fit(X_train, y_train)
 
+    min_error = np.min(errors)
+    print(min_error)
+
+    plt.figure(figsize=(10, 4))
+
+    # plot the point of the minimum error from gbrt
+    plt.subplot(121)
+    plt.plot(errors, "b.-")
+    plt.plot([bst_n_estimators, bst_n_estimators], [0, min_error], "k--")
+    plt.plot([0, 120], [min_error, min_error], "k--")
+    plt.plot(bst_n_estimators, min_error, "ko")
+    plt.text(bst_n_estimators, min_error*1.2, "Minimum", ha="center", fontsize=14)
+    plt.axis([0, 120, 0, 0.01])
+    plt.xlabel("Number of trees")
+    plt.ylabel("Validation error", fontsize=14)
+
+    # now plot the best model (gbrt_best)
+    plt.subplot(122)
+    plot_predictions([gbrt_best], X, y, axes=[-0.5, 0.5, -0.1, 0.8])
+    plt.title("Best model (%d trees" % bst_n_estimators, fontsize=14)
+    plt.ylabel("$y$", fontsize=16, rotation=0)
+    plt.xlabel("$x_1$", fontsize=16)
+
+    plt.show()
+
+
+def gb_early_stopping_manual(X, y):
+    """
+    This variation on early stopping checks each estimator as it goes, and it will quit when the mse trends
+    worse for five epochs in a row
+
+    Using warm_start in the regressor is important because it keeps existing trees when fit() is called.
+    :return:
+    """
+    X_train, X_val, y_train, y_val = train_test_split(X, y, random_state=49)
+    gbrt = GradientBoostingRegressor(max_depth=2, warm_start=True, random_state=42)
+
+    min_val_error = float("inf")
+    error_going_up = 0
+    for n_estimators in range(1, 120):
+        gbrt.n_estimators = n_estimators
+        gbrt.fit(X_train, y_train)
+        y_pred = gbrt.predict(X_val)
+        val_error = mean_squared_error(y_val, y_pred)
+        if val_error < min_val_error:
+            min_val_error = val_error
+            error_going_up = 0
+        else:
+            error_going_up += 1
+            if error_going_up == 5:
+                break  # this is your early stopping
+
+    print(gbrt.n_estimators)
 
 
 def run():
     X, y = create_quadratic_dataset()
     # simple_gradient_boost_eg(X, y)
     # gradient_boost_regressor(X, y)
-    gb_w_early_stopping(X, y)
+    # gb_w_early_stopping(X, y)
+    gb_early_stopping_manual(X, y)
