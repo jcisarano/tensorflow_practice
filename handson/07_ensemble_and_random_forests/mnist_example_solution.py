@@ -29,12 +29,12 @@ def run():
     svm_clf = LinearSVC(max_iter=100, tol=20, random_state=42)
     mlp_clf = MLPClassifier(random_state=42)
 
-    estimators = [random_forest_clf, extra_trees_clf, svm_clf, mlp_clf]
-    for estimator in estimators:
-        print("Training", estimator)
-        estimator.fit(X_train, y_train)
+    # estimators = [random_forest_clf, extra_trees_clf, svm_clf, mlp_clf]
+    # for estimator in estimators:
+    #     print("Training", estimator)
+    #     estimator.fit(X_train, y_train)
 
-    print([estimator.score(X_val, y_val) for estimator in estimators])
+    # print([estimator.score(X_val, y_val) for estimator in estimators])
 
     named_estimators = [
         ("random_forest_clf", random_forest_clf),

@@ -19,9 +19,7 @@ def fetch_mnist_data(size=70000):
 def train_random_forest(X_train, y_train, X_test, y_test):
     clf = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, random_state=42)
     clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    print("Random forest accuracy:", accuracy)
+    print("Random forest score", clf.score(X_test, y_test))
 
     return clf
 
@@ -29,9 +27,7 @@ def train_random_forest(X_train, y_train, X_test, y_test):
 def train_svm(X_train, y_train, X_test, y_test):
     clf = SVC()
     clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    print("SVM accuracy:", accuracy)
+    print("SVM score:", clf.score(X_test, y_test))
 
     return clf
 
@@ -39,9 +35,7 @@ def train_svm(X_train, y_train, X_test, y_test):
 def train_extra_trees(X_train, y_train, X_test, y_test):
     clf = ExtraTreesClassifier()
     clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    print("Extra trees accuracy:", accuracy)
+    print("Extra trees score:", clf.score(X_test, y_test))
 
     return clf
 
@@ -69,7 +63,6 @@ def run():
     )
 
     voting_clf.fit(X_train, y_train)
-    y_pred = voting_clf.predict(X_test)
-    print("Voting accuracy:", accuracy_score(y_test, y_pred))
+    print("Voting score:", voting_clf.score(X_test, y_test))
 
 

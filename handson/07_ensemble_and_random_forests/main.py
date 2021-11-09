@@ -10,8 +10,8 @@ import mnist_example_solution as mnes
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    mnes.run()
-    # mne.run()
+    # mnes.run()
+    mne.run()
     # gb.run()
     # abe.run()
     # rf.run()
