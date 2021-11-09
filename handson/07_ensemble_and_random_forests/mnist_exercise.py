@@ -57,12 +57,20 @@ def run():
     etrees_clf = train_extra_trees(X_train, y_train, X_val, y_val)
     svm_clf = train_svm(X_train, y_train, X_val, y_val)
 
-    voting_clf = VotingClassifier(
-        estimators=[("rf", forest_clf), ("et", etrees_clf), ("svc", svm_clf)],
-        voting="hard"
-    )
+    # voting_clf = VotingClassifier(
+    #     estimators=[("rf", forest_clf), ("et", etrees_clf), ("svc", svm_clf)],
+    #     voting="hard"
+    # )
 
-    voting_clf.fit(X_train, y_train)
-    print("Voting score:", voting_clf.score(X_test, y_test))
+    # voting_clf.fit(X_train, y_train)
+    # print("Voting score:", voting_clf.score(X_test, y_test))
 
+    rf_pred = forest_clf.predict(X_val)
+    etrees_pred = etrees_clf.predict(X_val)
+    svm_pred = svm_clf.predict(X_val)
 
+    pred_set = np.stack([rf_pred, etrees_pred, svm_pred], axis=1)
+    print(pred_set.shape)
+
+    blender_clf = train_svm(pred_set, y_val)
+    
