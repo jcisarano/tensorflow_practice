@@ -46,7 +46,25 @@ def run():
     voting_clf = VotingClassifier(named_estimators)
     print("Training", voting_clf)
     voting_clf.fit(X_train, y_train)
-    print(voting_clf.score(X_val, y_val))
+    print("Voting classifier score:", voting_clf.score(X_val, y_val))
+
+    # remove SVM because it is the weakest to see if overall performance is improved
+    voting_clf.set_params(svm_clf=None)
+    print(voting_clf.estimators_)
+    del voting_clf.estimators_[2]
+    print(voting_clf.estimators_)
+    print("Voting classifier score w/o SVM:", voting_clf.score(X_val, y_val))
+
+    # test with soft voting:
+    voting_clf.voting = "soft"
+    print("Voting classifier soft voting score:", voting_clf.score(X_val, y_val))
+
+    # switch back to hard voting, try it with test set:
+    voting_clf.voting = "hard"
+    print("Voting classifier test set score", voting_clf.score(X_test, y_test))
+
+    print("Other classifiers test set scores")
+    print([estimator.score(X_test, y_test) for estimator in voting_clf.estimators_])
 
 
 
