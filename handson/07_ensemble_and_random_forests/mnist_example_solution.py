@@ -23,3 +23,15 @@ def run():
     X_train, X_test, X_val, y_train, y_val, y_test = get_data()
     print(X_train.shape, X_test.shape)
 
+    random_forest_clf = RandomForestClassifier(n_estimators=100, random_state=42)
+    extra_trees_clf = ExtraTreesClassifier(n_estimators=100, random_state=42)
+    svm_clf = LinearSVC(max_iter=100, tol=20, random_state=42)
+    mlp_clf = MLPClassifier(random_state=42)
+
+    estimators = [random_forest_clf, extra_trees_clf, svm_clf, mlp_clf]
+    for estimator in estimators:
+        print("Training", estimator)
+        estimator.fit(X_train, y_train)
+
+    print([estimator.score(X_val, y_val) for estimator in estimators])
+
