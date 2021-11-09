@@ -65,6 +65,7 @@ def run():
     # voting_clf.fit(X_train, y_train)
     # print("Voting score:", voting_clf.score(X_test, y_test))
 
+    # now, build a blender classifier based on predictions from each model
     rf_pred = forest_clf.predict(X_val)
     etrees_pred = etrees_clf.predict(X_val)
     svm_pred = svm_clf.predict(X_val)
@@ -72,5 +73,18 @@ def run():
     pred_set = np.stack([rf_pred, etrees_pred, svm_pred], axis=1)
     print(pred_set.shape)
 
-    blender_clf = train_svm(pred_set, y_val)
-    
+    blender_clf = RandomForestClassifier(n_estimators=500, max_leaf_nodes=16, random_state=42)
+    blender_clf.fit(pred_set, y_val)
+
+    estimators = [forest_clf, etrees_clf, svm_clf]
+    # now make a prediction using blender based on test set
+    X_test_predictions = np.empty((len(y_test), len(estimators)), dtype=np.float32)
+
+    # capture the predictions of the various classifiers
+    for index, estimator in enumerate(estimators):
+        X_test_predictions[:, index] = estimator.predict(X_test)
+
+    # then make a prediction using them as the dataset
+    y_pred = blender_clf.predict(X_test_predictions)
+    print(accuracy_score(y_test, y_pred))
+
