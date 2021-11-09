@@ -6,10 +6,12 @@ import random_forests as rf
 import ada_boost_example as abe
 import  gradient_boosting as gb
 import mnist_exercise as mne
+import mnist_example_solution as mnes
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    mne.run()
+    mnes.run()
+    # mne.run()
     # gb.run()
     # abe.run()
     # rf.run()
