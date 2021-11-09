@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.svm import LinearSVC
 from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import VotingClassifier
 
 
 def get_data():
@@ -34,4 +35,18 @@ def run():
         estimator.fit(X_train, y_train)
 
     print([estimator.score(X_val, y_val) for estimator in estimators])
+
+    named_estimators = [
+        ("random_forest_clf", random_forest_clf),
+        ("extra_trees_clf", extra_trees_clf),
+        ("svm_clf", svm_clf),
+        ("mlp_clf", mlp_clf),
+    ]
+
+    voting_clf = VotingClassifier(named_estimators)
+    print("Training", voting_clf)
+    voting_clf.fit(X_train, y_train)
+    print(voting_clf.score(X_val, y_val))
+
+
 
