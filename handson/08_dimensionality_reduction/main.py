@@ -1,16 +1,20 @@
-# This is a sample Python script.
+"""
+Dimensionality reduction attempts to reduce the number of features in a dataset to speed training
+and also make it easier to find a good solution to the problem.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+E.g. edge pixels in some kinds of image recognition might not be important, or adjacent pixels might be redundant.
+
+It can also make data visualization easier in some cases by reducing the number of dimensions down to two or three.
+
+Dimensionality reduction can result in some data loss, so it can be a tradeoff between speed and accuracy.
+It can also add complexity to the production pipeline.
+"""
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
+import data_utils as du
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    print(du.get_3d_dataset().shape)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
