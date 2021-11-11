@@ -127,6 +127,7 @@ def plot_complex_decision_boundaries(X, t):
     x3s = np.linspace(axes[4], axes[5], 10)
     x2, x3 = np.meshgrid(x2s, x3s)
 
+    # plot boundary through 3d roll
     fig = plt.figure(figsize=(6, 5))
     ax = plt.subplot(111, projection='3d')
 
@@ -143,6 +144,17 @@ def plot_complex_decision_boundaries(X, t):
     ax.set_xlim(axes[0:2])
     ax.set_ylim(axes[2:4])
     ax.set_zlim(axes[4:6])
+
+    # plot manifold boundary 1
+    fig = plt.figure(figsize=(5, 4))
+    ax = plt.subplot(111)
+
+    plt.plot(t[positive_class], X[positive_class, 1], "gs")
+    plt.plot(t[~positive_class], X[~positive_class, 1], "y^")
+    plt.axis([4, 15, axes[2], axes[3]])
+    plt.xlabel("$z_1$", fontsize=18)
+    plt.ylabel("$z_2$", fontsize=18, rotation=0)
+    plt.grid(True)
 
     plt.show()
 
@@ -164,3 +176,4 @@ def run():
     # plot_swiss_roll(X, t)
     # plot_competing_swiss_roll_squashes(X, t)
     plot_complex_decision_boundaries(X, t)
+
