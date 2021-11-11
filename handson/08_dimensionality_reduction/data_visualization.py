@@ -67,6 +67,22 @@ def plot_3d_dataset_close_to_2d_subspace(pca, X, X3D_inv, m):
     plt.show()
 
 
+def plot_2d_dataset_projection(X2D):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, aspect="equal")
+
+    ax.plot(X2D[:, 0], X2D[:, 1], "k+")
+    ax.plot(X2D[:, 0], X2D[:, 1], "k.")
+    ax.arrow(0, 0, 0, 1, head_width=0.05, length_includes_head=True, head_length=0.1, fc="k", ec="k")
+    ax.arrow(0, 0, 1, 0, head_width=0.05, length_includes_head=True, head_length=0.1, fc="k", ec="k")
+    ax.set_xlabel("$x_1$", fontsize=18)
+    ax.set_ylabel("$z_2$", fontsize=18, rotation=0)
+    ax.axis([-1.5, 1.3, -1.2, 1.2])
+    ax.grid(True)
+
+    plt.show()
+
+
 def run():
     X = du.get_3d_dataset()
     m, n = X.shape
@@ -76,3 +92,4 @@ def run():
     X3D_inv = pca.inverse_transform(X2D)
 
     plot_3d_dataset_close_to_2d_subspace(pca, X, X3D_inv, m)
+    plot_2d_dataset_projection(X2D)
