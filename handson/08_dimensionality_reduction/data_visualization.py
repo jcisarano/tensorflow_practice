@@ -51,8 +51,17 @@ def plot_3d_dataset_close_to_2d_subspace(pca, X, X3D_inv, m):
         if X[i, 2] > X3D_inv[i, 2]:
             ax.plot([X[i][0], X3D_inv[i][0]], [X[i][1], X3D_inv[i][1]], [X[i][2], X3D_inv[i][2]], "k-")
         else:
-            ax.plot([X[i][0], X3D_inv[i][0]], [X[i][1], X3D_inv[i][1]], [X[i][2], X3D_inv[i][2]], "k-", color="#505050")
+            ax.plot([X[i][0], X3D_inv[i][0]], [X[i][1], X3D_inv[i][1]], [X[i][2], X3D_inv[i][2]], "-", color="#505050")
 
+    ax.plot(X3D_inv[:, 0], X3D_inv[:, 1], X3D_inv[:, 2], "k+")
+    ax.plot(X3D_inv[:, 0], X3D_inv[:, 1], X3D_inv[:, 2], "k.")
+    ax.plot(X3D_above[:, 0], X3D_above[:, 1], X3D_above[:, 2], "bo")
+    ax.set_xlabel("$x_1$", fontsize=18, labelpad=10)
+    ax.set_ylabel("$y_2$", fontsize=18, labelpad=10)
+    ax.set_zlabel("$z_3$", fontsize=18, labelpad=10)
+    ax.set_xlim(axes[0:2])
+    ax.set_ylim(axes[2:4])
+    ax.set_zlim(axes[4:6])
 
     plt.show()
 
