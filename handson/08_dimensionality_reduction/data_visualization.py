@@ -172,6 +172,18 @@ def plot_complex_decision_boundaries(X, t):
     ax.set_ylim(axes[2:4])
     ax.set_zlim(axes[4:6])
 
+    fig = plt.figure(figsize=(5, 4))
+    ax = plt.subplot(111)
+
+    plt.plot(t[positive_class], X[positive_class, 1], "gs")
+    plt.plot(t[~positive_class], X[~positive_class, 1], "y^")
+    plt.plot([4, 15], [0, 22], "b-", linewidth=2)
+    plt.axis([4, 15, axes[2], axes[3]])
+    plt.xlabel("$z_1$", fontsize=18)
+    plt.ylabel("$z_2$", fontsize=18, rotation=0)
+    plt.grid(True)
+
+
     plt.show()
 
 
