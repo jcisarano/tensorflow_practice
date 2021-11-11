@@ -5,19 +5,18 @@ from mpl_toolkits.mplot3d import proj3d
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA
 
-
 import data_utils as du
 
 
 class Arrow3D(FancyArrowPatch):
     def __init__(self, xs, ys, zs, *args, **kwargs):
-        FancyArrowPatch.__init__(self, (0,0), (0,0), *args, **kwargs)
+        FancyArrowPatch.__init__(self, (0, 0), (0, 0), *args, **kwargs)
         self._verts3d = xs, ys, zs
 
     def draw(self, renderer):
         xs3d, ys3d, zs3d = self._verts3d
         xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, renderer.M)
-        self.set_positions((xs[0], ys[0]), (xs[1], xs[1]))
+        self.set_positions((xs[0], ys[0]), (xs[1], ys[1]))
         FancyArrowPatch.draw(self, renderer)
 
 
@@ -31,7 +30,7 @@ def plot_3d_dataset_close_to_2d_subspace(pca, X, X3D_inv, m):
 
     C = pca.components_
     R = C.T.dot(C)
-    z = (R[0, 2]*x1 + R[1, 2]*x2) / (1 - R[2, 2])
+    z = (R[0, 2] * x1 + R[1, 2] * x2) / (1 - R[2, 2])
 
     fig = plt.figure(figsize=(6, 3.8))
     ax = fig.add_subplot(111, projection="3d")
@@ -43,8 +42,10 @@ def plot_3d_dataset_close_to_2d_subspace(pca, X, X3D_inv, m):
 
     ax.plot_surface(x1, x2, z, alpha=0.2, color="k")
     np.linalg.norm(C, axis=0)
-    ax.add_artist(Arrow3D([0, C[0, 0]], [0, C[0, 1]], [0, C[0, 2]], mutation_scale=15, lw=1, arrowstyle="-|>", color="k"))
-    ax.add_artist(Arrow3D([0, C[1, 0]], [0, C[1, 1]], [0, C[1, 2]], mutation_scale=15, lw=1, arrowstyle="-|>", color="k"))
+    ax.add_artist(
+        Arrow3D([0, C[0, 0]], [0, C[0, 1]], [0, C[0, 2]], mutation_scale=15, lw=1, arrowstyle="-|>", color="k"))
+    ax.add_artist(
+        Arrow3D([0, C[1, 0]], [0, C[1, 1]], [0, C[1, 2]], mutation_scale=15, lw=1, arrowstyle="-|>", color="k"))
     ax.plot([0], [0], [0], "k.")
 
     for i in range(m):
