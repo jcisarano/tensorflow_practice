@@ -3,6 +3,7 @@ import numpy as np
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 from mpl_toolkits.mplot3d import Axes3D
+from sklearn.datasets import make_swiss_roll
 from sklearn.decomposition import PCA
 
 import data_utils as du
@@ -83,13 +84,33 @@ def plot_2d_dataset_projection(X2D):
     plt.show()
 
 
+def plot_swiss_roll(X, t):
+    axes = [-11.5, 14, -2, 23, -12, 15]
+    fig = plt.figure(figsize=(6, 5))
+    ax = fig.add_subplot(111, projection='3d')
+
+    ax.scatter(X[:, 0], X[:, 1], X[:, 2], c=t, cmap=plt.cm.hot)
+    ax.view_init(10, -70)
+    ax.set_xlabel("$x_1$", fontsize=18)
+    ax.set_ylabel("$x_2$", fontsize=18)
+    ax.set_zlabel("$x_3$", fontsize=18)
+    ax.set_xlim(axes[0:2])
+    ax.set_ylim(axes[2:4])
+    ax.set_zlim(axes[4:6])
+
+    plt.show()
+
+
 def run():
-    X = du.get_3d_dataset()
-    m, n = X.shape
+    # X = du.get_3d_dataset()
+    # m, n = X.shape
 
-    pca = PCA(n_components=2)
-    X2D = pca.fit_transform(X)
-    X3D_inv = pca.inverse_transform(X2D)
+    # pca = PCA(n_components=2)
+    # X2D = pca.fit_transform(X)
+    # X3D_inv = pca.inverse_transform(X2D)
 
-    plot_3d_dataset_close_to_2d_subspace(pca, X, X3D_inv, m)
-    plot_2d_dataset_projection(X2D)
+    # plot_3d_dataset_close_to_2d_subspace(pca, X, X3D_inv, m)
+    # plot_2d_dataset_projection(X2D)
+
+    X, t = make_swiss_roll(n_samples=1000, noise=0.2, random_state=42)
+    plot_swiss_roll(X, t)
