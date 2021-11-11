@@ -8,6 +8,9 @@ It can also make data visualization easier in some cases by reducing the number 
 
 Dimensionality reduction can result in some data loss, so it can be a tradeoff between speed and accuracy.
 It can also add complexity to the production pipeline.
+
+Dimensionality reduction is different from feature extraction in that it may modify features or create new ones, where
+feature extraction selects a subset of existing features.
 """
 
 """
