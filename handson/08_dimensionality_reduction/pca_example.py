@@ -29,6 +29,9 @@ def pca_manual_example(X):
     X2D = X_centered.dot(W2)
 
     X3D_inv = X2D.dot(Vt[:2, :])
+
+    evr = np.square(s) / np.square(s).sum()
+    print("svd explained variance ratio:", evr)
     return X2D, X3D_inv
 
 
@@ -37,6 +40,8 @@ def pca_using_sklearn(X):
     X2D = pca.fit_transform(X)
     X3D_inv = pca.inverse_transform(X2D)
 
+    print("pca.explained_variance_ratio_:", pca.explained_variance_ratio_)
+    print("pca data loss:", 1-pca.explained_variance_ratio_.sum())
     return X2D, X3D_inv, pca.mean_
 
 def run():
