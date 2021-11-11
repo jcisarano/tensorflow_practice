@@ -11,6 +11,7 @@ from sklearn.decomposition import PCA
 
 import data_utils as du
 
+
 def pca_manual_example(X):
     # obtain principal components c1, c2 using Singular Value Decomposition (SVD)
     X_centered = X - X.mean(axis=0)
