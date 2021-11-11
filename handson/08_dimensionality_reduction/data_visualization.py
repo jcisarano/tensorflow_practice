@@ -101,6 +101,26 @@ def plot_swiss_roll(X, t):
     plt.show()
 
 
+def plot_competing_swiss_roll_squashes(X, t):
+    axes = [-11.5, 14, -2, 23, -12, 15]
+    plt.figure(figsize=(11, 4))
+
+    plt.subplot(121)
+    plt.scatter(X[:, 0], X[:, 1], c=t, cmap=plt.cm.hot)
+    plt.axis(axes[:4])
+    plt.xlabel("$x_1$", fontsize=18)
+    plt.ylabel("$x_2$", fontsize=18)
+    plt.grid(True)
+
+    plt.subplot(122)
+    plt.scatter(t, X[:, 1], c=t, cmap=plt.cm.hot)
+    plt.axis([4, 15, axes[2], axes[3]])
+    plt.xlabel("$z_1$", fontsize=18)
+    plt.grid(True)
+
+    plt.show()
+
+
 def run():
     # X = du.get_3d_dataset()
     # m, n = X.shape
@@ -113,4 +133,5 @@ def run():
     # plot_2d_dataset_projection(X2D)
 
     X, t = make_swiss_roll(n_samples=1000, noise=0.2, random_state=42)
-    plot_swiss_roll(X, t)
+    # plot_swiss_roll(X, t)
+    plot_competing_swiss_roll_squashes(X, t)
