@@ -121,6 +121,34 @@ def plot_competing_swiss_roll_squashes(X, t):
     plt.show()
 
 
+def plot_complex_decision_boundaries(X, t):
+    axes = [-11.5, 14, -2, 23, -12, 15]
+    x2s = np.linspace(axes[2], axes[3], 10)
+    x3s = np.linspace(axes[4], axes[5], 10)
+    x2, x3 = np.meshgrid(x2s, x3s)
+
+    fig = plt.figure(figsize=(6, 5))
+    ax = plt.subplot(111, projection='3d')
+
+    positive_class = X[:, 0] > 5
+    X_pos = X[positive_class]
+    X_neg = X[~positive_class]
+    ax.view_init(10, -70)
+    ax.plot(X_neg[:, 0], X_neg[:, 1], X_neg[:, 2], "y^")
+    ax.plot_wireframe(5, x2, x3, alpha=0.5)
+    ax.plot(X_pos[:, 0], X_pos[:, 1], X_pos[:, 2], "gs")
+    ax.set_xlabel("$x_1$", fontsize=18)
+    ax.set_ylabel("$x_2$", fontsize=18)
+    ax.set_zlabel("$x_3$", fontsize=18)
+    ax.set_xlim(axes[0:2])
+    ax.set_ylim(axes[2:4])
+    ax.set_zlim(axes[4:6])
+
+    plt.show()
+
+
+
+
 def run():
     # X = du.get_3d_dataset()
     # m, n = X.shape
@@ -134,4 +162,5 @@ def run():
 
     X, t = make_swiss_roll(n_samples=1000, noise=0.2, random_state=42)
     # plot_swiss_roll(X, t)
-    plot_competing_swiss_roll_squashes(X, t)
+    # plot_competing_swiss_roll_squashes(X, t)
+    plot_complex_decision_boundaries(X, t)
