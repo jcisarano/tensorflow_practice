@@ -235,9 +235,13 @@ def plot_dimension_selection_options():
     plt.axis([-2, 2, -1, 1])
     plt.grid(True)
 
-
-
-
+    plt.subplot2grid((3, 2), (2, 1))
+    plt.plot([-2, 2], [0, 0], "k:", linewidth=2)
+    plt.plot(X_proj3[:, 0], np.zeros(m), "bo", alpha=0.3)
+    plt.gca().get_yaxis().set_ticks([])
+    plt.axis([-2, 2, -1, 1])
+    plt.xlabel("$z_1$", fontsize=18)
+    plt.grid(True)
 
     plt.show()
 
