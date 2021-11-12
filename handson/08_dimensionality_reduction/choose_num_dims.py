@@ -6,7 +6,7 @@ But if you are reducing dimensions for visualization, you'll have to go to just 
 """
 from sklearn.datasets import fetch_openml
 import numpy as np
-from sklearn.decomposition import PCA
+from sklearn.decomposition import PCA, IncrementalPCA
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -68,6 +68,8 @@ def pca_reduce_and_restore(X_train):
     plt.title("Compressed", fontsize=16)
     plt.show()
 
+    return X_reduced
+
 
 def plot_digits(instances, images_per_row=5, **options):
     size = 28
@@ -93,12 +95,39 @@ def plot_digits(instances, images_per_row=5, **options):
     plt.axis("off")
 
 
+def pca_randomized(X_train):
+    pca = PCA(n_components=154, svd_solver="randomized", random_state=42)
+    X_reduced = pca.fit_transform(X_train)
+
+
+def pca_incremental(X_train):
+    n_batches = 100
+    pca = IncrementalPCA(n_components=154)
+    for X_batch in np.array_split(X_train, n_batches):
+        print(".", end="")
+        pca.partial_fit(X_batch)
+    X_reduced = pca.transform(X_train)
+
+    X_recovered = pca.inverse_transform(X_reduced)
+
+    # plot to visualize the compression:
+    plt.figure(figsize=(7, 4))
+    plt.subplot(121)
+    plot_digits(X_train[::2100])
+    plt.subplot(122)
+    plot_digits(X_recovered[::2100])
+    plt.tight_layout()
+    plt.show()
+
+    return X_reduced
+
 def run():
     X_train, X_test, y_train, y_test = get_mnist_train_test_split()
 
     # pca_reduce_and_plot(X_train)
     # X_reduced = pca_reduce(X_train)
-    pca_reduce_and_restore(X_train)
+    X_reduced_pca = pca_reduce_and_restore(X_train)
+    X_reduced_inc_pca = pca_incremental(X_train)
 
 
 
