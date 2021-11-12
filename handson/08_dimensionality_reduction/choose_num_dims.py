@@ -68,7 +68,7 @@ def pca_reduce_and_restore(X_train):
     plt.title("Compressed", fontsize=16)
     plt.show()
 
-    return X_reduced
+    return pca, X_reduced
 
 
 def plot_digits(instances, images_per_row=5, **options):
@@ -119,15 +119,23 @@ def pca_incremental(X_train):
     plt.tight_layout()
     plt.show()
 
-    return X_reduced
+    return pca, X_reduced
+
 
 def run():
     X_train, X_test, y_train, y_test = get_mnist_train_test_split()
 
     # pca_reduce_and_plot(X_train)
     # X_reduced = pca_reduce(X_train)
-    X_reduced_pca = pca_reduce_and_restore(X_train)
-    X_reduced_inc_pca = pca_incremental(X_train)
+    pca, X_reduced_pca = pca_reduce_and_restore(X_train)
+    pca_inc, X_reduced_inc_pca = pca_incremental(X_train)
+
+    # means of each are close:
+    print("\n", np.allclose(pca.mean_, pca_inc.mean_))
+
+    # these two methods do not give identical results:
+    print(np.allclose(X_reduced_pca, X_reduced_inc_pca))
+
 
 
 
