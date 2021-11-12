@@ -8,6 +8,7 @@ from sklearn.datasets import fetch_openml
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 
 def get_mnist_train_test_split():
@@ -30,4 +31,25 @@ def run():
     # print(cumsum.shape)
     d = np.argmax(cumsum >= 0.95) + 1
     print(d)
+
+    # plot the variance curve
+    plt.figure(figsize=(6, 4))
+    plt.plot(cumsum, linewidth=3)
+    plt.axis([0, 400, 0, 1])
+    plt.xlabel("Dimensions")
+    plt.ylabel("Explained Variance")
+    plt.plot([d, d], [0, 0.95], "k:")
+    plt.plot([0, d], [0.95, 0.95], "k:")
+    plt.plot(d, 0.95, "ko")
+    plt.annotate("Elbow", xy=(65, 0.85), xytext=(70, 0.7), arrowprops=dict(arrowstyle="->"), fontsize=16)
+    plt.grid(True)
+
+    plt.show()
+
+    # or, specify the min variance when you create the PCA()
+    pca = PCA(n_components=0.95)
+    X_reduced = pca.fit_transform(X_train)
+    print(pca.n_components_)
+
+    print(np.sum(pca.explained_variance_ratio_))
 
