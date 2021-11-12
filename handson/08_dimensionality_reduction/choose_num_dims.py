@@ -21,9 +21,7 @@ def get_mnist_train_test_split():
     return train_test_split(X, y)
 
 
-def run():
-    X_train, X_test, y_train, y_test = get_mnist_train_test_split()
-
+def pca_reduce_and_plot(X_train):
     # create the PCA, then fit it, then determine number of dims to keep variance above 95%
     pca = PCA()
     pca.fit(X_train)
@@ -46,10 +44,23 @@ def run():
 
     plt.show()
 
+
+def pca_reduce(X_train):
     # or, specify the min variance when you create the PCA()
     pca = PCA(n_components=0.95)
     X_reduced = pca.fit_transform(X_train)
     print(pca.n_components_)
-
     print(np.sum(pca.explained_variance_ratio_))
+    
+
+
+def run():
+    X_train, X_test, y_train, y_test = get_mnist_train_test_split()
+
+    # pca_reduce_and_plot(X_train)
+    X_reduced = pca_reduce(X_train)
+
+
+
+
 
