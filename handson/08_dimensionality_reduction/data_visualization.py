@@ -219,6 +219,13 @@ def plot_dimension_selection_options():
     plt.ylabel("$x_2", fontsize=18, rotation=0)
     plt.grid(True)
 
+    plt.subplot2grid((3, 2), (0, 1))
+    plt.plot([-2, 2], [0, 0], "k-", linewidth=1)
+    plt.plot(X_proj1[:, 0], np.zeros(m), "bo", alpha=0.3)
+    plt.gca().get_yaxis().set_ticks([])
+    plt.gca().get_xaxis().set_ticklabels([])
+    plt.axis([-2, 2, -1, 1])
+    plt.grid(True)
 
 
     plt.show()
