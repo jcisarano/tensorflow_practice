@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 
 
 def get_mnist_train_test_split():
@@ -51,15 +52,53 @@ def pca_reduce(X_train):
     X_reduced = pca.fit_transform(X_train)
     print(pca.n_components_)
     print(np.sum(pca.explained_variance_ratio_))
-    
+
+
+def pca_reduce_and_restore(X_train):
+    pca = PCA(n_components=154)
+    X_reduced = pca.fit_transform(X_train)
+    X_recovered = pca.inverse_transform(X_reduced)
+
+    plt.figure(figsize=(7, 4))
+    plt.subplot(121)
+    plot_digits(X_train[::2100])
+    plt.title("Original", fontsize=16)
+    plt.subplot(122)
+    plot_digits(X_recovered[::2100])
+    plt.title("Compressed", fontsize=16)
+    plt.show()
+
+
+def plot_digits(instances, images_per_row=5, **options):
+    size = 28
+    images_per_row = min(len(instances), images_per_row)
+    # this is equivalent to n_rows = ceil(len(instances) / images_per row):
+    n_rows = (len(instances) - 1) // images_per_row + 1
+
+    # append empty images to fill the end of the grid, if needed:
+    n_empty = n_rows * images_per_row - len(instances)
+    padded_instances = np.concatenate([instances, np.zeros((n_empty, size*size))], axis=0)
+
+    # reshape the array so it's organized as a grid containing 28x28 images
+    image_grid = padded_instances.reshape((n_rows, images_per_row, size, size))
+
+    # combine axes 0 and 2 (vert image grid axis, vert image axis),
+    # and axes 1 and 3 (horizontal axes). We first need to move the axes that we
+    # want to combine next to each other, using transpose(), and only then we
+    # can reshape:
+    big_image = image_grid.transpose(0, 2, 1, 3).reshape(n_rows*size, images_per_row*size)
+
+    # now that we have a big image, we can show it:
+    plt.imshow(big_image, cmap=mpl.cm.binary, **options)
+    plt.axis("off")
 
 
 def run():
     X_train, X_test, y_train, y_test = get_mnist_train_test_split()
 
     # pca_reduce_and_plot(X_train)
-    X_reduced = pca_reduce(X_train)
-
+    # X_reduced = pca_reduce(X_train)
+    pca_reduce_and_restore(X_train)
 
 
 
