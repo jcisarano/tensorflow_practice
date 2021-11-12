@@ -48,10 +48,12 @@ in the higher-dimensional original representation--it will depend on the dataset
 import data_utils as du
 import pca_example as pcae
 import data_visualization as dv
+import choose_num_dims as cnd
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    dv.run()
+    cnd.run()
+    # dv.run()
     # pcae.run()
     # print(du.get_3d_dataset().shape)
 
