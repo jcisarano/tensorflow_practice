@@ -160,6 +160,34 @@ def pca_timing(X_train):
             t2 = time.time()
             print("     {}:{:.1f} seconds".format(name, t2-t1))
 
+    # timing for different data set sizes
+    times_rpca = []
+    times_pca = []
+    sizes = [1000, 10000, 20000, 30000, 40000, 50000, 70000, 100000, 200000, 500000]
+    for n_samples in sizes:
+        X = np.random.randn(n_samples, 5)
+        pca = PCA(n_components=2, svd_solver="randomized", random_state=42)
+        t1 = time.time()
+        pca.fit(X)
+        t2 = time.time()
+        times_rpca.append(t2 - t1)
+
+        pca = PCA(n_components=2, svd_solver="full")
+        t1 = time.time()
+        pca.fit(X)
+        t2 = time.time()
+        times_pca.append(t2 - t1)
+
+    plt.plot(sizes, times_rpca, "b-o", label="RPCA")
+    plt.plot(sizes, times_pca, "r-s", label="PCA")
+    plt.xlabel("n_samples")
+    plt.ylabel("Training time")
+    plt.legend(loc="upper left")
+    plt.title("PCA and Randomized PCA time complexity")
+    plt.show()
+
+
+
 
 def run():
     X_train, X_test, y_train, y_test = get_mnist_train_test_split()
