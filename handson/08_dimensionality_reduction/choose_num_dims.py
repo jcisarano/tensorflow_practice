@@ -122,19 +122,68 @@ def pca_incremental(X_train):
     return pca, X_reduced
 
 
+def pca_load_memmap(X_train):
+    # memmap() loads data from file as needed rather than loading everything into memory at the start
+    n_batches = 100
+    filename = "my_mnist.data"
+    m, n = X_train.shape
+
+    X_mm = np.memmap(filename, dtype="float32", mode="write", shape=(m, n))
+    X_mm[:] = X_train
+
+    # delete to trigger finalizer, which saves data to disk
+    del X_mm
+
+    # now load again
+    X_mm = np.memmap(filename, dtype="float32", mode="readonly", shape=(m, n))
+
+    batch_size = m // n_batches
+    pca = IncrementalPCA(n_components=154, batch_size=batch_size)
+    pca.fit(X_mm)
+    X_reduced = pca.transform(X_mm)
+
+    return pca, X_reduced
+
+
+def pca_timing(X_train):
+    import time
+
+    for n_components in (2, 10, 154):
+        print("n_components=", n_components)
+        regular_pca = PCA(n_components=n_components, svd_solver="full")
+        inc_pca = IncrementalPCA(n_components=n_components, batch_size=500)
+        rnd_pca = PCA(n_components=n_components, random_state=42, svd_solver="randomized")
+
+        for name, pca in (("PCA", regular_pca), ("Incremental PCA", inc_pca), ("Rnd PCA", rnd_pca)):
+            t1 = time.time()
+            pca.fit(X_train)
+            t2 = time.time()
+            print("     {}:{:.1f} seconds".format(name, t2-t1))
+
+
 def run():
     X_train, X_test, y_train, y_test = get_mnist_train_test_split()
 
     # pca_reduce_and_plot(X_train)
     # X_reduced = pca_reduce(X_train)
-    pca, X_reduced_pca = pca_reduce_and_restore(X_train)
-    pca_inc, X_reduced_inc_pca = pca_incremental(X_train)
+    # pca, X_reduced_pca = pca_reduce_and_restore(X_train)
+    # pca_inc, X_reduced_inc_pca = pca_incremental(X_train)
 
     # means of each are close:
-    print("\n", np.allclose(pca.mean_, pca_inc.mean_))
+    # print("\n", np.allclose(pca.mean_, pca_inc.mean_))
 
     # these two methods do not give identical results:
-    print(np.allclose(X_reduced_pca, X_reduced_inc_pca))
+    # print(np.allclose(X_reduced_pca, X_reduced_inc_pca))
+
+    # pca_mm, X_reduced_pca_mm = pca_load_memmap(X_train)
+    # print("pca.mean_ compared to pca_mm.mean_", np.all(pca.mean_, pca_mm.mean_))
+    # print("X_reduced_pca compared to X_reduced_pca_mm", np.all(pca.mean_, pca_mm.mean_))
+
+    pca_timing(X_train)
+
+
+
+
 
 
 
