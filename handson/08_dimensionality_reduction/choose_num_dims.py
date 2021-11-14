@@ -186,7 +186,31 @@ def pca_timing(X_train):
     plt.title("PCA and Randomized PCA time complexity")
     plt.show()
 
+    # compare PCA versions on same size dataset with different num features
+    times_rpca = []
+    times_pca = []
+    sizes = [1000, 2000, 3000, 4000, 5000, 6000]
 
+    for n_features in sizes:
+        X = np.random.randn(2000, n_features)
+        pca = PCA(n_components=2, random_state=42, svd_solver="randomized")
+        t1 = time.time()
+        pca.fit(X)
+        t2 = time.time()
+        times_rpca.append(t2 - t1)
+        pca = PCA(n_components=2, svd_solver="full")
+        t1 = time.time()
+        pca.fit(X)
+        t2 = time.time()
+        times_pca.append(t2 - t1)
+
+    plt.plot(sizes, times_rpca, "b-o", label="RPCA")
+    plt.plot(sizes, times_pca, "r-s", label="PCA")
+    plt.xlabel("n_features")
+    plt.ylabel("Training time")
+    plt.legend(loc="upper left")
+    plt.title("PCA and Randomized PCA time complexity")
+    plt.show()
 
 
 def run():
