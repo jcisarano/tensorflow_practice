@@ -40,6 +40,32 @@ def plot_kernel_variations(X, t):
 
     plt.show()
 
+    # plot inverse
+    plt.figure(figsize=(6, 5))
+    X_inverse = rbf_pca.inverse_transform(X_reduced_rbf)
+
+    ax = plt.subplot(111, projection="3d")
+    ax.view_init(10, -70)
+    ax.scatter(X_inverse[:, 0], X_inverse[:, 1], X_inverse[:, 2], c=t, cmap=plt.cm.hot, marker="x")
+    ax.set_xlabel("")
+    ax.set_ylabel("")
+    ax.set_zlabel("")
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    ax.set_zticklabels([])
+
+    plt.show()
+
+    X_reduced = rbf_pca.fit_transform(X)
+    plt.figure(figsize=(11, 4))
+    plt.subplot(132)
+    plt.scatter(X_reduced[:, 0], X_reduced[:, 1], c=t, cmap=plt.cm.hot, marker="x")
+    plt.xlabel("$z_1$", fontsize=18)
+    plt.ylabel("$z_2$", fontsize=18, rotation=0)
+    plt.grid(True)
+    plt.show()
+
+
 
 
 def run():
