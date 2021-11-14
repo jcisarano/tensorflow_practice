@@ -1,9 +1,13 @@
 """
 PCA method that uses the kernel trick, which allows effecient processing of high-dimensional feature sets
 """
+import numpy as np
 from sklearn.datasets import make_swiss_roll
 from sklearn.decomposition import KernelPCA
 import matplotlib.pyplot as plt
+from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
 
 def get_data(n_samples=1000, noise=0.2):
     X, t = make_swiss_roll(n_samples=n_samples, noise=noise, random_state=42)
@@ -19,8 +23,6 @@ def plot_kernel_variations(X, t):
     lin_pca = KernelPCA(n_components=2, kernel="linear", fit_inverse_transform=True)
     rbf_pca = KernelPCA(n_components=2, kernel="rbf", gamma=0.0433, fit_inverse_transform=True)
     sig_pca = KernelPCA(n_components=2, kernel="sigmoid", gamma=0.001, coef0=1, fit_inverse_transform=True)
-
-    y = t > 6.9
 
     plt.figure(figsize=(11, 4))
     for subplot, pca, title in ((131, lin_pca, "Linear kernel"),
@@ -66,12 +68,31 @@ def plot_kernel_variations(X, t):
     plt.show()
 
 
+def select_kernel_and_tune_hyperparams(X, y):
+    clf = Pipeline([
+        ("kpca", KernelPCA(n_components=2)),
+        ("log_reg", LogisticRegression(solver="lbfgs"))
+    ])
+
+    param_grid = [{
+        "kpca__gamma": np.linspace(0.03, 0.05, 10),
+        "kpca__kernel": ["rbf", "sigmoid"]
+    }]
+
+    grid_search = GridSearchCV(clf, param_grid, cv=3)
+    print(grid_search.get_params().keys())
+    grid_search.fit(X, y)
+
+
+
 
 
 def run():
     X, t = get_data()
+    y = t > 6.9
+
 
     # rbf_pca = create_rbf_kernel_pca(X)
-    plot_kernel_variations(X, t)
-
+    # plot_kernel_variations(X, t)
+    select_kernel_and_tune_hyperparams(X, y)
 
