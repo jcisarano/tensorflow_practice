@@ -49,10 +49,12 @@ import data_utils as du
 import pca_example as pcae
 import data_visualization as dv
 import choose_num_dims as cnd
+import kernel_pca_examples as kpca
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    cnd.run()
+    kpca.run()
+    # cnd.run()
     # dv.run()
     # pcae.run()
     # print(du.get_3d_dataset().shape)
