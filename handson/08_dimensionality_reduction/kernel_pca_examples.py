@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.datasets import make_swiss_roll
 from sklearn.decomposition import KernelPCA
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import GridSearchCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -69,6 +70,8 @@ def plot_kernel_variations(X, t):
 
 
 def select_kernel_and_tune_hyperparams(X, y):
+    # One way to get best params for KernelPCA is to create pipeline that modifies only pca params looking
+    # for the best results
     clf = Pipeline([
         ("kpca", KernelPCA(n_components=2)),
         ("log_reg", LogisticRegression(solver="lbfgs"))
@@ -80,8 +83,16 @@ def select_kernel_and_tune_hyperparams(X, y):
     }]
 
     grid_search = GridSearchCV(clf, param_grid, cv=3)
-    print(grid_search.get_params().keys())
     grid_search.fit(X, y)
+    print(grid_search.best_params_)
+
+    # Another way to find best KernelPCA params is to look for the lowest possible MSA when reconstructing
+    # original dataset from the KPCA reduced set:
+    rbf_pca = KernelPCA(n_components=2, kernel="rbf", gamma=0.0433, fit_inverse_transform=True)
+    X_reduced = rbf_pca.fit_transform(X)
+    X_preimage = rbf_pca.inverse_transform(X_reduced)
+
+    print(mean_squared_error(X, X_preimage))
 
 
 
