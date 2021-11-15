@@ -47,6 +47,7 @@ def run():
     # print("RF PCA time:", t2 - t1)
 
     # try softmax regression
+    # it gives much faster training on the reduced set with a much smaller loss of accuracy
     log_clf = LogisticRegression(multi_class="multinomial", solver="lbfgs", random_state=42)
     t1 = time.time()
     log_clf.fit(X_train, y_train)
@@ -57,6 +58,15 @@ def run():
     print("LR accuracy score:", accuracy_score(y_test, y_pred_lr))
     print("LR training time:", t2 - t1)
 
+    log_clf_pca = LogisticRegression(multi_class="multinomial", solver="lbfgs", random_state=42)
+    t1 = time.time()
+    log_clf_pca.fit(X_train_reduced, y_train)
+    t2 = time.time()
+
+    y_pred_lr_pca = log_clf_pca.predict(X_test_reduced)
+    print("LR PCA score:", log_clf_pca.score(X_test_reduced, y_test))
+    print("LR PCA accuracy score:", accuracy_score(y_test, y_pred_lr_pca))
+    print("LR PCA training time:", t2 - t1)
 
 
 
