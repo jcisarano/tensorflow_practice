@@ -7,6 +7,7 @@ from sklearn.datasets import make_swiss_roll
 from sklearn.manifold import LocallyLinearEmbedding
 import matplotlib.pyplot as plt
 
+
 def get_data(n_samples=1000, noise=0.2):
     X, t = make_swiss_roll(n_samples=n_samples, noise=noise, random_state=41)
     return X, t
