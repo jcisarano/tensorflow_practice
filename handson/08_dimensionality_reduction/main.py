@@ -52,10 +52,12 @@ import choose_num_dims as cnd
 import kernel_pca_examples as kpca
 import lle_examples as llee
 import other_examples as oe
+import pca_timing_exercise as pcate
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    oe.run()
+    pcate.run()
+    # +oe.run()
     # llee.run()
     # kpca.run()
     # cnd.run()

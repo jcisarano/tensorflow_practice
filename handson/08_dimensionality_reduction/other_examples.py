@@ -10,6 +10,7 @@ def get_data(n_samples=1000, noise=0.2):
     X, t = make_swiss_roll(n_samples=n_samples, noise=noise, random_state=41)
     return X, t
 
+
 def get_mnist():
     mnist = fetch_openml("mnist_784", version=1, as_frame=False)
     mnist.target = mnist.target.astype(np.uint8)
