@@ -48,6 +48,8 @@ def improve_2_3_5(X_reduced, X, y):
     X_subset_reduced = tsne_subset.fit_transform(X_subset)
     plot_subset(X_subset_reduced, y_subset)
 
+    plot_digits(X_subset_reduced, y_subset, images=X_subset, figsize=(22, 22))
+
 
 def plot_digits(X, y, min_distance=0.05, images=None, figsize=(13, 10)):
     X_normalized = MinMaxScaler().fit_transform(X)
@@ -63,13 +65,13 @@ def plot_digits(X, y, min_distance=0.05, images=None, figsize=(13, 10)):
         closest_distance = np.linalg.norm(neighbors - image_coord, axis=1).min()
         if closest_distance > min_distance:
             neighbors = np.r_[neighbors, [image_coord]]
-        if images is None:
-            plt.text(image_coord[0], image_coord[1], str(int(y[index])),
-                     color=cmap(y[index] / 9), fontdict={"weight": "bold", "size": 16})
-        else:
-            image = images[index].reshape(28, 28)
-            imagebox = AnnotationBbox(OffsetImage(image, cmap="binary"), image_coord)
-            ax.add_artist(imagebox)
+            if images is None:
+                plt.text(image_coord[0], image_coord[1], str(int(y[index])),
+                         color=cmap(y[index] / 9), fontdict={"weight": "bold", "size": 16})
+            else:
+                image = images[index].reshape(28, 28)
+                imagebox = AnnotationBbox(OffsetImage(image, cmap="binary"), image_coord)
+                ax.add_artist(imagebox)
 
     plt.show()
 
@@ -88,3 +90,4 @@ def run():
     # improve_2_3_5(X_reduced, X, y)
 
     plot_digits(X_reduced, y)
+    plot_digits(X_reduced, y, images=X, figsize=(15, 10))
