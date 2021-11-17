@@ -191,7 +191,7 @@ def plot_loss_curves(history):
     plt.plot(epochs, val_accuracy, label='val_accuracy')
     plt.title('Accuracy')
     plt.xlabel('Epochs')
-    plt.legend();
+    plt.legend()
 
 
 def compare_historys(original_history, new_history, initial_epochs=5):
