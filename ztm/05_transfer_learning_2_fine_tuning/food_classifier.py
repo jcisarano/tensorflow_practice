@@ -73,6 +73,22 @@ def transfer_learning_functional_api(train_data, test_data):
     plot_loss_curves(history=history)
 
 
+def global_average_pooling2d_example():
+    input_shape = (1, 4, 4, 3)
+
+    tf.random.set_seed(42)
+    input_tensor = tf.random.normal(input_shape)
+    print(f"Random input tensor:\n {input_tensor}\n")
+
+    # will convert input to averaged 2d vector:
+    global_avg_pooled_tensor = tf.keras.layers.GlobalAveragePooling2D()(input_tensor)
+    print(f"2d global avg pooled tensor:\n {global_avg_pooled_tensor}\n")
+
+    print(f"Shape of input tensor: {input_tensor.shape}")
+    print(f"Shape of global average pooled 2d tensor: {global_avg_pooled_tensor.shape}")
+
+    # do the same thing by hand:
+    print(tf.reduce_mean(input_tensor, axis=[1, 2]))
 
 
 def run():
@@ -92,4 +108,5 @@ def run():
     # for images, labels in train_data_10_percent.take(1):
     #    print(images, labels)
 
-    transfer_learning_functional_api(train_data_10_percent, test_data)
+    # transfer_learning_functional_api(train_data_10_percent, test_data)
+    global_average_pooling2d_example()
