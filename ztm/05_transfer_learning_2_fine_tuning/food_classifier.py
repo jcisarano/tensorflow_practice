@@ -50,12 +50,23 @@ def transfer_learning_functional_api(train_data, test_data):
                     metrics=["accuracy"])
 
     # 10. Fit the model and save its history
-    model_0.fit(train_data,
-                epochs=5,
-                steps_per_epoch=len(train_data),
-                validation_data=test_data,
-                validation_steps=len(test_data),
-                workers=-1)
+    history = model_0.fit(train_data,
+                          epochs=5,
+                          steps_per_epoch=len(train_data),
+                          validation_data=test_data,
+                          # validation_steps=len(test_data),
+                          validation_steps=int(0.25 * len(test_data)),  # speeds up a bit by not using all test data
+                          callbacks=[create_tensorboard_callback(dir_name="transfer_learning",
+                                                                 experiment_name="10_percent_feature_extraction")],
+                          workers=-1)
+
+    print("Evaluate on test data:")
+    model_0.evaluate(test_data)
+
+    print("Base model layers:")
+    for layer_number, layer in enumerate(model.layers):
+        print(layer_number, layer.name)
+
 
 
 
