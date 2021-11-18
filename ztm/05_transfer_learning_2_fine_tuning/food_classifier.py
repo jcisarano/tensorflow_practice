@@ -15,7 +15,7 @@ IMG_SHAPE = (IMG_SIZE, IMG_SIZE)
 BATCH_SIZE: int = 32
 
 
-def transfer_learning_functional_api():
+def transfer_learning_functional_api(train_data, test_data):
     # 1. Create the base model with tf.keras.applications
     model = tf.keras.applications.EfficientNetB0(include_top=False)
 
@@ -45,10 +45,17 @@ def transfer_learning_functional_api():
     model_0 = tf.keras.Model(inputs, outputs)
 
     # 9. Compile the model
-    # model_0.Compile()
+    model_0.compile(loss="categorical_crossentropy",
+                    optimizer=tf.keras.optimizers.Adam(),
+                    metrics=["accuracy"])
 
     # 10. Fit the model and save its history
-
+    model_0.fit(train_data,
+                epochs=5,
+                steps_per_epoch=len(train_data),
+                validation_data=test_data,
+                validation_steps=len(test_data),
+                workers=-1)
 
 
 
@@ -69,4 +76,4 @@ def run():
     # for images, labels in train_data_10_percent.take(1):
     #    print(images, labels)
 
-    transfer_learning_functional_api()
+    transfer_learning_functional_api(train_data_10_percent, test_data)
