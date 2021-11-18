@@ -67,6 +67,11 @@ def transfer_learning_functional_api(train_data, test_data):
     for layer_number, layer in enumerate(model.layers):
         print(layer_number, layer.name)
 
+    print(model.summary())
+    print(model_0.summary())
+
+    plot_loss_curves(history=history)
+
 
 
 
