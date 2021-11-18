@@ -15,6 +15,43 @@ IMG_SHAPE = (IMG_SIZE, IMG_SIZE)
 BATCH_SIZE: int = 32
 
 
+def transfer_learning_functional_api():
+    # 1. Create the base model with tf.keras.applications
+    model = tf.keras.applications.EfficientNetB0(include_top=False)
+
+    # 2. Freeze the base model (underlying, pre-trained patterns arent changed during training)
+    model.trainable = False
+
+    # 3. Create inputs
+    inputs = tf.keras.layers.Input(shape=(224, 224, 3), name="input_layer")
+
+    # 4. If using a model like ResNet50V2, you will need to normalize input
+    # EfficientNet does not need this
+    # x = tf.keras.layers.experimental.preprocessing.Rescaling(1./255)(inputs)
+
+    # 5. pass the inputs to the base model
+    x = model(inputs)
+    print(f"Shape after passing inputs through base model: {x.shape}")
+
+    # 6. Average pool the outputs of base model
+    # Aggregates all the most important info and reduces computations
+    x = tf.keras.layers.GlobalAveragePooling2D(name="global_average_pooling_layer")(x)
+    print(f"Shape after GlobalAveragePooling2D: {x.shape}")
+
+    # 7. Create the output activation layer
+    outputs = tf.keras.layers.Dense(10, activation="softmax", name="output_layer")(x)
+
+    # 8. Combine inputs with outputs into model
+    model_0 = tf.keras.Model(inputs, outputs)
+
+    # 9. Compile the model
+    # model_0.Compile()
+
+    # 10. Fit the model and save its history
+
+
+
+
 def run():
     # unzip_data("10_food_classes_10_percent.zip")
     # walk_through_dir(LOCAL_DATA_PATH)
@@ -29,5 +66,7 @@ def run():
                                                                     image_size=IMG_SHAPE,
                                                                     batch_size=BATCH_SIZE)
 
-    for images, labels in train_data_10_percent.take(1):
-        print(images, labels)
+    # for images, labels in train_data_10_percent.take(1):
+    #    print(images, labels)
+
+    transfer_learning_functional_api()
