@@ -1,4 +1,3 @@
-
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -37,13 +36,52 @@ def visualize_random_img(data_augmentation, train_data):
     # augment image and plot
     augmented_img = data_augmentation(tf.expand_dims(img, axis=0))
     plt.sca(axes[1])
-    plt.imshow(tf.squeeze(augmented_img)/255.)
+    plt.imshow(tf.squeeze(augmented_img) / 255.)
     plt.xlabel("Augmented image")
     axes[1].set_yticklabels([])
     axes[1].set_xticklabels([])
     axes[1].set_yticks([])
     axes[1].set_xticks([])
     plt.show()
+
+
+def experiment_one(data_augmentation, train_data, test_data):
+    """
+    feature extraction transfer learning on 1% of the data with data augmentation
+    :return:
+    """
+    # set up input shape & base model with base model layers frozen
+    input_shape = (du.IMG_SIZE, du.IMG_SIZE, 3)
+    base_model = tf.keras.applications.EfficientNetB0(include_top=False)
+    base_model.trainable = False
+
+    # Create input layer
+    inputs = layers.Input(shape=input_shape, name="input_layer")
+
+    # Add data augmentation as a layer
+    x = data_augmentation(inputs)
+
+    # Give base_model inputs (after augmentation) and don't train it
+    x = base_model(x, training=False)
+
+    # pool output features of the base model
+    x = layers.GlobalAveragePooling2D(name="global_average_pooling_layer")(x)
+
+    # put dense layer on as output
+    outputs = layers.Dense(10, activation="softmax", name="output_layer")(x)
+
+    # make a model using inputs and outputs
+    model = keras.Model(inputs, outputs)
+
+    # compile the model
+    model.compile(loss="categorical_crossentropy", optimizer=tf.keras.optimizers.Adam(), metrics=["accuracy"])
+
+    # fit the model
+    history = model.fit(train_data, epochs=5, steps_per_epoch=len(train_data),
+                        validation_data=test_data, validation_steps=int(0.25 * len(test_data)),
+                        callbacks=[create_tensorboard_callback(dir_name="transfer_learning",
+                                                               experiment_name="1_percent_data_aug")])
+
 
 def run():
     # walk_through_dir(du.LOCAL_DATA_PATH_1_PERCENT)
@@ -74,6 +112,5 @@ def run():
         # preprocessing.Rescaling(1./255)  # use for models like ResNet50V2, but not EfficientNet
     ], name="data_augmentation")
 
-    visualize_random_img(data_augmentation, train_data_1_percent)
-
-
+    # visualize_random_img(data_augmentation, train_data_1_percent)
+    experiment_one(data_augmentation, train_data_1_percent, test_data)
