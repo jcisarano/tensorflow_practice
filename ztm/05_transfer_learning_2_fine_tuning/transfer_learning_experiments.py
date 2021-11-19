@@ -47,10 +47,30 @@ def run():
     target_class = random.choice(train_data_1_percent.class_names)
     target_dir = os.path.join(du.TRAIN_DATA_PATH_1_PERCENT, target_class)
 
+    # select a random image and plot it
     random_image = random.choice(os.listdir(target_dir))
     random_image_path = os.path.join(target_dir, random_image)
     img = mpimg.imread(random_image_path)
+
+    _, axes = plt.subplots(ncols=2, figsize=(10, 4), sharey=True)
+    plt.suptitle(f"Random images from {target_class} class")
+    plt.sca(axes[0])
     plt.imshow(img)
+    plt.xlabel("Original image")
+    axes[0].set_yticklabels([])
+    axes[0].set_xticklabels([])
+    axes[0].set_yticks([])
+    axes[0].set_xticks([])
+
+    # augment image and plot
+    augmented_img = data_augmentation(tf.expand_dims(img, axis=0))
+    plt.sca(axes[1])
+    plt.imshow(tf.squeeze(augmented_img)/255.)
+    plt.xlabel("Augmented image")
+    axes[1].set_yticklabels([])
+    axes[1].set_xticklabels([])
+    axes[1].set_yticks([])
+    axes[1].set_xticks([])
     plt.show()
 
 
