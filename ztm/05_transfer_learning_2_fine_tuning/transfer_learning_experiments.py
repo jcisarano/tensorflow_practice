@@ -82,6 +82,10 @@ def experiment_one(data_augmentation, train_data, test_data):
                         callbacks=[create_tensorboard_callback(dir_name="transfer_learning",
                                                                experiment_name="1_percent_data_aug")])
 
+    # results = model.evaluate(test_data)
+
+    plot_loss_curves(history)
+
 
 def run():
     # walk_through_dir(du.LOCAL_DATA_PATH_1_PERCENT)
