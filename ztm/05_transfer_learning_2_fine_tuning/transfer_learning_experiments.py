@@ -107,7 +107,8 @@ def experiment_two(train_data, test_data):
     # Create the inputs and outputs and layers in between
     inputs = layers.Input(shape=input_shape, name="input_layer")
     x = data_augmentation(inputs)  # augment our training images (does not affect test data)
-    x = base_model(x, training=False)  # pass augmented images to the base model but keep it in inference mode, this also insures that batchnorm layers don't get updated, see: https://keras.io/guides/transfer_learning/#build-a-model
+    x = base_model(x,
+                   training=False)  # pass augmented images to the base model but keep it in inference mode, this also insures that batchnorm layers don't get updated, see: https://keras.io/guides/transfer_learning/#build-a-model
     x = layers.GlobalAveragePooling2D(name="global_avg_pooling_2d")(x)
     outputs = layers.Dense(10, activation="softmax", name="output_layer")(x)
 
@@ -116,8 +117,21 @@ def experiment_two(train_data, test_data):
                   optimizer=keras.optimizers.Adam(),
                   metrics=["accuracy"])
 
-    print(model.summary())
-    #model.fit(train_data, epochs=5, validation_data=train_data, validation_steps=len(train_data), workers=-1)
+    # print(model.summary())
+    # add ModelCHeckpoint callback to save model during training
+    checkpoint_path = "checkpoints/ten_pct_mod_wts/checkpoint.ckpt"
+    checkpoint_callback = keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                          save_weights_only=True,
+                                                          save_best_only=False,
+                                                          save_freq="epoch",
+                                                          verbose=1)
+
+    model.fit(train_data,
+              epochs=5,
+              validation_data=train_data,
+              validation_steps=len(train_data),
+              callbacks=[checkpoint_callback],
+              workers=-1)
 
 
 def run():
@@ -160,4 +174,3 @@ def run():
                                                                     image_size=du.IMG_SHAPE)
 
     experiment_two(train_data_10_percent, test_data)
-
