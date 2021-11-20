@@ -126,12 +126,15 @@ def experiment_two(train_data, test_data):
                                                           save_freq="epoch",
                                                           verbose=1)
 
-    model.fit(train_data,
-              epochs=5,
-              validation_data=train_data,
-              validation_steps=len(train_data),
-              callbacks=[checkpoint_callback],
-              workers=-1)
+    initial_epochs = 5
+    history = model.fit(train_data,
+                        epochs=initial_epochs,
+                        validation_data=train_data,
+                        validation_steps=int(0.25 * len(train_data)),
+                        callbacks=[create_tensorboard_callback(dir_name="transfer_learning",
+                                                               experiment_name="10_percent_data_aug"),
+                                   checkpoint_callback],
+                        workers=-1)
 
 
 def run():
