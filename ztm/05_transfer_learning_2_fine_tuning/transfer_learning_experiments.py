@@ -87,6 +87,39 @@ def experiment_one(data_augmentation, train_data, test_data):
     plot_loss_curves(history)
 
 
+def experiment_two(train_data, test_data):
+    # create data augmentation layers
+    data_augmentation = keras.Sequential([
+        preprocessing.RandomFlip("horizontal"),
+        preprocessing.RandomHeight(0.2),
+        preprocessing.RandomWidth(0.2),
+        preprocessing.RandomZoom(0.2),
+        preprocessing.RandomRotation(0.2),
+    ], name="data_augmentation")
+
+    # set up the input shape of our model
+    input_shape = (224, 224, 3)
+
+    # Create a frozen base model (also called the backbone)
+    base_model = keras.applications.EfficientNetB0(include_top=False)
+    base_model.trainable = False
+
+    # Create the inputs and outputs and layers in between
+    inputs = layers.Input(shape=input_shape, name="input_layer")
+    x = data_augmentation(inputs)  # augment our training images (does not affect test data)
+    x = base_model(x, training=False)  # pass augmented images to the base model but keep it in inference mode, this also insures that batchnorm layers don't get updated, see: https://keras.io/guides/transfer_learning/#build-a-model
+    x = layers.GlobalAveragePooling2D(name="global_avg_pooling_2d")(x)
+    outputs = layers.Dense(10, activation="softmax", name="output_layer")(x)
+
+    model = keras.Model(inputs, outputs)
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+
+    print(model.summary())
+    #model.fit(train_data, epochs=5, validation_data=train_data, validation_steps=len(train_data), workers=-1)
+
+
 def run():
     # walk_through_dir(du.LOCAL_DATA_PATH_1_PERCENT)
 
@@ -117,4 +150,14 @@ def run():
     ], name="data_augmentation")
 
     # visualize_random_img(data_augmentation, train_data_1_percent)
-    experiment_one(data_augmentation, train_data_1_percent, test_data)
+    # experiment_one(data_augmentation, train_data_1_percent, test_data)
+
+    train_data_10_percent = tf.keras.preprocessing.image_dataset_from_directory(du.TRAIN_DATA_PATH,
+                                                                                label_mode="categorical",
+                                                                                image_size=du.IMG_SHAPE)
+    test_data = tf.keras.preprocessing.image_dataset_from_directory(du.TEST_DATA_PATH,
+                                                                    label_mode="categorical",
+                                                                    image_size=du.IMG_SHAPE)
+
+    experiment_two(train_data_10_percent, test_data)
+
