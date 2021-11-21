@@ -239,13 +239,21 @@ def run():
     # visualize_random_img(data_augmentation, train_data_1_percent)
     # experiment_one(data_augmentation, train_data_1_percent, test_data)
 
-    train_data_10_percent = tf.keras.preprocessing.image_dataset_from_directory(du.TRAIN_DATA_PATH,
-                                                                                label_mode="categorical",
-                                                                                image_size=du.IMG_SHAPE)
-    test_data = tf.keras.preprocessing.image_dataset_from_directory(du.TEST_DATA_PATH,
-                                                                    label_mode="categorical",
-                                                                    image_size=du.IMG_SHAPE)
+    # train_data_10_percent = tf.keras.preprocessing.image_dataset_from_directory(du.TRAIN_DATA_PATH,
+    #                                                                             label_mode="categorical",
+    #                                                                             image_size=du.IMG_SHAPE)
+    # test_data = tf.keras.preprocessing.image_dataset_from_directory(du.TEST_DATA_PATH,
+    #                                                                 label_mode="categorical",
+    #                                                                 image_size=du.IMG_SHAPE)
 
-    model, history = experiment_two(train_data_10_percent, test_data)
-    experiment_three(model, train_data_10_percent, test_data, 5, history)
+    # model, history = experiment_two(train_data_10_percent, test_data)
+    # experiment_three(model, train_data_10_percent, test_data, 5, history)
+
+    # load full food image dataset, 7500 training images
+    train_data_all = keras.preprocessing.image_dataset_from_directory(du.TRAIN_DATA_PATH_ALL,
+                                                                      label_mode="categorical",
+                                                                      image_size=du.IMG_SHAPE)
+    test_data_all = keras.preprocessing.image_dataset_from_directory(du.TEST_DATA_PATH_ALL,
+                                                                     label_mode="categorical",
+                                                                     image_size=du.IMG_SHAPE)
 
