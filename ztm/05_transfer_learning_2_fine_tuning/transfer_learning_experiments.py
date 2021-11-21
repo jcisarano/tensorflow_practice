@@ -10,7 +10,8 @@ import os
 import random
 
 import data_utils as du
-from helper_functions import create_tensorboard_callback, plot_loss_curves, unzip_data, walk_through_dir
+from helper_functions import create_tensorboard_callback, \
+    plot_loss_curves, unzip_data, walk_through_dir, compare_histories
 
 
 def set_up_data_aug():
@@ -217,21 +218,22 @@ def experiment_three(model, test_data, train_data, initial_epochs, prev_hist):
     results = model.evaluate(test_data)
     print(results)
     # plot_loss_curves(history)
+    compare_histories(prev_hist, history, initial_epochs)
 
 
 def run():
     # walk_through_dir(du.LOCAL_DATA_PATH_1_PERCENT)
 
     # load datasets from files
-    train_data_1_percent = tf.keras.preprocessing.image_dataset_from_directory(du.TRAIN_DATA_PATH_1_PERCENT,
-                                                                               label_mode="categorical",
-                                                                               image_size=du.IMG_SHAPE,
-                                                                               batch_size=du.BATCH_SIZE)
+    # train_data_1_percent = tf.keras.preprocessing.image_dataset_from_directory(du.TRAIN_DATA_PATH_1_PERCENT,
+    #                                                                            label_mode="categorical",
+    #                                                                            image_size=du.IMG_SHAPE,
+    #                                                                            batch_size=du.BATCH_SIZE)
 
-    test_data = tf.keras.preprocessing.image_dataset_from_directory(du.TEST_DATA_PATH_1_PERCENT,
-                                                                    label_mode="categorical",
-                                                                    image_size=du.IMG_SHAPE,
-                                                                    batch_size=du.BATCH_SIZE)
+    # test_data = tf.keras.preprocessing.image_dataset_from_directory(du.TEST_DATA_PATH_1_PERCENT,
+    #                                                                 label_mode="categorical",
+    #                                                                 image_size=du.IMG_SHAPE,
+    #                                                                 batch_size=du.BATCH_SIZE)
 
     # data_augmentation = set_up_data_aug()
     # visualize_random_img(data_augmentation, train_data_1_percent)
