@@ -108,7 +108,7 @@ def experiment_one(data_augmentation, train_data, test_data):
     plot_loss_curves(history)
 
 
-def experiment_two(train_data, test_data):
+def experiment_two(train_data, test_data, plot_curves=False):
     # create data augmentation layers
     data_augmentation = keras.Sequential([
         preprocessing.RandomFlip("horizontal"),
@@ -157,7 +157,8 @@ def experiment_two(train_data, test_data):
                                    checkpoint_callback],
                         workers=-1)
     results_10_percent_data = model.evaluate(test_data)
-    plot_loss_curves(history)
+    if plot_curves:
+        plot_loss_curves(history)
 
     # load saved weights from checkpoint
     # this returns a model to a specific checkpoint
@@ -182,10 +183,23 @@ def experiment_three(model, test_data, train_data):
     :return:
     """
     # visualize layer accessibility:
-    for layer in model.layers:
-        print(layer, layer.trainable)
+    # for layer in model.layers:
+    #     print(layer, layer.trainable)
 
-    # look closer at base model layer set to not trainable:
+    # look closer at base model layer set to not trainable:#
+    # for i, layer in enumerate(model.layers[2].layers):
+    #     print(i, layer.name, layer.trainable)
+
+    model.trainable = True
+    # now freeze all layers except the last 10
+    for layer in model.layers[2].layers[:-10]:
+        layer.trainable = False
+
+    # Must recompile model every time it is changed
+    # lower the learning rate by factor of 10 when fine tuning to reduce (see ULMFit paper)
+    model.compile(loss="categorical_crossentropy", optimizer=keras.optimizers.Adam(lr=0.0001), metrics=["accuracy"])
+
+    # now check trainable layers again
     for i, layer in enumerate(model.layers[2].layers):
         print(i, layer.name, layer.trainable)
 
