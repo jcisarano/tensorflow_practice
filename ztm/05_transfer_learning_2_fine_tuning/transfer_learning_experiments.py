@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
@@ -118,11 +119,11 @@ def experiment_two(train_data, test_data):
                   metrics=["accuracy"])
 
     # print(model.summary())
-    # add ModelCHeckpoint callback to save model during training
+    # add ModelCceckpoint callback to save model during training
     checkpoint_path = "checkpoints/ten_pct_mod_wts/checkpoint.ckpt"
     checkpoint_callback = keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                           save_weights_only=True,
-                                                          save_best_only=False,
+                                                          save_best_only=True,
                                                           save_freq="epoch",
                                                           verbose=1)
 
@@ -135,8 +136,22 @@ def experiment_two(train_data, test_data):
                                                                experiment_name="10_percent_data_aug"),
                                    checkpoint_callback],
                         workers=-1)
+    results_10_percent_data = model.evaluate(test_data)
+    plot_loss_curves(history)
 
+    # load saved weights from checkpoint
+    # this returns a model to a specific checkpoint
+    model.load_weights(checkpoint_path)
 
+    loaded_weights_results = model.evaluate(test_data)
+
+    # results should be the same, but there is precision difference
+    # so use np.isclose() to compare
+    print(results_10_percent_data == loaded_weights_results)
+    print(np.isclose(np.array(results_10_percent_data), np.array(loaded_weights_results)))
+    print(np.array(results_10_percent_data) - np.array(loaded_weights_results))
+
+    
 def run():
     # walk_through_dir(du.LOCAL_DATA_PATH_1_PERCENT)
 
@@ -177,3 +192,5 @@ def run():
                                                                     image_size=du.IMG_SHAPE)
 
     experiment_two(train_data_10_percent, test_data)
+
+
