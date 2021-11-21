@@ -172,10 +172,10 @@ def experiment_two(train_data, test_data, plot_curves=False):
     # print(np.isclose(np.array(results_10_percent_data), np.array(results_loaded_weights)))
     # print(np.array(results_10_percent_data) - np.array(results_loaded_weights))
 
-    return model
+    return model, history
 
 
-def experiment_three(model, test_data, train_data):
+def experiment_three(model, test_data, train_data, initial_epochs, prev_hist):
     """
     efficient net with fine tuning, with some layers unfrozen for training
     Fine tuning usually works best _after_ training a feature extraction model for a few epochs with large amounts of
@@ -192,16 +192,31 @@ def experiment_three(model, test_data, train_data):
 
     model.trainable = True
     # now freeze all layers except the last 10
-    for layer in model.layers[2].layers[:-10]:
-        layer.trainable = False
+    # for layer in model.layers[2].layers# [:-10]:
+    #    layer.trainable = False
 
     # Must recompile model every time it is changed
     # lower the learning rate by factor of 10 when fine tuning to reduce (see ULMFit paper)
     model.compile(loss="categorical_crossentropy", optimizer=keras.optimizers.Adam(lr=0.0001), metrics=["accuracy"])
 
     # now check trainable layers again
-    for i, layer in enumerate(model.layers[2].layers):
-        print(i, layer.name, layer.trainable)
+    # for i, layer in enumerate(model.layers[2].layers):
+    #     print(i, layer.name, layer.trainable)
+
+    # fine tune for five more epochs
+    fine_tune_epochs = initial_epochs + 5
+    history = model.fit(train_data,
+                        epochs=fine_tune_epochs,
+                        validation_data=test_data,
+                        validation_steps=int(0.25 * len(test_data)),
+                        initial_epoch=prev_hist.epoch[-1],  # start training from previous last epoch
+                        callbacks=[create_tensorboard_callback(dir_name="transfer_learning",
+                                                               experiment_name="10_percent_fine_tune_last_10")]
+                        )
+
+    results = model.evaluate(test_data)
+    print(results)
+    # plot_loss_curves(history)
 
 
 def run():
@@ -229,6 +244,6 @@ def run():
                                                                     label_mode="categorical",
                                                                     image_size=du.IMG_SHAPE)
 
-    model = experiment_two(train_data_10_percent, test_data)
-    experiment_three(model, train_data_10_percent, test_data)
+    model, history = experiment_two(train_data_10_percent, test_data)
+    experiment_three(model, train_data_10_percent, test_data, 5, history)
 
