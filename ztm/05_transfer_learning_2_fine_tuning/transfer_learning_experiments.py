@@ -143,15 +143,15 @@ def experiment_two(train_data, test_data):
     # this returns a model to a specific checkpoint
     model.load_weights(checkpoint_path)
 
-    loaded_weights_results = model.evaluate(test_data)
+    results_loaded_weights = model.evaluate(test_data)
 
     # results should be the same, but there is precision difference
     # so use np.isclose() to compare
-    print(results_10_percent_data == loaded_weights_results)
-    print(np.isclose(np.array(results_10_percent_data), np.array(loaded_weights_results)))
-    print(np.array(results_10_percent_data) - np.array(loaded_weights_results))
+    print(results_10_percent_data == results_loaded_weights)
+    print(np.isclose(np.array(results_10_percent_data), np.array(results_loaded_weights)))
+    print(np.array(results_10_percent_data) - np.array(results_loaded_weights))
 
-    
+
 def run():
     # walk_through_dir(du.LOCAL_DATA_PATH_1_PERCENT)
 
