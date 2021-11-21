@@ -13,6 +13,25 @@ import data_utils as du
 from helper_functions import create_tensorboard_callback, plot_loss_curves, unzip_data, walk_through_dir
 
 
+def set_up_data_aug():
+    # do data augmentation
+    # tf.keras.layers.experimental.preprocessing has data augmentation features
+    # Using Sequential() here to pass to functional API
+    # This will add data augmentation to model, so they run on the gpu and become part of the model,
+    # so a saved model will include the preprocessing steps
+    # this preprocessing is only used during training, not during evaluation
+    data_augmentation = keras.Sequential([
+        preprocessing.RandomFlip("horizontal"),
+        preprocessing.RandomRotation(0.2),
+        preprocessing.RandomZoom(0.2),
+        preprocessing.RandomHeight(0.2),
+        preprocessing.RandomWidth(0.2),
+        # preprocessing.Rescaling(1./255)  # use for models like ResNet50V2, but not EfficientNet
+    ], name="data_augmentation")
+
+    return data_augmentation
+
+
 def visualize_random_img(data_augmentation, train_data):
     # visualize data augmentation
     # view a random image and compare to augmented version
@@ -51,6 +70,7 @@ def experiment_one(data_augmentation, train_data, test_data):
     feature extraction transfer learning on 1% of the data with data augmentation
     :return:
     """
+
     # set up input shape & base model with base model layers frozen
     input_shape = (du.IMG_SIZE, du.IMG_SIZE, 3)
     base_model = tf.keras.applications.EfficientNetB0(include_top=False)
@@ -141,15 +161,33 @@ def experiment_two(train_data, test_data):
 
     # load saved weights from checkpoint
     # this returns a model to a specific checkpoint
-    model.load_weights(checkpoint_path)
+    # # model.load_weights(checkpoint_path)
 
-    results_loaded_weights = model.evaluate(test_data)
+    # results_loaded_weights = model.evaluate(test_data)
 
     # results should be the same, but there is precision difference
     # so use np.isclose() to compare
-    print(results_10_percent_data == results_loaded_weights)
-    print(np.isclose(np.array(results_10_percent_data), np.array(results_loaded_weights)))
-    print(np.array(results_10_percent_data) - np.array(results_loaded_weights))
+    # print(results_10_percent_data == results_loaded_weights)
+    # print(np.isclose(np.array(results_10_percent_data), np.array(results_loaded_weights)))
+    # print(np.array(results_10_percent_data) - np.array(results_loaded_weights))
+
+    return model
+
+
+def experiment_three(model, test_data, train_data):
+    """
+    efficient net with fine tuning, with some layers unfrozen for training
+    Fine tuning usually works best _after_ training a feature extraction model for a few epochs with large amounts of
+    custom data. So train the model for some epochs, and then unfreeze the layers for fine tuning and more training
+    :return:
+    """
+    # visualize layer accessibility:
+    for layer in model.layers:
+        print(layer, layer.trainable)
+
+    # look closer at base model layer set to not trainable:
+    for i, layer in enumerate(model.layers[2].layers):
+        print(i, layer.name, layer.trainable)
 
 
 def run():
@@ -166,21 +204,7 @@ def run():
                                                                     image_size=du.IMG_SHAPE,
                                                                     batch_size=du.BATCH_SIZE)
 
-    # do data augmentation
-    # tf.keras.layers.experimental.preprocessing has data augmentation features
-    # Using Sequential() here to pass to functional API
-    # This will add data augmentation to model, so they run on the gpu and become part of the model,
-    # so a saved model will include the preprocessing steps
-    # this preprocessing is only used during training, not during evaluation
-    data_augmentation = keras.Sequential([
-        preprocessing.RandomFlip("horizontal"),
-        preprocessing.RandomRotation(0.2),
-        preprocessing.RandomZoom(0.2),
-        preprocessing.RandomHeight(0.2),
-        preprocessing.RandomWidth(0.2),
-        # preprocessing.Rescaling(1./255)  # use for models like ResNet50V2, but not EfficientNet
-    ], name="data_augmentation")
-
+    # data_augmentation = set_up_data_aug()
     # visualize_random_img(data_augmentation, train_data_1_percent)
     # experiment_one(data_augmentation, train_data_1_percent, test_data)
 
@@ -191,6 +215,6 @@ def run():
                                                                     label_mode="categorical",
                                                                     image_size=du.IMG_SHAPE)
 
-    experiment_two(train_data_10_percent, test_data)
-
+    model = experiment_two(train_data_10_percent, test_data)
+    experiment_three(model, train_data_10_percent, test_data)
 
