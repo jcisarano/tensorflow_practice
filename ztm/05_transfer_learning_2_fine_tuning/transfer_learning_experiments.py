@@ -14,6 +14,9 @@ from helper_functions import create_tensorboard_callback, \
     plot_loss_curves, unzip_data, walk_through_dir, compare_histories
 
 
+CHECKPOINT_PATH: str = "checkpoints/ten_pct_mod_wts/checkpoint.ckpt"
+
+
 def set_up_data_aug():
     # do data augmentation
     # tf.keras.layers.experimental.preprocessing has data augmentation features
@@ -110,6 +113,17 @@ def experiment_one(data_augmentation, train_data, test_data):
 
 
 def experiment_two(train_data, test_data, plot_curves=False):
+    """
+    This is a feature extraction transfer learning model that trains for five epochs on only 10% of the
+    total data set (75 examples per class) using data augmentation. It will save the best weights using
+    a checkpoint callback.
+    The model is EfficientNetB0 with training turned off, meaning the internal layers of the model will
+    not train beyond the existing transfer learning. Only our added pooling and output layers are trainable.
+    :param train_data:
+    :param test_data:
+    :param plot_curves:
+    :return:
+    """
     # create data augmentation layers
     data_augmentation = keras.Sequential([
         preprocessing.RandomFlip("horizontal"),
@@ -141,8 +155,7 @@ def experiment_two(train_data, test_data, plot_curves=False):
 
     # print(model.summary())
     # add ModelCceckpoint callback to save model during training
-    checkpoint_path = "checkpoints/ten_pct_mod_wts/checkpoint.ckpt"
-    checkpoint_callback = keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+    checkpoint_callback = keras.callbacks.ModelCheckpoint(filepath=CHECKPOINT_PATH,
                                                           save_weights_only=True,
                                                           save_best_only=True,
                                                           save_freq="epoch",
@@ -163,7 +176,7 @@ def experiment_two(train_data, test_data, plot_curves=False):
 
     # load saved weights from checkpoint
     # this returns a model to a specific checkpoint
-    # # model.load_weights(checkpoint_path)
+    # # model.load_weights(CHECKPOINT_PATH)
 
     # results_loaded_weights = model.evaluate(test_data)
 
@@ -178,7 +191,9 @@ def experiment_two(train_data, test_data, plot_curves=False):
 
 def experiment_three(model, test_data, train_data, initial_epochs, prev_hist):
     """
-    efficient net with fine tuning, with some layers unfrozen for training
+    Trains the same model as experiment two, but unfreezes its top ten layers to allow them to train further.
+
+    Efficient net with fine tuning, with some layers unfrozen for training
     Fine tuning usually works best _after_ training a feature extraction model for a few epochs with large amounts of
     custom data. So train the model for some epochs, and then unfreeze the layers for fine tuning and more training
     :return:
@@ -193,10 +208,10 @@ def experiment_three(model, test_data, train_data, initial_epochs, prev_hist):
 
     model.trainable = True
     # now freeze all layers except the last 10
-    # for layer in model.layers[2].layers# [:-10]:
-    #    layer.trainable = False
+    for layer in model.layers[2].layers[:-10]:
+        layer.trainable = False
 
-    # Must recompile model every time it is changed
+    # Mt recompile model every time it is changed
     # lower the learning rate by factor of 10 when fine tuning to reduce (see ULMFit paper)
     model.compile(loss="categorical_crossentropy", optimizer=keras.optimizers.Adam(lr=0.0001), metrics=["accuracy"])
 
@@ -219,6 +234,33 @@ def experiment_three(model, test_data, train_data, initial_epochs, prev_hist):
     print(results)
     # plot_loss_curves(history)
     compare_histories(prev_hist, history, initial_epochs)
+
+    return model, history
+
+
+def experiment_four(model, test_data, train_data, initial_epochs, prev_hist):
+    """
+    This experiment will be the same as experiment three, but will use all of the training data.
+    It starts by reloading the experiment two checkpoint to make sure it starts with the same trained weights.
+    :param model:
+    :param test_data:
+    :param train_data:
+    :param initial_epochs:
+    :param prev_hist:
+    :return:
+    """
+    # revert to the best weights saved for experiment 2
+    model.load_weights(CHECKPOINT_PATH)
+    # make sure the evaluation matches the earlier results:
+    # print(model.evaluate(test_data))
+
+    # visualize tunable layers
+    for layer_number, layer in enumerate(model.layers):
+        print(layer_number, layer.name, layer.trainable)
+
+    # only the top 10 layers of the base layer should be trainable (as before)
+    for layer_number, layer in enumerate(model.layers[2].layers):
+        print(layer_number, layer.name, layer.trainable)
 
 
 def run():
@@ -247,7 +289,7 @@ def run():
                                                                     image_size=du.IMG_SHAPE)
 
     model, history = experiment_two(train_data_10_percent, test_data)
-    # experiment_three(model, train_data_10_percent, test_data, 5, history)
+    model_1, history_1 = experiment_three(model, train_data_10_percent, test_data, 5, history)
 
     # load full food image dataset, 7500 training images
     train_data_all = keras.preprocessing.image_dataset_from_directory(du.TRAIN_DATA_PATH_ALL,
@@ -256,5 +298,9 @@ def run():
     test_data_all = keras.preprocessing.image_dataset_from_directory(du.TEST_DATA_PATH_ALL,
                                                                      label_mode="categorical",
                                                                      image_size=du.IMG_SHAPE)
-    print(model.evaluate(test_data))
-    print(model.evaluate(test_data_all))
+
+    # these should be the same:
+    # print(model.evaluate(test_data))
+    # print(model.evaluate(test_data_all))
+
+    experiment_four(model, train_data_all, test_data_all, 5, history)
