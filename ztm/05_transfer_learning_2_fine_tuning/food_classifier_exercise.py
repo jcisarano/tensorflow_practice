@@ -51,3 +51,25 @@ def run():
 
     result_1 = model.evaluate(test_data)
     print(result_1)
+
+    model.trainable = True
+    for layer in model.layers[1].layers[:-20]:
+        layer.trainable = False
+
+    model.load_weights(checkpoint_path)
+
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+                  metrics=["accuracy"])
+
+    fine_tune_epochs = initial_epoch + 10
+    history_2 = model.fit(train_data,
+                          epochs=fine_tune_epochs,
+                          validation_data=test_data,
+                          validation_steps=int(0.25 * len(test_data)),
+                          initial_epoch=history_1.epoch[-1],
+                          workers=-1
+                          )
+    result_2 = model.evaluate(test_data)
+    print(result_2)
+
