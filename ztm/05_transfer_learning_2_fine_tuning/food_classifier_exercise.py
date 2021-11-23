@@ -1,3 +1,4 @@
+import keras.callbacks
 import tensorflow as tf
 from tensorflow.keras.layers.experimental import preprocessing
 
@@ -13,11 +14,11 @@ def print_model_info(model):
 def run():
     # load ten percent dataset
     train_data = tf.keras.preprocessing.image_dataset_from_directory(du.TRAIN_DATA_PATH,
-                                                                                label_mode="categorical",
-                                                                                image_size=du.IMG_SHAPE)
+                                                                     label_mode="categorical",
+                                                                     image_size=du.IMG_SHAPE)
     test_data = tf.keras.preprocessing.image_dataset_from_directory(du.TEST_DATA_PATH,
-                                                                 label_mode="categorical",
-                                                                 image_size=du.IMG_SHAPE)
+                                                                    label_mode="categorical",
+                                                                    image_size=du.IMG_SHAPE)
 
     base_model = tf.keras.applications.EfficientNetB0(include_top=False)
     base_model.trainable = False
@@ -31,6 +32,22 @@ def run():
 
     model = tf.keras.Model(inputs, outputs)
     model.compile(loss="categorical_crossentropy", optimizer=tf.keras.optimizers.Adam(), metrics=["accuracy"])
-    print_model_info(model)
+    # print_model_info(model)
 
+    initial_epoch = 10
+    checkpoint_path = "checkpoints/ten_pct_food101_exercise/checkpoint.ckpt"
+    checkpoint_callback = keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                          save_weights_only=True,
+                                                          save_best_only=True,
+                                                          save_freq="epoch",
+                                                          verbose=1)
 
+    history_1 = model.fit(train_data,
+                          epochs=initial_epoch,
+                          validation_data=test_data,
+                          validation_steps=int(0.25 * len(test_data)),
+                          callbacks=[checkpoint_callback],
+                          workers=-1)
+
+    result_1 = model.evaluate(test_data)
+    print(result_1)
