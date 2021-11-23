@@ -189,7 +189,7 @@ def experiment_two(train_data, test_data, plot_curves=False):
     return model, history
 
 
-def experiment_three(model, test_data, train_data, initial_epochs, prev_hist):
+def experiment_three(model, train_data, test_data, initial_epochs, prev_hist):
     """
     Trains the same model as experiment two, but unfreezes its top ten layers to allow them to train further.
 
@@ -238,7 +238,7 @@ def experiment_three(model, test_data, train_data, initial_epochs, prev_hist):
     return model, history
 
 
-def experiment_four(model, test_data, train_data, initial_epochs, prev_hist):
+def experiment_four(model, train_data, test_data, initial_epochs, prev_hist):
     """
     This experiment will be the same as experiment three, but will use all of the training data.
     It starts by reloading the experiment two checkpoint to make sure it starts with the same trained weights.
@@ -276,6 +276,10 @@ def experiment_four(model, test_data, train_data, initial_epochs, prev_hist):
                                                                experiment_name="all_data_fine_tune")],
                         workers=-1)
 
+    results = model.evaluate(test_data)
+    print(results)
+
+    compare_histories(prev_hist, history, initial_epochs)
 
 
 def run():
