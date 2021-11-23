@@ -255,12 +255,27 @@ def experiment_four(model, test_data, train_data, initial_epochs, prev_hist):
     # print(model.evaluate(test_data))
 
     # visualize tunable layers
-    for layer_number, layer in enumerate(model.layers):
-        print(layer_number, layer.name, layer.trainable)
+    # for layer_number, layer in enumerate(model.layers):
+    #     print(layer_number, layer.name, layer.trainable)
 
     # only the top 10 layers of the base layer should be trainable (as before)
-    for layer_number, layer in enumerate(model.layers[2].layers):
-        print(layer_number, layer.name, layer.trainable)
+    # for layer_number, layer in enumerate(model.layers[2].layers):
+    #     print(layer_number, layer.name, layer.trainable)
+
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=keras.optimizers.Adam(lr=0.0001),
+                  metrics=["accuracy"])
+
+    fine_tune_epochs = initial_epochs + 5
+    history = model.fit(train_data,
+                        epochs=fine_tune_epochs,
+                        validation_data=test_data,
+                        validation_steps=int(0.25 * len(test_data)),
+                        initial_epoch=prev_hist.epoch[-1],
+                        callbacks=[create_tensorboard_callback(dir_name="transfer_learning",
+                                                               experiment_name="all_data_fine_tune")],
+                        workers=-1)
+
 
 
 def run():
