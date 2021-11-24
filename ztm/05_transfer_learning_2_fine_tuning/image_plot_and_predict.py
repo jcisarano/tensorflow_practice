@@ -16,7 +16,8 @@ def get_random_image(dir, class_names):
 
     random_image = random.choice(os.listdir(target_dir))
     random_image_path = os.path.join(target_dir, random_image)
-    img = mpimg.imread(random_image_path)
+    # img = mpimg.imread(random_image_path)
+    img = tf.io.read_file(random_image_path)
 
     return img
 
@@ -26,6 +27,20 @@ def visualize_image(image, class_name):
     plt.title(class_name)
     plt.axis("off")
     plt.show()
+
+
+def predict_random(model, test_data):
+    img = get_random_image(du.TEST_DATA_PATH, test_data.class_names)
+    # img_pred = img / 255.
+    img_pred = tf.image.decode_image(img)
+    img_pred = tf.image.resize(img_pred, [du.IMG_SIZE, du.IMG_SIZE])
+    img_pred = img_pred / 255.
+
+    pred = model.predict(tf.expand_dims(img_pred, axis=0))
+    class_name = test_data.class_names[np.argmax(pred)]
+    print(pred)
+
+    visualize_image(img_pred, class_name)
 
 
 def run():
@@ -38,11 +53,27 @@ def run():
     print(train_data.class_names)
 
 
-    # model, history = experiment_two(train_data, test_data)
+    model, history = experiment_two(train_data, test_data)
 
-    img = get_random_image(du.TEST_DATA_PATH, test_data.class_names)
-    visualize_image(img, "je;lo")
+    # img = get_random_image(du.TEST_DATA_PATH, test_data.class_names)
+    # img_pred = img / 255.
+    # img_pred = tf.image.decode_image(img)
+    # img_pred = tf.image.resize(img_pred, [du.IMG_SIZE, du.IMG_SIZE])
+    # img_pred = img_pred / 255.
+
+    # pred = model.predict(tf.expand_dims(img_pred, axis=0))
+    # class_name = test_data.class_names[np.argmax(pred)]
+    # print(pred)
+
+    # visualize_image(img_pred, class_name)
     # print(model.evaluate(test_data))
+
+    predict_random(model, test_data)
+    predict_random(model, test_data)
+    predict_random(model, test_data)
+    predict_random(model, test_data)
+    predict_random(model, test_data)
+    predict_random(model, test_data)
 
 
 
