@@ -4,10 +4,12 @@
 import food_classifier as fc
 import transfer_learning_experiments as tfle
 import food_classifier_exercise as fce
+import image_plot_and_predict as ipp
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    fce.run()
+    ipp.run()
+    # fce.run()
     # tfle.run()
     # fc.run()
 
