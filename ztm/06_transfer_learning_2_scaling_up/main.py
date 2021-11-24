@@ -5,15 +5,10 @@
     by leveraging the power of transfer learning.
 """
 
-from helper_functions import create_tensorboard_callback, plot_loss_curves, unzip_data, compare_histories, walk_through_dir
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
+import food_classifier as fc
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('Transfer Learning')
+    fc.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
