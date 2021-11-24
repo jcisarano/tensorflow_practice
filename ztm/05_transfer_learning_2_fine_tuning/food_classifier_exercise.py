@@ -11,6 +11,10 @@ def print_model_info(model):
         print(index, layer.name, layer.trainable)
 
 
+def visualize_and_predict_image():
+    print("todo")
+
+
 def run():
     # load ten percent dataset
     train_data = tf.keras.preprocessing.image_dataset_from_directory(du.TRAIN_DATA_PATH,
