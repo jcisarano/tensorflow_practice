@@ -9,7 +9,7 @@ Steps to create the model:
 5) Feature extract for 5 full passes (5 epochs on train set and validate on 15% of test data to save time)
 
 """
-
+import keras
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
@@ -35,7 +35,6 @@ def run():
                                                              monitor="val_accuracy",
                                                              save_best_only=True)
 
-
     data_augmentation = Sequential([
         preprocessing.RandomFlip("horizontal"),
         preprocessing.RandomRotation(0.2),
@@ -44,4 +43,21 @@ def run():
         preprocessing.RandomZoom(0.2),
         # preprocessing.Rescale(1/255.) # rescale only if model doesn't include scaling
     ], name="data_augmentation")
+
+    # create base model and freeze its layers
+    backbone = tf.keras.applications.EfficientNetB0(include_top=False)
+    backbone.trainable = False
+
+    # create trainable top layer architecture
+    inputs = layers.Input(shape=(224, 224, 3), name="input_layer")
+    x = data_augmentation(inputs)
+    x = backbone(x, training=False)  # puts base model in inference mode, so frozen weights will stay frozen
+    x = layers.GlobalAveragePooling2D(name="global_avg_pooling_2d")(x)
+    outputs = layers.Dense(len(train_data_all_10_percent.class_names),
+                           activation="softmax",
+                           name="output_layer")(x)
+
+    model = keras.Model(inputs, outputs)
+
+
 
