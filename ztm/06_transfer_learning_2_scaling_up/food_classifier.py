@@ -19,16 +19,7 @@ import data_utils
 from helper_functions import plot_loss_curves
 
 
-def run():
-    train_data_all_10_percent \
-        = tf.keras.preprocessing.image_dataset_from_directory(data_utils.TRAIN_DATA_PATH,
-                                                              label_mode="categorical",
-                                                              image_size=data_utils.IMG_SHAPE)
-    test_data = tf.keras.preprocessing.image_dataset_from_directory(data_utils.TEST_DATA_PATH,
-                                                                    label_mode="categorical",
-                                                                    image_size=data_utils.IMG_SHAPE,
-                                                                    shuffle=False)
-
+def train_model(train_data, test_data):
     # Create checkpoint callback
     checkpoint_path = "checkpoints/101_classes_10_percent_data_model_checkpoint"
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
@@ -54,7 +45,7 @@ def run():
     x = data_augmentation(inputs)
     x = backbone(x, training=False)  # puts base model in inference mode, so frozen weights will stay frozen
     x = layers.GlobalAveragePooling2D(name="global_avg_pooling_2d")(x)
-    outputs = layers.Dense(len(train_data_all_10_percent.class_names),
+    outputs = layers.Dense(len(train_data.class_names),
                            activation="softmax",
                            name="output_layer")(x)
 
@@ -65,7 +56,7 @@ def run():
     model.compile(loss="categorical_crossentropy",
                   optimizer=tf.keras.optimizers.Adam(),
                   metrics="accuracy")
-    history = model.fit(train_data_all_10_percent,
+    history = model.fit(train_data,
                         epochs=5,  # only five for now to keep experiments faster
                         validation_data=test_data,
                         validation_steps=int(0.15 * len(test_data)),  # using only 15% speeds up the epochs
@@ -98,7 +89,7 @@ def run():
         print(index, layer.name, layer.trainable)
 
     # now fit again, starting from where the last one left off
-    history_fine_tune = model.fit(train_data_all_10_percent,
+    history_fine_tune = model.fit(train_data,
                                   epochs=10,  # five more than previous attempt
                                   validation_data=test_data,
                                   validation_steps=int(0.15 * len(test_data)),
@@ -106,6 +97,41 @@ def run():
                                   workers=-1)
 
     results_fine_tune = model.evaluate(test_data, workers=-1)
-    plot_loss_curves(history_fine_tune)
+    print(results_fine_tune)
+    # plot_loss_curves(history_fine_tune)
+
+    # save and load model
+    model_path = "saved_models/101_food_classes_10_percent_saved"
+    model.save(model_path)
+
+    # load and evaluate saved model
+    model_loaded = tf.keras.models.load_model(model_path)
+    results_loaded = model_loaded.evaluate(test_data)
+    print(results_loaded)
 
 
+def evaluate_saved_model(test_data):
+    model = tf.keras.models.load_model("saved_models/06_101_food_class_10_percent_saved_big_dog_model")
+    print(model.summary())
+
+    # results = model.evaluate(test_data)
+    # print(results)
+
+    # make predictions
+    pred_probs = model.predict(test_data, verbose=1)
+    print(pred_probs[0], len(pred_probs[0]), sum(pred_probs[0]))
+
+
+
+
+def run():
+    train_data_all_10_percent \
+        = tf.keras.preprocessing.image_dataset_from_directory(data_utils.TRAIN_DATA_PATH,
+                                                              label_mode="categorical",
+                                                              image_size=data_utils.IMG_SHAPE)
+    test_data = tf.keras.preprocessing.image_dataset_from_directory(data_utils.TEST_DATA_PATH,
+                                                                    label_mode="categorical",
+                                                                    image_size=data_utils.IMG_SHAPE,
+                                                                    shuffle=False)
+    # train_model(train_data_all_10_percent, test_data)
+    evaluate_saved_model(test_data)
