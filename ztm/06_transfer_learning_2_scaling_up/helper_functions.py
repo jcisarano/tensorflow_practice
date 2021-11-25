@@ -92,6 +92,9 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
     ax.xaxis.set_label_position("bottom")
     ax.xaxis.tick_bottom()
 
+    plt.xticks(rotation=70, fontsize=text_size)
+    plt.yticks(fontsize=text_size)
+
     # Set the threshold for different colors
     threshold = (cm.max() + cm.min()) / 2.
 
@@ -111,6 +114,8 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
     # Save the figure to the current working directory
     if savefig:
         fig.savefig("confusion_matrix.png")
+
+    # plt.show()
 
 
 # Make a function to predict on images and plot them (works with multi-class)

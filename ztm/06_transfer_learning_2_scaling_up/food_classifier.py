@@ -17,7 +17,7 @@ from tensorflow.keras.layers.experimental import preprocessing
 from tensorflow.keras.models import Sequential
 
 import data_utils
-from helper_functions import plot_loss_curves
+from helper_functions import plot_loss_curves, make_confusion_matrix
 
 
 def train_model(train_data, test_data):
@@ -140,6 +140,9 @@ def evaluate_saved_model(test_data):
     # Evaluate model's predictions
     # accuracy = accuracy_score(y_labels, pred_classes)
     # print(accuracy)
+
+    make_confusion_matrix(y_true=y_labels, y_pred=pred_classes, classes=test_data.class_names, figsize=(100, 100),
+                          text_size=20, savefig=True)
 
 
 
