@@ -16,6 +16,7 @@ from tensorflow.keras.layers.experimental import preprocessing
 from tensorflow.keras.models import Sequential
 
 import data_utils
+from helper_functions import plot_loss_curves
 
 
 def run():
@@ -29,7 +30,7 @@ def run():
                                                                     shuffle=False)
 
     # Create checkpoint callback
-    checkpoint_path = "101_classes_10_percent_data_model_checkpoint"
+    checkpoint_path = "checkpoints/101_classes_10_percent_data_model_checkpoint"
     checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                              save_weights_only=True,
                                                              monitor="val_accuracy",
@@ -58,6 +59,20 @@ def run():
                            name="output_layer")(x)
 
     model = keras.Model(inputs, outputs)
+    print(model.summary())
 
+    # Compile() and Fit()
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics="accuracy")
+    history = model.fit(train_data_all_10_percent,
+                        epochs=5,  # only five for now to keep experiments faster
+                        validation_data=test_data,
+                        validation_steps=int(0.15 * len(test_data)),  # using only 15% speeds up the epochs
+                        callbacks=[checkpoint_callback],
+                        workers=-1)
 
+    results = model.evaluate(test_data)
+
+    plot_loss_curves(history)
 
