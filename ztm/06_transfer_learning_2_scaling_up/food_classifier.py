@@ -93,19 +93,19 @@ def run():
     for layer in model.layers:
         print(layer.name, layer.trainable)
 
-    # see if efficientnet layers are trainable:
+    # see if EfficientNet layers are trainable:
     for index, layer in enumerate(model.layers[2].layers):
         print(index, layer.name, layer.trainable)
 
     # now fit again, starting from where the last one left off
     history_fine_tune = model.fit(train_data_all_10_percent,
-                                  epochs=10,
+                                  epochs=10,  # five more than previous attempt
                                   validation_data=test_data,
                                   validation_steps=int(0.15 * len(test_data)),
                                   initial_epoch=history.epoch[-1],
                                   workers=-1)
 
-    model.evaluate(test_data, workers=-1)
+    results_fine_tune = model.evaluate(test_data, workers=-1)
     plot_loss_curves(history_fine_tune)
 
 
