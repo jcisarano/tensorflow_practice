@@ -121,7 +121,20 @@ def evaluate_saved_model(test_data):
     pred_probs = model.predict(test_data, verbose=1)
     print(pred_probs[0], len(pred_probs[0]), sum(pred_probs[0]))
 
+    print(f"Number of prediction probabilities for sample 0: {len(pred_probs[0])}")
+    print(f"Predictions for sample 0:\n {pred_probs[0]}")
+    print(f"The class for the best predicted probability for sample 0: {pred_probs[0].argmax()}")
+    print(f"Predicted class for sample 0: {test_data.class_names[pred_probs[0].argmax()]}")
 
+    # predictions for each data instance:
+    pred_classes = pred_probs.argmax(axis=1)
+    print(pred_classes)
+
+    # unravel test data BatchDataset
+    y_labels = []
+    for images, labels in test_data.unbatch():
+        y_labels.append(labels.numpy().argmax())  # get index of predicted class from one-hot encoded array
+    print(y_labels[:10])
 
 
 def run():
@@ -135,3 +148,4 @@ def run():
                                                                     shuffle=False)
     # train_model(train_data_all_10_percent, test_data)
     evaluate_saved_model(test_data)
+
