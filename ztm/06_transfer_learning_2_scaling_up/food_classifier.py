@@ -12,7 +12,7 @@ Steps to create the model:
 
 import tensorflow as tf
 from tensorflow.keras import layers
-from tensorflow.keras import preprocessing
+from tensorflow.keras.layers.experimental import preprocessing
 from tensorflow.keras.models import Sequential
 
 import data_utils
@@ -45,4 +45,3 @@ def run():
         # preprocessing.Rescale(1/255.) # rescale only if model doesn't include scaling
     ], name="data_augmentation")
 
-    
