@@ -72,7 +72,40 @@ def run():
                         callbacks=[checkpoint_callback],
                         workers=-1)
 
-    results = model.evaluate(test_data)
+    results = model.evaluate(test_data, workers=-1)
 
-    plot_loss_curves(history)
+    # plot_loss_curves(history)
+
+    # Unfreeze every layer except the last 5
+    # then refreeze all but the last five
+    backbone.trainable = True
+    for layer in backbone.layers[:-5]:
+        layer.trainable = False
+
+    # lower the learning rate by 10x for fine tuning
+    # if we do another pass with more trainable layers, that should lower the learning rate even more
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+                  metrics="accuracy")
+
+    # see the trainable layers in overall model
+    # if any parts of a layer is trainable, this will show the whole thing trainable
+    for layer in model.layers:
+        print(layer.name, layer.trainable)
+
+    # see if efficientnet layers are trainable:
+    for index, layer in enumerate(model.layers[2].layers):
+        print(index, layer.name, layer.trainable)
+
+    # now fit again, starting from where the last one left off
+    history_fine_tune = model.fit(train_data_all_10_percent,
+                                  epochs=10,
+                                  validation_data=test_data,
+                                  validation_steps=int(0.15 * len(test_data)),
+                                  initial_epoch=history.epoch[-1],
+                                  workers=-1)
+
+    model.evaluate(test_data, workers=-1)
+    plot_loss_curves(history_fine_tune)
+
 
