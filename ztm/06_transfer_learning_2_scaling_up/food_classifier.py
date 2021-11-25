@@ -11,6 +11,7 @@ Steps to create the model:
 """
 import keras
 import tensorflow as tf
+from sklearn.metrics import accuracy_score
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 from tensorflow.keras.models import Sequential
@@ -119,22 +120,27 @@ def evaluate_saved_model(test_data):
 
     # make predictions
     pred_probs = model.predict(test_data, verbose=1)
-    print(pred_probs[0], len(pred_probs[0]), sum(pred_probs[0]))
+    # print(pred_probs[0], len(pred_probs[0]), sum(pred_probs[0]))
 
-    print(f"Number of prediction probabilities for sample 0: {len(pred_probs[0])}")
-    print(f"Predictions for sample 0:\n {pred_probs[0]}")
-    print(f"The class for the best predicted probability for sample 0: {pred_probs[0].argmax()}")
-    print(f"Predicted class for sample 0: {test_data.class_names[pred_probs[0].argmax()]}")
+    # print(f"Number of prediction probabilities for sample 0: {len(pred_probs[0])}")
+    # print(f"Predictions for sample 0:\n {pred_probs[0]}")
+    # print(f"The class for the best predicted probability for sample 0: {pred_probs[0].argmax()}")
+    # print(f"Predicted class for sample 0: {test_data.class_names[pred_probs[0].argmax()]}")
 
     # predictions for each data instance:
     pred_classes = pred_probs.argmax(axis=1)
-    print(pred_classes)
+    # print(pred_classes)
 
     # unravel test data BatchDataset
     y_labels = []
     for images, labels in test_data.unbatch():
         y_labels.append(labels.numpy().argmax())  # get index of predicted class from one-hot encoded array
-    print(y_labels[:10])
+    # print(y_labels[:10])
+
+    # Evaluate model's predictions
+    # accuracy = accuracy_score(y_labels, pred_classes)
+    # print(accuracy)
+
 
 
 def run():
