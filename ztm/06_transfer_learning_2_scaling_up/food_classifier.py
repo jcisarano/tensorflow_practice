@@ -11,6 +11,9 @@ Steps to create the model:
 """
 
 import tensorflow as tf
+from tensorflow.keras import layers
+from tensorflow.keras import preprocessing
+from tensorflow.keras.models import Sequential
 
 import data_utils
 
@@ -31,3 +34,15 @@ def run():
                                                              save_weights_only=True,
                                                              monitor="val_accuracy",
                                                              save_best_only=True)
+
+
+    data_augmentation = Sequential([
+        preprocessing.RandomFlip("horizontal"),
+        preprocessing.RandomRotation(0.2),
+        preprocessing.RandomHeight(0.2),
+        preprocessing.RandomWidth(0.2),
+        preprocessing.RandomZoom(0.2),
+        # preprocessing.Rescale(1/255.) # rescale only if model doesn't include scaling
+    ], name="data_augmentation")
+
+    
