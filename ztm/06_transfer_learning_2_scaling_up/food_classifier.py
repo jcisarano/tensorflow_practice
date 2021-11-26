@@ -149,10 +149,11 @@ def evaluate_saved_model(test_data):
                                                        y_pred=pred_classes,
                                                        output_dict=True)
     class_f1_scores = {}
-    for k, v in class_f1_scores.items():
+    for k, v in classification_report_dict.items():
         if k == "accuracy":
             break
         else:
+            print(test_data.class_names[int(k)], v["f1-score"])
             class_f1_scores[test_data.class_names[int(k)]] = v["f1-score"]
 
     # convert to dataframe
