@@ -9,6 +9,8 @@ Steps to create the model:
 5) Feature extract for 5 full passes (5 epochs on train set and validate on 15% of test data to save time)
 
 """
+import os
+
 import keras
 import tensorflow as tf
 from matplotlib import pyplot as plt
@@ -17,9 +19,13 @@ from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 from tensorflow.keras.models import Sequential
 import pandas as pd
+import random
 
 import data_utils
 from helper_functions import plot_loss_curves, make_confusion_matrix
+
+
+MODEL_PATH: str = "saved_models/06_101_food_class_10_percent_saved_big_dog_model"
 
 
 def train_model(train_data, test_data):
@@ -137,6 +143,10 @@ def plot_horizontal_graph(test_data, classification_report_dict):
     plt.show()
 
 
+def load_saved_model(model_path):
+    return tf.keras.models.load_model(model_path)
+
+
 def evaluate_saved_model(test_data):
     model = tf.keras.models.load_model("saved_models/06_101_food_class_10_percent_saved_big_dog_model")
     print(model.summary())
@@ -201,6 +211,41 @@ def load_and_preprocess_image(filename, image_shape=224, normalize=True):
     return img
 
 
+def predict_random_image(test_data, model):
+    """
+        Steps
+            Load a few random images
+            Make predictions
+            Plot images along with predictions
+    :return:
+    """
+
+    plt.figure(figsize=(17, 10))
+    for i in range(3):
+        class_name = random.choice(test_data.class_names)
+        file_name = random.choice(os.listdir(os.path.join(data_utils.TEST_DATA_PATH, class_name)))
+        file_path = os.path.join(data_utils.TEST_DATA_PATH, class_name, file_name)
+        # print(file_path)
+        img = load_and_preprocess_image(file_path, normalize=False)
+        img_expanded = tf.expand_dims(img, axis=0)
+        pred_prob = model.predict(img_expanded)
+        pred_class = test_data.class_names[pred_prob.argmax()]
+        # print(pred_prob, pred_class)
+        # print(pred_class)
+
+        plt.subplot(1, 3, i+1)
+        plt.imshow(img/255.)
+        if class_name == pred_class:
+            title_color = "g"
+        else:
+            title_color = "r"
+
+        plt.title(f"actual: {class_name}, pred: {pred_class}, prob: {pred_prob.max():.2f}", c=title_color)
+        plt.axis(False)
+    plt.show()
+
+
+
 def run():
     train_data_all_10_percent \
         = tf.keras.preprocessing.image_dataset_from_directory(data_utils.TRAIN_DATA_PATH,
@@ -211,4 +256,7 @@ def run():
                                                                     image_size=data_utils.IMG_SHAPE,
                                                                     shuffle=False)
     # train_model(train_data_all_10_percent, test_data)
-    evaluate_saved_model(test_data)
+    # evaluate_saved_model(test_data)
+
+    model = load_saved_model(MODEL_PATH)
+    predict_random_image(test_data, model)
