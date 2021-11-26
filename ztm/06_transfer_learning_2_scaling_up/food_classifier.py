@@ -245,6 +245,21 @@ def predict_random_image(test_data, model):
     plt.show()
 
 
+def find_most_wrong_predictions():
+    """
+    'Most wrong' predictions are the wrong predictions with the highest probability. Identifying them can help you
+    improve the model and improve the data.
+
+    Steps:
+        Get all of the image file paths in the test dataset using list_files()
+        Create a pandas dataframe of image filepaths, ground truth labels, predicted classes, max pred probabilities
+        Use dataframe to find all the wrong predictions
+        Sort dataframe with wrong preds and highest probabilities at the top
+        Visualize the images with the highest pred probabilities and wrong preds
+
+    :return:
+    """
+
 
 def run():
     train_data_all_10_percent \
