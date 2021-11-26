@@ -15,6 +15,7 @@ from sklearn.metrics import accuracy_score, classification_report
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 from tensorflow.keras.models import Sequential
+import pandas as pd
 
 import data_utils
 from helper_functions import plot_loss_curves, make_confusion_matrix
@@ -141,11 +142,23 @@ def evaluate_saved_model(test_data):
     # accuracy = accuracy_score(y_labels, pred_classes)
     # print(accuracy)
 
-    #make_confusion_matrix(y_true=y_labels, y_pred=pred_classes, classes=test_data.class_names, figsize=(100, 100),
+    # make_confusion_matrix(y_true=y_labels, y_pred=pred_classes, classes=test_data.class_names, figsize=(100, 100),
     #                      text_size=20, savefig=True)
 
-    print(classification_report(y_true=y_labels,
-                                y_pred=pred_classes))
+    classification_report_dict = classification_report(y_true=y_labels,
+                                                       y_pred=pred_classes,
+                                                       output_dict=True)
+    class_f1_scores = {}
+    for k, v in class_f1_scores.items():
+        if k == "accuracy":
+            break
+        else:
+            class_f1_scores[test_data.class_names[int(k)]] = v["f1-score"]
+
+    # convert to dataframe
+    f1_scores = pd.DataFrame({"class_names":list(class_f1_scores.keys()),
+                              "f1-score":list(class_f1_scores.values())}).sort_values("f1-score", ascending=False)
+    print(f1_scores[:10])
 
 
 def run():
