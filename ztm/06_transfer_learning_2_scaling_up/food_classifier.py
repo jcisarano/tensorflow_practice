@@ -11,6 +11,7 @@ Steps to create the model:
 """
 import keras
 import tensorflow as tf
+from matplotlib import pyplot as plt
 from sklearn.metrics import accuracy_score, classification_report
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
@@ -112,6 +113,30 @@ def train_model(train_data, test_data):
     print(results_loaded)
 
 
+def plot_horizontal_graph(test_data, classification_report_dict):
+    class_f1_scores = {}
+    for k, v in classification_report_dict.items():
+        if k == "accuracy":
+            break
+        else:
+            # print(test_data.class_names[int(k)], v["f1-score"])
+            class_f1_scores[test_data.class_names[int(k)]] = v["f1-score"]
+
+    # convert to dataframe
+    f1_scores = pd.DataFrame({"class_names": list(class_f1_scores.keys()),
+                              "f1-score": list(class_f1_scores.values())}).sort_values("f1-score", ascending=False)
+    # print(f1_scores[:10])
+
+    fix, axes = plt.subplots(figsize=(12, 25))
+    scores = axes.barh(range(len(f1_scores)), f1_scores["f1-score"].values)
+    axes.set_yticks(range(len(f1_scores)))
+    axes.set_yticklabels(f1_scores["class_names"])
+    axes.set_xlabel("F1-score")
+    axes.set_title("F1-score for food classes")
+    axes.invert_yaxis()
+    plt.show()
+
+
 def evaluate_saved_model(test_data):
     model = tf.keras.models.load_model("saved_models/06_101_food_class_10_percent_saved_big_dog_model")
     print(model.summary())
@@ -148,18 +173,9 @@ def evaluate_saved_model(test_data):
     classification_report_dict = classification_report(y_true=y_labels,
                                                        y_pred=pred_classes,
                                                        output_dict=True)
-    class_f1_scores = {}
-    for k, v in classification_report_dict.items():
-        if k == "accuracy":
-            break
-        else:
-            print(test_data.class_names[int(k)], v["f1-score"])
-            class_f1_scores[test_data.class_names[int(k)]] = v["f1-score"]
 
-    # convert to dataframe
-    f1_scores = pd.DataFrame({"class_names":list(class_f1_scores.keys()),
-                              "f1-score":list(class_f1_scores.values())}).sort_values("f1-score", ascending=False)
-    print(f1_scores[:10])
+    plot_horizontal_graph(test_data, classification_report_dict)
+
 
 
 def run():
@@ -173,4 +189,3 @@ def run():
                                                                     shuffle=False)
     # train_model(train_data_all_10_percent, test_data)
     evaluate_saved_model(test_data)
-
