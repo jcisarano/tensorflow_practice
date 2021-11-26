@@ -220,7 +220,7 @@ def predict_random_image(test_data, model):
     :return:
     """
 
-    plt.figure(figsize=(17, 10))
+    plt.figure(figsize=(16, 8))
     for i in range(3):
         class_name = random.choice(test_data.class_names)
         file_name = random.choice(os.listdir(os.path.join(data_utils.TEST_DATA_PATH, class_name)))
