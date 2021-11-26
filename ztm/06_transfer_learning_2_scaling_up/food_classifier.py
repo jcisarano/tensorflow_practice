@@ -174,8 +174,31 @@ def evaluate_saved_model(test_data):
                                                        y_pred=pred_classes,
                                                        output_dict=True)
 
-    plot_horizontal_graph(test_data, classification_report_dict)
+    # plot_horizontal_graph(test_data, classification_report_dict)
 
+    # now predict on a single image from the test set
+
+
+def load_and_preprocess_image(filename, image_shape=224, normalize=True):
+    """
+    Reads an image filename, converts to tensor, and reshapes to (image_shape, image_shape, 3)
+    Steps:
+        Read a target image using tf.io.read_file()
+        Turn image into Tensor using tf.io.decode_image()
+        Resize image tensor to be the same size as training images using tf.image.resize()
+        Scale image to get all pixel values between 0 & 1 if needed
+    :param filename
+    :param image_shape
+    :param normalize
+    :return:
+    """
+    img = tf.io.read_file(filename)
+    img = tf.io.decode_image(img, channels=3)
+    img = tf.image.resize(img, [image_shape, image_shape])
+    if normalize:
+        img = img / 255.
+
+    return img
 
 
 def run():
