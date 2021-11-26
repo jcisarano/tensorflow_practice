@@ -11,7 +11,7 @@ Steps to create the model:
 """
 import keras
 import tensorflow as tf
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 from tensorflow.keras.models import Sequential
@@ -141,9 +141,11 @@ def evaluate_saved_model(test_data):
     # accuracy = accuracy_score(y_labels, pred_classes)
     # print(accuracy)
 
-    make_confusion_matrix(y_true=y_labels, y_pred=pred_classes, classes=test_data.class_names, figsize=(100, 100),
-                          text_size=20, savefig=True)
+    #make_confusion_matrix(y_true=y_labels, y_pred=pred_classes, classes=test_data.class_names, figsize=(100, 100),
+    #                      text_size=20, savefig=True)
 
+    print(classification_report(y_true=y_labels,
+                                y_pred=pred_classes))
 
 
 def run():
