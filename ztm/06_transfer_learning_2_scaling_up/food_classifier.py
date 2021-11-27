@@ -185,11 +185,18 @@ def evaluate_saved_model(test_data):
 
     # plot_horizontal_graph(test_data, classification_report_dict)
 
-    # now predict on a single image from the test set
-    # ?
+    # find_most_wrong_predictions(test_data, y_labels, pred_classes, pred_probs)
 
-    find_most_wrong_predictions(test_data, y_labels, pred_classes, pred_probs)
 
+def predict_custom_images(test_data, model):
+    custom_food_images = [data_utils.DATA_PATH_CUSTOM + "/"
+                          + img_path for img_path in os.listdir(data_utils.DATA_PATH_CUSTOM)]
+
+    for path in custom_food_images:
+        img = load_and_preprocess_image(path, normalize=False)
+        pred_prob = model.predict(tf.expand_dims(img, axis=0))
+        pred_class = test_data.class_names[pred_prob.argmax()]
+        
 
 def load_and_preprocess_image(filename, image_shape=224, normalize=True):
     """
@@ -264,7 +271,6 @@ def find_most_wrong_predictions(test_data, y_labels, pred_classes, pred_probs):
 
     image_file_paths = []
     for file_path in test_data.list_files(os.path.join(data_utils.TEST_DATA_PATH, "*/*.jpg"), shuffle=False):
-        # print(file_path.numpy())
         image_file_paths.append(file_path.numpy())
 
     pred_df = pd.DataFrame({"img_path": image_file_paths,
@@ -276,14 +282,12 @@ def find_most_wrong_predictions(test_data, y_labels, pred_classes, pred_probs):
 
     pred_df["pred_correct"] = pred_df["y_true"] == pred_df["y_pred"]
     top_100_wrong = pred_df[pred_df["pred_correct"] == False].sort_values("pred_conf", ascending=False)[:100]
-    # print(top_100_wrong)
 
     start_index = 10
     images_to_view = 9
     plt.figure(figsize=(15, 15))
     for i, row in enumerate(top_100_wrong[start_index:start_index+images_to_view].itertuples()):
         plt.subplot(3, 3, i+1)
-        print(row)
         _, path, _, _, pred_prob, y_true_class_name, y_pred_class_name, _ = row
         img = load_and_preprocess_image(path, normalize=True)
         plt.imshow(img)
@@ -293,16 +297,18 @@ def find_most_wrong_predictions(test_data, y_labels, pred_classes, pred_probs):
 
 
 def run():
-    train_data_all_10_percent \
-        = tf.keras.preprocessing.image_dataset_from_directory(data_utils.TRAIN_DATA_PATH,
-                                                              label_mode="categorical",
-                                                              image_size=data_utils.IMG_SHAPE)
+    # train_data_all_10_percent \
+    #     = tf.keras.preprocessing.image_dataset_from_directory(data_utils.TRAIN_DATA_PATH,
+    #                                                           label_mode="categorical",
+    #                                                           image_size=data_utils.IMG_SHAPE)
     test_data = tf.keras.preprocessing.image_dataset_from_directory(data_utils.TEST_DATA_PATH,
-                                                                    label_mode="categorical",
-                                                                    image_size=data_utils.IMG_SHAPE,
-                                                                    shuffle=False)
+                                                                     label_mode="categorical",
+                                                                     image_size=data_utils.IMG_SHAPE,
+                                                                     shuffle=False)
     # train_model(train_data_all_10_percent, test_data)
-    evaluate_saved_model(test_data)
+    # evaluate_saved_model(test_data)
 
-    # model = load_saved_model(MODEL_PATH)
+    model = load_saved_model(MODEL_PATH)
     # predict_random_image(test_data, model)
+
+    predict_custom_images(test_data, model)
