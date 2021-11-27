@@ -24,7 +24,6 @@ import random
 import data_utils
 from helper_functions import plot_loss_curves, make_confusion_matrix
 
-
 MODEL_PATH: str = "saved_models/06_101_food_class_10_percent_saved_big_dog_model"
 
 
@@ -236,8 +235,8 @@ def predict_random_image(test_data, model):
         # print(pred_prob, pred_class)
         # print(pred_class)
 
-        plt.subplot(1, 3, i+1)
-        plt.imshow(img/255.)
+        plt.subplot(1, 3, i + 1)
+        plt.imshow(img / 255.)
         if class_name == pred_class:
             title_color = "g"
         else:
@@ -272,13 +271,25 @@ def find_most_wrong_predictions(test_data, y_labels, pred_classes, pred_probs):
                             "y_true": y_labels,
                             "y_pred": pred_classes,
                             "pred_conf": pred_probs.max(axis=1),
-                            "y_true_classname":[test_data.class_names[i] for i in y_labels],
-                            "y_pred_classname":[test_data.class_names[i] for i in pred_classes]})
+                            "y_true_classname": [test_data.class_names[i] for i in y_labels],
+                            "y_pred_classname": [test_data.class_names[i] for i in pred_classes]})
 
     pred_df["pred_correct"] = pred_df["y_true"] == pred_df["y_pred"]
     top_100_wrong = pred_df[pred_df["pred_correct"] == False].sort_values("pred_conf", ascending=False)[:100]
+    # print(top_100_wrong)
 
-
+    start_index = 10
+    images_to_view = 9
+    plt.figure(figsize=(15, 15))
+    for i, row in enumerate(top_100_wrong[start_index:start_index+images_to_view].itertuples()):
+        plt.subplot(3, 3, i+1)
+        print(row)
+        _, path, _, _, pred_prob, y_true_class_name, y_pred_class_name, _ = row
+        img = load_and_preprocess_image(path, normalize=True)
+        plt.imshow(img)
+        plt.title(f"actual: {y_true_class_name}, pred: {y_pred_class_name}\nprob: {pred_prob}", c="r")
+        plt.axis(False)
+    plt.show()
 
 
 def run():
@@ -295,4 +306,3 @@ def run():
 
     # model = load_saved_model(MODEL_PATH)
     # predict_random_image(test_data, model)
-
