@@ -6,9 +6,11 @@
 """
 
 import food_classifier as fc
+import feature_extraction_exercise as fee
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    fc.run()
+    fee.run()
+    # fc.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
