@@ -187,6 +187,9 @@ def evaluate_saved_model(test_data):
     # plot_horizontal_graph(test_data, classification_report_dict)
 
     # now predict on a single image from the test set
+    # ?
+
+    find_most_wrong_predictions(test_data, y_labels, pred_classes, pred_probs)
 
 
 def load_and_preprocess_image(filename, image_shape=224, normalize=True):
@@ -245,7 +248,7 @@ def predict_random_image(test_data, model):
     plt.show()
 
 
-def find_most_wrong_predictions():
+def find_most_wrong_predictions(test_data, y_labels, pred_classes, pred_probs):
     """
     'Most wrong' predictions are the wrong predictions with the highest probability. Identifying them can help you
     improve the model and improve the data.
@@ -260,6 +263,23 @@ def find_most_wrong_predictions():
     :return:
     """
 
+    image_file_paths = []
+    for file_path in test_data.list_files(os.path.join(data_utils.TEST_DATA_PATH, "*/*.jpg"), shuffle=False):
+        # print(file_path.numpy())
+        image_file_paths.append(file_path.numpy())
+
+    pred_df = pd.DataFrame({"img_path": image_file_paths,
+                            "y_true": y_labels,
+                            "y_pred": pred_classes,
+                            "pred_conf": pred_probs.max(axis=1),
+                            "y_true_classname":[test_data.class_names[i] for i in y_labels],
+                            "y_pred_classname":[test_data.class_names[i] for i in pred_classes]})
+
+    pred_df["pred_correct"] = pred_df["y_true"] == pred_df["y_pred"]
+    top_100_wrong = pred_df[pred_df["pred_correct"] == False].sort_values("pred_conf", ascending=False)[:100]
+
+
+
 
 def run():
     train_data_all_10_percent \
@@ -271,7 +291,8 @@ def run():
                                                                     image_size=data_utils.IMG_SHAPE,
                                                                     shuffle=False)
     # train_model(train_data_all_10_percent, test_data)
-    # evaluate_saved_model(test_data)
+    evaluate_saved_model(test_data)
 
-    model = load_saved_model(MODEL_PATH)
-    predict_random_image(test_data, model)
+    # model = load_saved_model(MODEL_PATH)
+    # predict_random_image(test_data, model)
+
