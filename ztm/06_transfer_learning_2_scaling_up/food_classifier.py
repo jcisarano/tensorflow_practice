@@ -196,7 +196,12 @@ def predict_custom_images(test_data, model):
         img = load_and_preprocess_image(path, normalize=False)
         pred_prob = model.predict(tf.expand_dims(img, axis=0))
         pred_class = test_data.class_names[pred_prob.argmax()]
-        
+        plt.figure()
+        plt.imshow(img/255.)
+        plt.title(f"pred: {pred_class}, prob: {pred_prob.max()}")
+        plt.axis(False)
+    plt.show()
+
 
 def load_and_preprocess_image(filename, image_shape=224, normalize=True):
     """
