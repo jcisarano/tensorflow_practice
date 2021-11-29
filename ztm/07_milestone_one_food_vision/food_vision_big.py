@@ -7,9 +7,32 @@ TensorFlow Datasets:
 However, TF Datasets are static, they do not change like real-world datasets would
 """
 
+import tensorflow as tf
+import matplotlib as plt
 import tensorflow_datasets as tfds
 
 from helper_functions import compare_histories
+
+
+def visualize_data(train_data, test_data, ds_info):
+    """
+    Explore the data to find:
+        Class names
+        Shape of input data (image tensors)
+        Data type of input data
+        What do the labels look like? One-hot encoding or label encoding?
+        Do the labels match the class names?
+    """
+    print(ds_info.features["label"].names[:10])
+    train_one_sample = train_data.take(1)
+    for image, label in train_one_sample:
+        print(f"""
+        Image shape: {image.shape}
+        Image datatype: {image.dtype}
+        Target class from Food101 (tensor form): {label}
+        Class name (str form): {ds_info.features["label"].names[label.numpy()]}
+        """)
+        print(image)
 
 
 def run():
@@ -25,4 +48,6 @@ def run():
                                                  as_supervised=True,  # includes labels in tuple (data,labels)
                                                  with_info=True  # includes meta data
                                                  )
-    # print(train_data.shape)
+
+    visualize_data(train_data, test_data, ds_info)
+
