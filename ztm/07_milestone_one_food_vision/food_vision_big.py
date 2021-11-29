@@ -8,7 +8,7 @@ However, TF Datasets are static, they do not change like real-world datasets wou
 """
 
 import tensorflow as tf
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
 
 from helper_functions import compare_histories
@@ -32,7 +32,12 @@ def visualize_data(train_data, test_data, ds_info):
         Target class from Food101 (tensor form): {label}
         Class name (str form): {ds_info.features["label"].names[label.numpy()]}
         """)
-        print(image)
+        # print(image)
+        plt.figure()
+        plt.imshow(image)
+        plt.title(f"class: {ds_info.features['label'].names[label.numpy()]}")
+        plt.axis(False)
+    plt.show()
 
 
 def run():
