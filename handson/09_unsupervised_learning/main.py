@@ -150,6 +150,29 @@ def compare_clusterers():
     plt.show()
 
 
+def kmeans_init_example():
+    """
+    By setting n_init higher, the system will run multiple times and use the best results, the one with the lowest
+    inertia value. Inertia is is the sum of the squared distances between each training instance and its closest
+    centroid.
+    :return:
+    """
+    X, _ = create_blobs()
+    kmeans_rnd_10_init = KMeans(n_clusters=5, init="random", n_init=10,
+                                 algorithm="full", random_state=2)
+    kmeans_rnd_10_init.fit(X)
+
+    plt.figure(figsize=(8, 4))
+    plot_decision_boundaries(kmeans_rnd_10_init, X)
+    plt.show()
+
+    # inertia info
+    print(kmeans_rnd_10_init.inertia_)
+    # same as squared distance between training instance and closest centroid:
+    X_dist = kmeans_rnd_10_init.transform(X)
+    print(np.sum(X_dist[np.arange(len(X_dist)), kmeans_rnd_10_init.labels_]**2))
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     data = load_iris()
@@ -158,6 +181,7 @@ if __name__ == '__main__':
     # plot_blobs()
     # predict_blobs()
     # compare_kmeans_diff_iter()
-    compare_clusterers()
+    # compare_clusterers()
+    kmeans_init_example()
 
 
