@@ -85,6 +85,14 @@ def predict_blobs():
     plot_decision_boundaries(kmeans, X)
     plt.show()
 
+    # predict against new points:
+    X_new = np.array([[0, 2], [3, 2], [-3, 3], [-3, 2.5]])
+    print(kmeans.predict(X_new))
+
+    # their distance to centroids:
+    print(kmeans.transform(X_new))
+    # same as
+    print(np.linalg.norm(np.tile(X_new, (1, k)).reshape(-1, k, 2) - kmeans.cluster_centers_, axis=2))
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

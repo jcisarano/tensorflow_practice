@@ -44,7 +44,7 @@ def plot_decision_boundaries(clusterer, X, resolution=1000, show_centroids=True,
         plt.xlabel("$x_1$", fontsize=14)
     else:
         plt.tick_params(labelbottom=False)
-        
+
     if show_ylabels:
         plt.ylabel("$x_2$", fontsize=14, rotation=0)
     else:
