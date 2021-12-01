@@ -7,6 +7,8 @@ import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
+from visualization_helpers import plot_clusters, plot_data, plot_centroids, plot_decision_boundaries
+
 
 def show_iris_clusters(data):
     x = data.data
@@ -53,12 +55,6 @@ def predict_iris(iris_data):
     print("Percent correct predictions", sum(y_pred == y) / len(y))
 
 
-def plot_clusters(X, y=None):
-    plt.scatter(X[:, 0], X[:, 1], c=y, s=1)
-    plt.xlabel("$x_1$", fontsize=14)
-    plt.ylabel("$x_2$", fontsize=14, rotation=0)
-
-
 def create_blobs():
     blob_centers = np.array(
         [[0.2, 2.3],
@@ -85,6 +81,10 @@ def predict_blobs():
 
     # view centroids:
     print(kmeans.cluster_centers_)
+    plt.figure(figsize=(8, 4))
+    plot_decision_boundaries(kmeans, X)
+    plt.show()
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
