@@ -94,12 +94,59 @@ def predict_blobs():
     # same as
     print(np.linalg.norm(np.tile(X_new, (1, k)).reshape(-1, k, 2) - kmeans.cluster_centers_, axis=2))
 
+
+def compare_kmeans_diff_iter():
+    X, _ = create_blobs()
+    kmeans_iter1 = KMeans(n_clusters=5, init="random", n_init=1,
+                          algorithm="full", max_iter=1, random_state=0)
+    kmeans_iter2 = KMeans(n_clusters=5, init="random", n_init=1,
+                          algorithm="full", max_iter=2, random_state=0)
+    kmeans_iter3 = KMeans(n_clusters=5, init="random", n_init=1,
+                          algorithm="full", max_iter=3, random_state=0)
+    kmeans_iter1.fit(X)
+    kmeans_iter2.fit(X)
+    kmeans_iter3.fit(X)
+
+    plt.figure(figsize=(10, 8))
+
+    plt.subplot(321)
+    plot_data(X)
+    plot_centroids(kmeans_iter1.cluster_centers_, circle_color="r", cross_color="w")
+    plt.ylabel("$x_2$", fontsize=14, rotation=0)
+    plt.tick_params(labelbottom=False)
+    plt.title("Update the centroids (initially random)", fontsize=14)
+
+    plt.subplot(322)
+    plot_data(X)
+    plot_decision_boundaries(kmeans_iter1, X, show_xlabels=False, show_ylabels=False)
+    plt.tick_params(labelbottom=False)
+    plt.title("Label the instances", fontsize=14)
+
+    plt.subplot(323)
+    plot_decision_boundaries(kmeans_iter1, X, show_centroids=False, show_xlabels=False)
+    plot_centroids(kmeans_iter2.cluster_centers_)
+
+    plt.subplot(324)
+    plot_decision_boundaries(kmeans_iter2, X, show_ylabels=False, show_xlabels=False)
+
+    plt.subplot(325)
+    plot_decision_boundaries(kmeans_iter2, X, show_centroids=False)
+    plot_centroids(kmeans_iter3.cluster_centers_)
+
+    plt.subplot(326)
+    plot_decision_boundaries(kmeans_iter3, X, show_ylabels=False)
+
+    plt.show()
+
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     data = load_iris()
     # show_iris_clusters(data)
     # predict_iris(data)
     # plot_blobs()
-    predict_blobs()
+    # predict_blobs()
+    compare_kmeans_diff_iter()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
