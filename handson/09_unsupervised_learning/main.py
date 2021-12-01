@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
-from visualization_helpers import plot_clusters, plot_data, plot_centroids, plot_decision_boundaries
+from visualization_helpers import plot_clusters, plot_data, plot_centroids, plot_decision_boundaries, plot_clusterer_comparison
 
 
 def show_iris_clusters(data):
@@ -139,6 +139,17 @@ def compare_kmeans_diff_iter():
     plt.show()
 
 
+def compare_clusterers():
+    X, _ = create_blobs()
+    kmeans_rnd_1 = KMeans(n_clusters=5, init="random", n_init=1,
+                          algorithm="full", random_state=2)
+    kmeans_rnd_2 = KMeans(n_clusters=5, init="random", n_init=1,
+                          algorithm="full", random_state=5)
+
+    plot_clusterer_comparison(kmeans_rnd_1, kmeans_rnd_2, X, "Solution one", "Solution two (with different random seed")
+    plt.show()
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     data = load_iris()
@@ -146,6 +157,7 @@ if __name__ == '__main__':
     # predict_iris(data)
     # plot_blobs()
     # predict_blobs()
-    compare_kmeans_diff_iter()
+    # compare_kmeans_diff_iter()
+    compare_clusterers()
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
