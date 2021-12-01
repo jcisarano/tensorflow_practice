@@ -47,6 +47,8 @@ def predict_iris(iris_data):
     plt.legend(loc="upper left", fontsize=12)
     plt.show()
 
+    print("Percent correct predictions", sum(y_pred == y) / len(y))
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
