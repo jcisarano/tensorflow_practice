@@ -173,6 +173,18 @@ def kmeans_init_example():
     print(np.sum(X_dist[np.arange(len(X_dist)), kmeans_rnd_10_init.labels_]**2))
 
 
+
+def kmeans_plusplus_example():
+    """
+    K-Means++ uses a better means of choosing the starting centroids (the rest of the algorithm is unchanged).
+    The first centroid is chosen at random, the rest are farther away from already chosen centroids.
+    This is the default init method, but it can be specified as init="k-means++"
+    :return:
+    """
+    
+
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     data = load_iris()
