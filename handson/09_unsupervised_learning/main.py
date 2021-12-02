@@ -410,6 +410,24 @@ def kmeans_limits(do_plot=False):
     return X, y
 
 
+def kmeans_draw_limits(X, y):
+    kmeans_good = KMeans(n_clusters=3, init=np.array([[-1.5, 2.5], [0.5, 0], [4, 0]]), n_init=1, random_state=42)
+    kmeans_bad = KMeans(n_clusters=3, random_state=42)
+    kmeans_good.fit(X)
+    kmeans_bad.fit(X)
+
+    plt.figure(figsize=(10, 3.2))
+
+    plt.subplot(121)
+    plot_decision_boundaries(kmeans_good, X)
+    plt.title("Inertia = {:.1f}".format(kmeans_good.inertia_), fontsize=14)
+
+    plt.subplot(122)
+    plot_decision_boundaries(kmeans_bad, X, show_ylabels=False)
+    plt.title("Inertia = {:.1f}".format(kmeans_bad.inertia_), fontsize=14)
+
+    plt.show()
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -430,6 +448,7 @@ if __name__ == '__main__':
     # kmeans_plot_silhouette_score()
     # draw_silhouette_diagram()
     X, y = kmeans_limits()
+    kmeans_draw_limits(X, y)
 
 
 
