@@ -1,13 +1,17 @@
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_iris, fetch_openml
 import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
 from scipy import stats
 import numpy as np
 
+from sklearn.cluster import MiniBatchKMeans
+
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
+from sklearn.model_selection import train_test_split
 
-from visualization_helpers import plot_clusters, plot_data, plot_centroids, plot_decision_boundaries, plot_clusterer_comparison
+from visualization_helpers import plot_clusters, plot_data, plot_centroids, plot_decision_boundaries, \
+    plot_clusterer_comparison
 
 
 def show_iris_clusters(data):
@@ -159,7 +163,7 @@ def kmeans_init_example():
     """
     X, _ = create_blobs()
     kmeans_rnd_10_init = KMeans(n_clusters=5, init="random", n_init=10,
-                                 algorithm="full", random_state=2)
+                                algorithm="full", random_state=2)
     kmeans_rnd_10_init.fit(X)
 
     plt.figure(figsize=(8, 4))
@@ -170,8 +174,7 @@ def kmeans_init_example():
     print(kmeans_rnd_10_init.inertia_)
     # same as squared distance between training instance and closest centroid:
     X_dist = kmeans_rnd_10_init.transform(X)
-    print(np.sum(X_dist[np.arange(len(X_dist)), kmeans_rnd_10_init.labels_]**2))
-
+    print(np.sum(X_dist[np.arange(len(X_dist)), kmeans_rnd_10_init.labels_] ** 2))
 
 
 def kmeans_plusplus_example():
@@ -193,6 +196,27 @@ def kmeans_plusplus_example():
     plt.show()
 
 
+def kmeans_mini_batch():
+    X, _ = create_blobs()
+
+    minibatch_kmeans = MiniBatchKMeans(n_clusters=5, random_state=42)
+    minibatch_kmeans.fit(X)
+    print(minibatch_kmeans.inertia_)
+
+    # memmap minibatch
+    mnist = fetch_openml("mnist_784", version=1, as_frame=False)
+    mnist.target = mnist.target.astype(np.int64)
+
+    X_train, X_test, y_train, y_test = train_test_split(mnist["data"], mnist["target"], random_state=42)
+    filename = "data/my_mnist.data"
+    X_mm = np.memmap(filename, dtype="float32", mode="write", shape=X_train.shape)
+    X_mm[:] = X_train
+
+    minibatch_kmeans = MiniBatchKMeans(n_clusters=10, batch_size=10, random_state=42)
+    minibatch_kmeans.fit(X_mm)
+
+
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -204,6 +228,5 @@ if __name__ == '__main__':
     # compare_kmeans_diff_iter()
     # compare_clusterers()
     # kmeans_init_example()
-    kmeans_plusplus_example()
-
-
+    # kmeans_plusplus_example()
+    kmeans_mini_batch()
