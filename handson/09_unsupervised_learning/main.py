@@ -395,6 +395,21 @@ def draw_silhouette_diagram():
     plt.show()
 
 
+def kmeans_limits(do_plot=False):
+    x1, y1 = make_blobs(n_samples=1000, centers=((4, -4), (0, 0)), random_state=42)
+    x1 = x1.dot(np.array([[0.374, 0.95], [0.732, 0.598]]))
+    x2, y2 = make_blobs(n_samples=250, centers=1, random_state=42)
+    x2 = x2 + [6, -8]
+    X = np.r_[x1, x2]
+    y = np.r_[y1, y2]
+
+    if do_plot:
+        plot_clusters(X)
+        plt.show()
+
+    return X, y
+
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -413,7 +428,8 @@ if __name__ == '__main__':
     # kmeans_cluster_count()
     # kmeans_inertia_plot()
     # kmeans_plot_silhouette_score()
-    draw_silhouette_diagram()
+    # draw_silhouette_diagram()
+    X, y = kmeans_limits()
 
 
 
