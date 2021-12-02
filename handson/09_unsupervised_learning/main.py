@@ -301,6 +301,27 @@ def kmeans_cluster_count():
     print("k=8 inertia", kmeans_k8.inertia_)
 
 
+def kmeans_inertia_plot():
+    X, _ = create_blobs()
+    kmeans_per_k = [KMeans(n_clusters=k, random_state=42).fit(X)
+                    for k in range(1, 10)]
+    inertias = [model.inertia_ for model in kmeans_per_k]
+
+    plt.figure(figsize=(8, 3.5))
+    plt.plot(range(1, 10), inertias, "bo-")
+    plt.xlabel("$k$", fontsize=14)
+    plt.ylabel("Inertia", fontsize=14)
+    plt.annotate("Elbow",
+                 xy=(4, inertias[3]),
+                 xytext=(0.55, 0.55),
+                 textcoords="figure fraction",
+                 fontsize=16,
+                 arrowprops=dict(facecolor="black", shrink=0.1)
+                 )
+    plt.axis([1, 8.5, 0, 1300])
+    plt.show()
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     data = load_iris()
@@ -315,7 +336,8 @@ if __name__ == '__main__':
     # kmeans_mini_batch()
     # kmeans_minibatch_manual()
     # plot_minibatch_train_times()
-    kmeans_cluster_count()
+    # kmeans_cluster_count()
+    kmeans_inertia_plot()
 
 
 
