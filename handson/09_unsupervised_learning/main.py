@@ -327,6 +327,11 @@ def kmeans_inertia_plot():
 
 
 def kmeans_plot_silhouette_score():
+    """
+    silhouette score is a better measure than inertia. the plot shows 4 and 5 are both possible good k values.
+    It also shows that other values are far worse.
+    :return:
+    """
     X, _ = create_blobs()
     kmeans_per_k = [KMeans(n_clusters=k, random_state=42).fit(X)
                     for k in range(1, 10)]
