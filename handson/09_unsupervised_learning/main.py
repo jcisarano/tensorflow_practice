@@ -1,3 +1,5 @@
+from timeit import timeit
+
 from sklearn.datasets import load_iris, fetch_openml
 import matplotlib.pyplot as plt
 from sklearn.mixture import GaussianMixture
@@ -196,6 +198,10 @@ def kmeans_plusplus_example():
     plt.show()
 
 
+def load_next_batch(X, batch_size):
+    return X[np.random.choice(len(X), batch_size, replace=False)]
+
+
 def kmeans_mini_batch():
     X, _ = create_blobs()
 
@@ -216,6 +222,51 @@ def kmeans_mini_batch():
     minibatch_kmeans.fit(X_mm)
 
 
+def kmeans_minibatch_manual():
+    X, _ = create_blobs()
+    np.random.seed(42)
+
+    k = 5
+    n_init = 10
+    n_iterations = 100
+    batch_size = 100
+    init_size = 500
+    evaluate_on_last_n_iters = 10
+    best_kmeans = None
+
+    for init in range(n_init):
+        minibatch_kmeans = MiniBatchKMeans(n_clusters=k, init_size=init_size)
+        X_init = load_next_batch(X, batch_size=init_size)
+        minibatch_kmeans.partial_fit(X_init)
+
+        minibatch_kmeans.sum_inertia_ = 0
+        for iteration in range(n_iterations):
+            X_batch = load_next_batch(X, batch_size)
+            minibatch_kmeans.partial_fit(X_batch)
+            if iteration >= n_iterations - evaluate_on_last_n_iters:
+                minibatch_kmeans.sum_inertia_ += minibatch_kmeans.inertia_
+
+        if (best_kmeans is None or
+            minibatch_kmeans.sum_inertia_ < best_kmeans.inertia_):
+            best_kmeans = minibatch_kmeans
+
+    print(best_kmeans.score(X))
+
+
+def plot_minibatch_train_times():
+    X, _ = create_blobs()
+
+    times = np.empty((100, 2))
+    inertias = np.empty((100, 2))
+    for k in range(1, 101):
+        kmeans_ = KMeans(n_clusters=k, random_state=42)
+        minibatch_kmeans = MiniBatchKMeans(n_clusters=k, random_state=42)
+        print("\r{}/{}".format(k, 100), end="")
+        times[k-1, 0] = timeit("kmeans_.fit(X)", number=10, globals=locals())
+        times[k-1, 1] = timeit("minibatch_kmeans.fit(X)", number=10, globals=locals())
+        inertias[k-1, 0] = kmeans_.inertia_
+        inertias[k-1, 1] = minibatch_kmeans.inertia_
+
 
 
 # Press the green button in the gutter to run the script.
@@ -229,4 +280,10 @@ if __name__ == '__main__':
     # compare_clusterers()
     # kmeans_init_example()
     # kmeans_plusplus_example()
-    kmeans_mini_batch()
+    # kmeans_mini_batch()
+    # kmeans_minibatch_manual()
+    plot_minibatch_train_times()
+
+
+
+
