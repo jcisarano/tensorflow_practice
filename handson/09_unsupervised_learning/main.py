@@ -181,7 +181,16 @@ def kmeans_plusplus_example():
     This is the default init method, but it can be specified as init="k-means++"
     :return:
     """
-    
+
+    X, _ = create_blobs()
+    # or init with your own points:
+    good_init = np.array([[-3, 3], [-3, 2], [-3, 1], [-1, 2], [0, 2]])
+    kmeans = KMeans(n_clusters=5, init=good_init, n_init=1, random_state=42)
+    kmeans.fit(X)
+    print(kmeans.inertia_)
+    plt.figure(figsize=(8, 4))
+    plot_decision_boundaries(kmeans, X)
+    plt.show()
 
 
 
@@ -194,6 +203,7 @@ if __name__ == '__main__':
     # predict_blobs()
     # compare_kmeans_diff_iter()
     # compare_clusterers()
-    kmeans_init_example()
+    # kmeans_init_example()
+    kmeans_plusplus_example()
 
 
