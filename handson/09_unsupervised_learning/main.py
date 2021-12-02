@@ -286,6 +286,21 @@ def plot_minibatch_train_times():
     plt.show()
 
 
+def kmeans_cluster_count():
+    X, _ = create_blobs()
+    kmeans_k3 = KMeans(n_clusters=3, random_state=42)
+    kmeans_k8 = KMeans(n_clusters=8, random_state=42)
+    plot_clusterer_comparison(kmeans_k3, kmeans_k8, X, "$k=3$", "$k=8$")
+    plt.show()
+
+    """
+    inertia is not a good indicator of optimal number of clusters, because increasing cluster count (k)
+    will always decrease inertia. More centroids means that instances will be closer to their centroid.
+    """
+    print("k=3 inertia", kmeans_k3.inertia_)
+    print("k=8 inertia", kmeans_k8.inertia_)
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     data = load_iris()
@@ -299,7 +314,8 @@ if __name__ == '__main__':
     # kmeans_plusplus_example()
     # kmeans_mini_batch()
     # kmeans_minibatch_manual()
-    plot_minibatch_train_times()
+    # plot_minibatch_train_times()
+    kmeans_cluster_count()
 
 
 
