@@ -2,6 +2,7 @@ from timeit import timeit
 
 from sklearn.datasets import load_iris, fetch_openml
 import matplotlib.pyplot as plt
+from sklearn.metrics import silhouette_score
 from sklearn.mixture import GaussianMixture
 from scipy import stats
 import numpy as np
@@ -321,6 +322,24 @@ def kmeans_inertia_plot():
     plt.axis([1, 8.5, 0, 1300])
     plt.show()
 
+    plot_decision_boundaries(kmeans_per_k[4-1], X)
+    plt.show()
+
+
+def kmeans_plot_silhouette_score():
+    X, _ = create_blobs()
+    kmeans_per_k = [KMeans(n_clusters=k, random_state=42).fit(X)
+                    for k in range(1, 10)]
+    silhouette_scores = [silhouette_score(X, model.labels_)
+                         for model in kmeans_per_k[1:]]
+
+    plt.figure(figsize=(8, 3.5))
+    plt.plot(range(2, 10), silhouette_scores, "bo-")
+    plt.xlabel("$k", fontsize=14)
+    plt.ylabel("Silhouette score", fontsize=14)
+    plt.axis([1.8, 8.5, 0.55, 0.7])
+    plt.show()
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -337,7 +356,8 @@ if __name__ == '__main__':
     # kmeans_minibatch_manual()
     # plot_minibatch_train_times()
     # kmeans_cluster_count()
-    kmeans_inertia_plot()
+    # kmeans_inertia_plot()
+    kmeans_plot_silhouette_score()
 
 
 
