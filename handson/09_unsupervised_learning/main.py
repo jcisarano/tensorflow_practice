@@ -2,10 +2,12 @@ from timeit import timeit
 
 from sklearn.datasets import load_iris, fetch_openml
 import matplotlib.pyplot as plt
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import silhouette_score, silhouette_samples
 from sklearn.mixture import GaussianMixture
 from scipy import stats
 import numpy as np
+from matplotlib.ticker import FixedLocator, FixedFormatter
+import matplotlib as mpl
 
 from sklearn.cluster import MiniBatchKMeans
 
@@ -328,8 +330,10 @@ def kmeans_inertia_plot():
 
 def kmeans_plot_silhouette_score():
     """
-    silhouette score is a better measure than inertia. the plot shows 4 and 5 are both possible good k values.
+    Silhouette score is a better measure than inertia. The plot shows 4 and 5 are both possible good k values.
     It also shows that other values are far worse.
+    Silhouette coefficient varies from -1 to 1, where 1 means that the instance is well inside its own cluster and far
+    from other clusters, while 0 means it is close to a boundary and -1 means it may be in the wrong cluster.
     :return:
     """
     X, _ = create_blobs()
@@ -344,6 +348,52 @@ def kmeans_plot_silhouette_score():
     plt.ylabel("Silhouette score", fontsize=14)
     plt.axis([1.8, 8.5, 0.55, 0.7])
     plt.show()
+
+
+def draw_silhouette_diagram():
+    X, _ = create_blobs()
+    kmeans_per_k = [KMeans(n_clusters=k, random_state=42).fit(X)
+                    for k in range(1, 10)]
+    silhouette_scores = [silhouette_score(X, model.labels_)
+                         for model in kmeans_per_k[1:]]
+
+    plt.figure(figsize=(11, 9))
+
+    for k in (3, 4, 5, 6):
+        plt.subplot(2, 2, k-2)
+
+        y_pred = kmeans_per_k[k-1].labels_
+        silhouette_coefficients = silhouette_samples(X, y_pred)
+
+        padding = len(X)
+        pos = padding
+        ticks = []
+        for i in range(k):
+            coeffs = silhouette_coefficients[y_pred == i]
+            coeffs.sort()
+
+            color = mpl.cm.Spectral(i / k)
+            plt.fill_betweenx(np.arange(pos, pos + len(coeffs)), 0, coeffs,
+                              facecolor=color, edgecolor=color, alpha=0.7)
+            ticks.append(pos + len(coeffs) // 2)
+            pos += len(coeffs) + padding
+
+        plt.gca().yaxis.set_major_locator(FixedLocator(ticks))
+        plt.gca().yaxis.set_major_formatter(FixedFormatter(range(k)))
+        if k in (3, 5):
+            plt.ylabel("Cluster")
+
+        if k in (5, 6):
+            plt.gca().set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
+            plt.xlabel("Silhouette Coefficient")
+        else:
+            plt.tick_params(labelbottom=False)
+
+        plt.axvline(x=silhouette_scores[k - 2], color="red", linestyle="--")
+        plt.title("$k={}$".format(k), fontsize=16)
+
+    plt.show()
+
 
 
 # Press the green button in the gutter to run the script.
@@ -362,7 +412,8 @@ if __name__ == '__main__':
     # plot_minibatch_train_times()
     # kmeans_cluster_count()
     # kmeans_inertia_plot()
-    kmeans_plot_silhouette_score()
+    # kmeans_plot_silhouette_score()
+    draw_silhouette_diagram()
 
 
 
