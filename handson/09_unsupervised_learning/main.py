@@ -17,6 +17,7 @@ from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.model_selection import train_test_split
 from matplotlib.image import imread
+from sklearn.pipeline import Pipeline
 
 from visualization_helpers import plot_clusters, plot_data, plot_centroids, plot_decision_boundaries, \
     plot_clusterer_comparison
@@ -498,7 +499,16 @@ def kmeans_for_preprocessing():
     log_reg.fit(X_train, y_train)
 
     log_reg_score = log_reg.score(X_test, y_test)
-    print(log_reg_score)
+    print("Baseline score:", log_reg_score)
+
+    pipeline = Pipeline([
+        ("kmeans", KMeans(n_clusters=50, random_state=42)),
+        ("log_reg", LogisticRegression(multi_class="ovr", solver="lbfgs", max_iter=5000, random_state=42)),
+    ])
+    pipeline.fit(X_train, y_train)
+    pipeline_score = pipeline.score(X_test, y_test)
+    print("Score with K-Means preprocessing:", pipeline_score)
+    print("Percent improvement in score:", 1-(1-pipeline_score) / (1-log_reg_score))
 
 
 # Press the green button in the gutter to run the script.
