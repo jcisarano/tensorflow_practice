@@ -1,8 +1,9 @@
 import os
 from timeit import timeit
 
-from sklearn.datasets import load_iris, fetch_openml
+from sklearn.datasets import load_iris, fetch_openml, load_digits
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import silhouette_score, silhouette_samples
 from sklearn.mixture import GaussianMixture
 from scipy import stats
@@ -488,6 +489,18 @@ def kmeans_img_segmentation():
     plt.show()
 
 
+def kmeans_for_preprocessing():
+    X_digits, y_digits = load_digits(return_X_y=True)
+    X_train, X_test, y_train, y_test = train_test_split(X_digits, y_digits, random_state=42)
+
+    # logistic regression model to use as baseline
+    log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", max_iter=5000, random_state=42)
+    log_reg.fit(X_train, y_train)
+
+    log_reg_score = log_reg.score(X_test, y_test)
+    print(log_reg_score)
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     data = load_iris()
@@ -508,7 +521,8 @@ if __name__ == '__main__':
     # draw_silhouette_diagram()
     # X, y = kmeans_limits()
     # kmeans_draw_limits(X, y)
-    kmeans_img_segmentation()
+    # kmeans_img_segmentation()
+    kmeans_for_preprocessing()
 
 
 
