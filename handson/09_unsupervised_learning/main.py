@@ -1,3 +1,4 @@
+import os
 from timeit import timeit
 
 from sklearn.datasets import load_iris, fetch_openml
@@ -14,10 +15,13 @@ from sklearn.cluster import MiniBatchKMeans
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.model_selection import train_test_split
+from matplotlib.image import imread
 
 from visualization_helpers import plot_clusters, plot_data, plot_centroids, plot_decision_boundaries, \
     plot_clusterer_comparison
 
+
+PROJECT_ROOT_DIR: str = "."
 
 def show_iris_clusters(data):
     x = data.data
@@ -396,6 +400,11 @@ def draw_silhouette_diagram():
 
 
 def kmeans_limits(do_plot=False):
+    """
+    K-Means does not work well with some data shapes, e.g. the oblong patterns created here.
+    :param do_plot:
+    :return:
+    """
     x1, y1 = make_blobs(n_samples=1000, centers=((4, -4), (0, 0)), random_state=42)
     x1 = x1.dot(np.array([[0.374, 0.95], [0.732, 0.598]]))
     x2, y2 = make_blobs(n_samples=250, centers=1, random_state=42)
@@ -411,6 +420,12 @@ def kmeans_limits(do_plot=False):
 
 
 def kmeans_draw_limits(X, y):
+    """
+    Neither of these attempts at a K-Means solution fits the data well at all, due to the shape of the clusters.
+    :param X:
+    :param y:
+    :return:
+    """
     kmeans_good = KMeans(n_clusters=3, init=np.array([[-1.5, 2.5], [0.5, 0], [4, 0]]), n_init=1, random_state=42)
     kmeans_bad = KMeans(n_clusters=3, random_state=42)
     kmeans_good.fit(X)
@@ -427,6 +442,20 @@ def kmeans_draw_limits(X, y):
     plt.title("Inertia = {:.1f}".format(kmeans_bad.inertia_), fontsize=14)
 
     plt.show()
+
+
+def kmeans_img_segmentation():
+    images_path = os.path.join(PROJECT_ROOT_DIR, "images", "unsupervised_learning")
+    filename = "ladybug.png"
+    image = imread(os.path.join(images_path, filename))
+    print("Starting img shape:", image.shape)
+
+    X = image.reshape(-1, 3)
+    print("Reshape for clusterer:", X.shape)
+    kmeans = KMeans(n_clusters=8, random_state=42).fit(X)
+    segmented_img = kmeans.cluster_centers_[kmeans.labels_]
+    segmented_img = segmented_img.reshape(image.shape)
+    print("Shape after segmentation:", segmented_img.shape)
 
 
 # Press the green button in the gutter to run the script.
@@ -447,8 +476,9 @@ if __name__ == '__main__':
     # kmeans_inertia_plot()
     # kmeans_plot_silhouette_score()
     # draw_silhouette_diagram()
-    X, y = kmeans_limits()
-    kmeans_draw_limits(X, y)
+    # X, y = kmeans_limits()
+    # kmeans_draw_limits(X, y)
+    kmeans_img_segmentation()
 
 
 
