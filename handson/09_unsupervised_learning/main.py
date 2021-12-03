@@ -15,7 +15,7 @@ from sklearn.cluster import MiniBatchKMeans
 
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from matplotlib.image import imread
 from sklearn.pipeline import Pipeline
 
@@ -511,6 +511,26 @@ def kmeans_for_preprocessing():
     print("Percent improvement in score:", 1-(1-pipeline_score) / (1-log_reg_score))
 
 
+def kmeans_gridsearch():
+    """
+    Use gridsearch to find best value for K-Mean n_clusters in preprocessing pipeline.
+    Note: this function takes a long time to run.
+    :return:
+    """
+    X_digits, y_digits = load_digits(return_X_y=True)
+    X_train, X_test, y_train, y_test = train_test_split(X_digits, y_digits, random_state=42)
+
+    pipeline = Pipeline([
+        ("kmeans", KMeans(n_clusters=50, random_state=42)),
+        ("log_reg", LogisticRegression(multi_class="ovr", solver="lbfgs", max_iter=5000, random_state=42)),
+    ])
+
+    param_grid = dict(kmeans__n_clusters=range(2, 200))
+    grid_clf = GridSearchCV(pipeline, param_grid, cv=3, verbose=2)
+    grid_clf.fit(X_train, y_train)
+    
+
+
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     data = load_iris()
@@ -532,7 +552,8 @@ if __name__ == '__main__':
     # X, y = kmeans_limits()
     # kmeans_draw_limits(X, y)
     # kmeans_img_segmentation()
-    kmeans_for_preprocessing()
+    # kmeans_for_preprocessing()
+    kmeans_gridsearch()
 
 
 
