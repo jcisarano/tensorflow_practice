@@ -543,7 +543,7 @@ def kmeans_clustering():
 
     # first create baseline LogRegression using only 50 training instances
     n_labeled = 50
-    log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", random_state=42)
+    log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", max_iter=200, random_state=42)
     log_reg.fit(X_train[:n_labeled], y_train[:n_labeled])
     print("Baseline score 50 training instances:", log_reg.score(X_test, y_test))
 
@@ -565,6 +565,13 @@ def kmeans_clustering():
         plt.axis("off")
 
     plt.show()
+
+    y_representative_digits = np.array(y_train[representative_digit_idx])
+    print("Representative images labels", y_representative_digits)
+
+    log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", max_iter=200, random_state=42)
+    log_reg.fit(X_representative_digits, y_representative_digits)
+    print("Trained with 50 representative images score:", log_reg.score(X_test, y_test))
 
 
 
