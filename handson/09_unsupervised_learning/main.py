@@ -557,6 +557,7 @@ def kmeans_clustering():
     representative_digit_idx = np.argmin(X_digits_dist, axis=0)
     X_representative_digits = X_train[representative_digit_idx]
 
+    # visualize the 50 representative images for fun:
     n_cols = 10
     plt.figure(figsize=(8, 2))
     for idx, X_representative_digit in enumerate(X_representative_digits):
@@ -566,12 +567,27 @@ def kmeans_clustering():
 
     plt.show()
 
+    # create array of labels for the images for training
     y_representative_digits = np.array(y_train[representative_digit_idx])
     print("Representative images labels", y_representative_digits)
 
+    # train using the representative images as training set
+    # even though it is still only 50 instances, results improve by almost 9%
     log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", max_iter=200, random_state=42)
     log_reg.fit(X_representative_digits, y_representative_digits)
     print("Trained with 50 representative images score:", log_reg.score(X_test, y_test))
+
+    # now propagate the label for the representative image to all of the images in the same cluster:
+    # it will be a little better than the previous score, about 1%
+    # also, it needs a lot more iterations to converge to a result
+    y_train_propagated = np.empty(len(X_train))
+    for i in range(k):
+        y_train_propagated[kmeans.labels_ == i] = y_representative_digits[i]
+
+    log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", max_iter=1000, random_state=42)
+    log_reg.fit(X_train, y_train_propagated)
+    print("Trained with representative image labels propagated to whole cluster:", log_reg.score(X_test, y_test))
+
 
 
 
