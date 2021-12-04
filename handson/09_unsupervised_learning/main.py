@@ -588,6 +588,30 @@ def kmeans_clustering():
     log_reg.fit(X_train, y_train_propagated)
     print("Trained with representative image labels propagated to whole cluster:", log_reg.score(X_test, y_test))
 
+    # this time, only propagate the representative labels to the instances closest to the centroid, to avoid
+    # mislabeling some outliers
+    percentile_closest = 75
+    X_cluster_dist = X_digits_dist[np.arange(len(X_train)), kmeans.labels_]
+    for i in range(k):
+        in_cluster = (kmeans.labels_ == i)
+        cluster_dist = X_cluster_dist[in_cluster]
+        cutoff_distance = np.percentile(cluster_dist, percentile_closest)
+        above_cutoff = (X_cluster_dist > cutoff_distance)
+        X_cluster_dist[in_cluster & above_cutoff] = -1
+
+    partially_propagated = (X_cluster_dist != -1)
+    X_train_partially_propagated = X_train[partially_propagated]
+    y_train_partially_propagated = y_train[partially_propagated]
+
+    log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", max_iter=1000, random_state=42)
+    log_reg.fit(X_train_partially_propagated, y_train_partially_propagated)
+    print(len(X_train_partially_propagated))
+    print("Trained with representative img labels propagated only to closest instances:", log_reg.score(X_test, y_test))
+
+    print("Accuracy of partially populated labels", np.mean(y_train_partially_propagated == y_train[partially_propagated]))
+
+
+
 
 
 
