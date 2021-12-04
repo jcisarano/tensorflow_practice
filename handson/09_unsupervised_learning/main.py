@@ -557,6 +557,16 @@ def kmeans_clustering():
     representative_digit_idx = np.argmin(X_digits_dist, axis=0)
     X_representative_digits = X_train[representative_digit_idx]
 
+    n_cols = 10
+    plt.figure(figsize=(8, 2))
+    for idx, X_representative_digit in enumerate(X_representative_digits):
+        plt.subplot(k // n_cols, n_cols, idx+1)
+        plt.imshow(X_representative_digit.reshape(8,8), cmap="binary", interpolation="bilinear")
+        plt.axis("off")
+
+    plt.show()
+
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
