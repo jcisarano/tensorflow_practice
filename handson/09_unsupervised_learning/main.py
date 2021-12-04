@@ -528,8 +528,18 @@ def kmeans_gridsearch():
     param_grid = dict(kmeans__n_clusters=range(2, 200))
     grid_clf = GridSearchCV(pipeline, param_grid, cv=3, verbose=2)
     grid_clf.fit(X_train, y_train)
-    
 
+    print("Best params:", grid_clf.best_params_)
+    print(grid_clf.score(X_test, y_test))
+
+
+def kmeans_clustering():
+    X_digits, y_digits = load_digits(return_X_y=True)
+    X_train, X_test, y_train, y_test = train_test_split(X_digits, y_digits, random_state=42)
+    n_labeled = 50
+    log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", random_state=42)
+    log_reg.fit(X_train[:n_labeled], y_train[:n_labeled])
+    print("Baseline score 50 training instances:", log_reg.score(X_test, y_test))
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -553,7 +563,8 @@ if __name__ == '__main__':
     # kmeans_draw_limits(X, y)
     # kmeans_img_segmentation()
     # kmeans_for_preprocessing()
-    kmeans_gridsearch()
+    # kmeans_gridsearch()
+    kmeans_clustering()
 
 
 
