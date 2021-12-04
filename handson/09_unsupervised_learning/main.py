@@ -534,12 +534,29 @@ def kmeans_gridsearch():
 
 
 def kmeans_clustering():
+    """
+    :return:
+    """
+
     X_digits, y_digits = load_digits(return_X_y=True)
     X_train, X_test, y_train, y_test = train_test_split(X_digits, y_digits, random_state=42)
+
+    # first create baseline LogRegression using only 50 training instances
     n_labeled = 50
     log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", random_state=42)
     log_reg.fit(X_train[:n_labeled], y_train[:n_labeled])
     print("Baseline score 50 training instances:", log_reg.score(X_test, y_test))
+
+    """
+    Now use K-Means to cluster the training set into 50 custers and find the image for each cluster closest to the
+    centroid. These will be used as representative images, the best examples of each cluster.
+    """
+    k = 50
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    X_digits_dist = kmeans.fit_transform(X_train)
+    representative_digit_idx = np.argmin(X_digits_dist, axis=0)
+    X_representative_digits = X_train[representative_digit_idx]
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
