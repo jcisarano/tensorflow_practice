@@ -2,6 +2,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.datasets import make_moons
 from sklearn.cluster import DBSCAN
+from sklearn.neighbors import KNeighborsClassifier
+
+from visualization_helpers import plot_decision_boundaries
 
 """
     DBSCAN defines clusters as continuous regions of high density
@@ -27,6 +30,9 @@ def simple_example(X, y):
     print(dbscan.components_[:3])
     print(np.unique(dbscan.labels_))
 
+    # for comparison, another DBSCAN with a larger eps value
+    # this one does a much better job of plotting the moons dataset: each moon is a complete cluster
+    # and there are only two clusters
     dbscan2 = DBSCAN(eps=0.2)
     dbscan2.fit(X)
 
@@ -75,9 +81,31 @@ def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
     plt.title("eps={:.2f}, min_samples={}".format(dbscan.eps, dbscan.min_samples), fontsize=14)
 
 
+def knn_prediction(X, y):
+    """
+    DBSCAN does not have a predict() method, so it us up to the user to decide how to make predictions
+    on the trained model. Here we use KNeighborsClassifier
+    :return:
+    """
 
+    # this matches the second model in the first test, which better fit the moons dataset
+    dbscan = DBSCAN(eps=0.2)
+    dbscan.fit(X)
 
+    knn = KNeighborsClassifier(n_neighbors=50)
+    knn.fit(dbscan.components_, dbscan.labels_[dbscan.core_sample_indices_])
+
+    # create a few points to use for predictions
+    X_new = np.array([[-0.5, 0], [0, 0.5], [1, -0.1], [2, 1]])
+    print(knn.predict(X_new))
+    print(knn.predict_proba(X_new))
+
+    plt.figure(figsize=(6, 3))
+    plot_decision_boundaries(knn, X, show_centroids=False)
+    plt.scatter(X_new[:, 0], X_new[:, 1], c="b", marker="+", s=200, zorder=10)
+    plt.show()
 
 def run():
     X, y = create_moons()
-    simple_example(X, y)
+    # simple_example(X, y)
+    knn_prediction(X, y)
