@@ -3,6 +3,15 @@ from matplotlib import pyplot as plt
 from sklearn.datasets import make_moons
 from sklearn.cluster import DBSCAN
 
+"""
+    DBSCAN defines clusters as continuous regions of high density
+    eps is epsilon distance, how far to consider neighboring instances in the same cluster
+    min_samples is the minimum number of samples in an area for it to be considered a core instance. It is a dense region.
+    All instances in the neighborhood of a core instance belong to the same cluster. More than one core instance can form
+        a single cluster.
+    Anomalies are any instance not a core instance that does not have a core instance in its neighborhood
+"""
+
 
 def create_moons(n_samples=1000, noise=0.05, random_state=42):
     return make_moons(n_samples=n_samples, noise=noise, random_state=random_state)
@@ -35,7 +44,7 @@ def simple_example(X, y):
 def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
     core_mask = np.zeros_like(dbscan.labels_, dtype=bool)
     core_mask[dbscan.core_sample_indices_] = True
-    anomalies_mask = dbscan.labels_ == -1
+    anomalies_mask = dbscan.labels_ == -1  # anything labeled as -1 is an anomaly
     non_core_mask = ~(core_mask | anomalies_mask)
 
     cores = dbscan.components_
@@ -43,17 +52,17 @@ def plot_dbscan(dbscan, X, size, show_xlabels=True, show_ylabels=True):
     non_cores = X[non_core_mask]
 
     # first draw background colors
-    # plt.scatter(cores[:, 0], cores[:, 1], marker="o", s=size, c=dbscan.labels_[core_mask], cmap="Paired")
+    plt.scatter(cores[:, 0], cores[:, 1], marker="o", s=size, c=dbscan.labels_[core_mask], cmap="Paired")
 
     # next plot core items on top of background samples with smaller size and contrasting color
-    # plt.scatter(cores[:, 0], cores[:, 1], marker="*", s=20, c=dbscan.labels_[core_mask])
+    plt.scatter(cores[:, 0], cores[:, 1], marker="*", s=20, c=dbscan.labels_[core_mask])
 
     # plot the anomalies in big red Xs
-    # plt.scatter(anomalies[:, 0], anomalies[:, 1], marker="x", s=100, c="r")
+    plt.scatter(anomalies[:, 0], anomalies[:, 1], marker="x", s=100, c="r")
 
     # plot the non core items
     plt.scatter(non_cores[:, 0], non_cores[:, 1], marker=".", c=dbscan.labels_[non_core_mask])
-    
+
     if show_xlabels:
         plt.xlabel("$x_1$", fontsize=14)
     else:
