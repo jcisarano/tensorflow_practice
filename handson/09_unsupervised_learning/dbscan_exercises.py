@@ -105,6 +105,15 @@ def knn_prediction(X, y):
     plt.scatter(X_new[:, 0], X_new[:, 1], c="b", marker="+", s=200, zorder=10)
     plt.show()
 
+    # knn always makes a prediction, even when the points are far away from the clusters, as with a
+    # couple of points in the previous example. It is possible to use kneighbors() function to
+    # check against a maximum distance in a prediction:
+    y_dist, y_pred_idx = knn.kneighbors(X_new, n_neighbors=1)
+    y_pred = dbscan.labels_[dbscan.core_sample_indices_][y_pred_idx]
+    y_pred[y_dist > 0.2] = -1
+    print(y_pred.ravel())
+
+
 def run():
     X, y = create_moons()
     # simple_example(X, y)
