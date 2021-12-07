@@ -132,10 +132,35 @@ def select_num_clusters(X, y):
     print("Num params:", n_params)
 
 
+def train_for_k_vals(X, y):
+    gms_per_k = [GaussianMixture(n_components=k, n_init=10, random_state=42).fit(X)
+                 for k in range(1, 11)]
+    bics = [model.bic(X) for model in gms_per_k]
+    aics = [model.aic(X) for model in gms_per_k]
+
+    plt.figure(figsize=(8, 3))
+    plt.plot(range(1, 11), bics, "bo-", label="BIC")
+    plt.plot(range(1, 11), aics, "go--", label="AIC")
+    plt.xlabel("$k$", fontsize=14)
+    plt.ylabel("$Information Criterion", fontsize=14)
+    plt.axis([1, 9.5, np.min(aics)-5, np.max(aics)+50])
+    plt.annotate("Minimum",
+                 xy=(3, bics[2]),
+                 xytext=(0.35, 0.6),
+                 textcoords="figure fraction",
+                 fontsize=14,
+                 arrowprops=dict(facecolor="black", shrink=0.1)
+                 )
+    plt.legend()
+    plt.show()
+
+
 def run():
     X, y = get_blob_data()
     # examine_gm(X, y)
     # examine_var_gm(X, y)
     # anomaly_detection(X, y)
-    select_num_clusters(X, y)
+    # select_num_clusters(X, y)
+    train_for_k_vals(X, y)
+
 
