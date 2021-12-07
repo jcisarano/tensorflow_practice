@@ -54,6 +54,28 @@ def examine_gm(X, y):
     plt.show()
 
 
+def examine_var_gm(X, y):
+    """
+    examine different GM covariance type settings
+    full: any ellipsoid cluster shape allowed
+    tied: all clusters must have the same shape
+    spherical: all clusters must be spherical
+    diag: clusters must have axes parallel to axes (which makes the covariance diagonal)
+    :param X:
+    :param y:
+    :return:
+    """
+    gm_full = GaussianMixture(n_components=3, n_init=10, covariance_type="full", random_state=42)
+    gm_tied = GaussianMixture(n_components=3, n_init=10, covariance_type="tied", random_state=42)
+    gm_spherical = GaussianMixture(n_components=3, n_init=10, covariance_type="spherical", random_state=42)
+    gm_diag = GaussianMixture(n_components=3, n_init=10, covariance_type="diag", random_state=42)
+    gm_full.fit(X)
+    gm_tied.fit(X)
+    gm_spherical.fit(X)
+    gm_diag.fit(X)
+
+
+
 def run():
     X, y = get_blob_data()
     examine_gm(X, y)
