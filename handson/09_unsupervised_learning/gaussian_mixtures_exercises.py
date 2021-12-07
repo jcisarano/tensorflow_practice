@@ -110,10 +110,32 @@ def anomaly_detection(X, y):
     plt.show()
 
 
+def select_num_clusters(X, y):
+    gm = GaussianMixture(n_components=3, n_init=10, random_state=42)
+    gm.fit(X)
+
+    print("gm BIC", gm.bic(X))
+    print("gm AIC", gm.aic(X))
+
+    # manual calculat BIC and AIC
+    n_clusters = 3
+    n_dims = 2
+    n_params_for_weights = n_clusters - 1
+    n_params_for_means = n_clusters * n_dims
+    n_params_for_covariance = n_clusters * n_dims * (n_dims + 1) // 2
+    n_params = n_params_for_weights + n_params_for_means + n_params_for_covariance
+    max_log_likelihood = gm.score(X) * len(X)  # Log(L^)
+    bic = np.log(len(X)) * n_params - 2 * max_log_likelihood
+    aic = 2 * n_params - 2 * max_log_likelihood
+
+    print("Manual BIC: {}, AIC: {}".format(bic, aic))
+    print("Num params:", n_params)
+
+
 def run():
     X, y = get_blob_data()
     # examine_gm(X, y)
     # examine_var_gm(X, y)
-    anomaly_detection(X, y)
-
+    # anomaly_detection(X, y)
+    select_num_clusters(X, y)
 
