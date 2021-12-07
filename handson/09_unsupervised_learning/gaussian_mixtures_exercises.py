@@ -1,6 +1,10 @@
 import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.mixture import GaussianMixture
+from matplotlib.colors import LogNorm
+import matplotlib.pyplot as plt
+
+from visualization_helpers import plot_gaussian_mixture
 
 
 def get_blob_data():
@@ -26,7 +30,28 @@ def examine_gm(X, y):
     print("GM predictions:", gm.predict(X))
     print("GM pred probs:", gm.predict_proba(X))
 
+    # this model can create new instances along with their labels:
+    X_new, y_new = gm.sample(6)
+    print("Generated instances:", X_new)
+    print("Generated labels:", y_new)
 
+    # log of the Probability Density Function
+    print("PDF:", gm.score_samples(X))
+
+    # check that PDF integrates to 1 over the entire space:
+    # first, create a grid of tiny squares
+    resolution = 100
+    grid = np.arange(-10, 10, 1 / resolution)
+    xx, yy = np.meshgrid(grid, grid)
+    X_full = np.vstack([xx.ravel(), yy.ravel()]).T
+
+    pdf = np.exp(gm.score_samples(X_full))
+    pdf_probas = pdf * (1 / resolution) ** 2  # multiply pdf by area of its square
+    print("Close to 1:", pdf_probas.sum())
+
+    plt.figure(figsize=(8, 4))
+    plot_gaussian_mixture(gm, X)
+    plt.show()
 
 
 def run():
