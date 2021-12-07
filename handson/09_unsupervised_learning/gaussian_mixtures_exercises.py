@@ -74,10 +74,24 @@ def examine_var_gm(X, y):
     gm_spherical.fit(X)
     gm_diag.fit(X)
 
+    compare_gaussian_mixtures(gm_tied, gm_spherical, X)
+    plt.show()
+
+
+def compare_gaussian_mixtures(gm1, gm2, X):
+    plt.figure(figsize=(9, 4))
+    plt.subplot(121)
+    plot_gaussian_mixture(gm1, X)
+    plt.title("covariance_type={}".format(gm1.covariance_type), fontsize=14)
+
+    plt.subplot(122)
+    plot_gaussian_mixture(gm2, X)
+    plt.title("covariance_type={}".format(gm2.covariance_type), fontsize=14)
 
 
 def run():
     X, y = get_blob_data()
-    examine_gm(X, y)
+    # examine_gm(X, y)
+    examine_var_gm(X, y)
 
 
