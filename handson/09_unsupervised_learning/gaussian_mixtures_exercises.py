@@ -77,6 +77,10 @@ def examine_var_gm(X, y):
     compare_gaussian_mixtures(gm_tied, gm_spherical, X)
     plt.show()
 
+    compare_gaussian_mixtures(gm_full, gm_diag, X)
+    plt.tight_layout()
+    plt.show()
+
 
 def compare_gaussian_mixtures(gm1, gm2, X):
     plt.figure(figsize=(9, 4))
