@@ -155,12 +155,30 @@ def train_for_k_vals(X, y):
     plt.show()
 
 
+def find_best_covariance_type_and_k(X, y):
+    min_bic = np.infty
+
+    for k in range(1, 11):
+        for covariance_type in ("full", "tied", "spherical", "diag"):
+            bic = GaussianMixture(n_components=k,
+                                  n_init=10,
+                                  covariance_type=covariance_type,
+                                  random_state=42).fit(X).bic(X)
+            if bic < min_bic:
+                min_bic = bic
+                best_k = k
+                best_covariance_type = covariance_type
+    print("Best k:", best_k)
+    print("Best covariance type:", best_covariance_type)
+
+
 def run():
     X, y = get_blob_data()
     # examine_gm(X, y)
     # examine_var_gm(X, y)
     # anomaly_detection(X, y)
     # select_num_clusters(X, y)
-    train_for_k_vals(X, y)
+    # train_for_k_vals(X, y)
+    find_best_covariance_type_and_k(X, y)
 
 
