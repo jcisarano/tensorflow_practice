@@ -93,9 +93,27 @@ def compare_gaussian_mixtures(gm1, gm2, X):
     plt.title("covariance_type={}".format(gm2.covariance_type), fontsize=14)
 
 
+def anomaly_detection(X, y):
+    gm = GaussianMixture(n_components=3, n_init=10, random_state=42)
+    gm.fit(X)
+
+    densities = gm.score_samples(X)
+    # calculate value for 4th percentile
+    density_threshold = np.percentile(densities, 4)
+    # anomalies are any X where score_sample is less than the 4th percentile threshold
+    anomalies = X[densities < density_threshold]
+
+    plt.figure(figsize=(8, 4))
+    plot_gaussian_mixture(gm, X)
+    plt.scatter(anomalies[:, 0], anomalies[:, 1], color="r", marker="*")
+    plt.ylim(top=5.1)
+    plt.show()
+
+
 def run():
     X, y = get_blob_data()
     # examine_gm(X, y)
-    examine_var_gm(X, y)
+    # examine_var_gm(X, y)
+    anomaly_detection(X, y)
 
 
