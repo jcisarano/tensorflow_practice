@@ -1,9 +1,9 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from sklearn.datasets import make_blobs
+from sklearn.datasets import make_blobs, make_moons
 from sklearn.mixture import BayesianGaussianMixture
 
-from visualization_helpers import plot_gaussian_mixture
+from visualization_helpers import plot_gaussian_mixture, plot_data
 
 """
 BayesianGaussianMixture class will find the correct number of clusters by giving weights equal (or close to) zero
@@ -58,7 +58,28 @@ def bgm_low_v_high(X, y):
 
     plt.show()
 
+
+def bgm_moons():
+    X_moons, y_moons = make_moons(n_samples=1000, noise=0.05, random_state=42)
+    bgm = BayesianGaussianMixture(n_components=10, n_init=10, random_state=42)
+    bgm.fit(X_moons)
+
+    plt.figure(figsize=(9, 3.2))
+
+    plt.subplot(121)
+    plot_data(X_moons)
+    plt.xlabel("$x_1$", fontsize=14)
+    plt.ylabel("$x_2$", fontsize=14, rotation=0)
+
+    plt.subplot(122)
+    plot_gaussian_mixture(bgm, X_moons, show_ylabels=False)
+
+    plt.show()
+
 def run():
-    X, y = get_blob_data()
+    # X, y = get_blob_data()
     # bgm_simple_ex(X, y)
-    bgm_low_v_high(X, y)
+    # bgm_low_v_high(X, y)
+    bgm_moons()
+
+    
