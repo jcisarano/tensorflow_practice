@@ -98,6 +98,6 @@ def plot_gaussian_mixture(clusterer, X, resolution=1000, show_ylabels=True):
 
     plt.xlabel("$x_1$", fontsize=14)
     if show_ylabels:
-        plt.ylabel("$x_2", fontsize=14, rotation=0)
+        plt.ylabel("$x_2$", fontsize=14, rotation=0)
     else:
         plt.tick_params(labelleft=False)

@@ -34,6 +34,31 @@ def bgm_simple_ex(X, y):
     plt.show()
 
 
+def bgm_low_v_high(X, y):
+    bgm_low = BayesianGaussianMixture(n_components=10, max_iter=1000, n_init=1,
+                                      weight_concentration_prior=0.01, random_state=42)
+    bgm_high = BayesianGaussianMixture(n_components=10, max_iter=1000, n_init=1,
+                                       weight_concentration_prior=10000, random_state=42)
+    nn = 73
+    bgm_low.fit(X[:nn])
+    bgm_high.fit(X[:nn])
+
+    print(np.round(bgm_low.weights_, 2))
+    print(np.round(bgm_high.weights_, 2))
+
+    plt.figure(figsize=(9, 4))
+
+    plt.subplot(121)
+    plot_gaussian_mixture(bgm_low, X[:nn])
+    plt.title("weight_concentration_prior = {}".format(bgm_low.weight_concentration_prior), fontsize=14)
+
+    plt.subplot(122)
+    plot_gaussian_mixture(bgm_high, X[:nn], show_ylabels=False)
+    plt.title("weight_concentration_prior = {}".format(bgm_high.weight_concentration_prior), fontsize=14)
+
+    plt.show()
+
 def run():
     X, y = get_blob_data()
-    bgm_simple_ex(X, y)
+    # bgm_simple_ex(X, y)
+    bgm_low_v_high(X, y)
