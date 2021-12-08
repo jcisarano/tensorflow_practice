@@ -4,6 +4,7 @@ import dbscan_exercises as dbse
 import spectral_clustering_exercises as sce
 import agglomerative_clustering_exercises as ace
 import gaussian_mixtures_exercises as gme
+import bayesian_gaussian_mixture_exercises as bgme
 
 
 
@@ -16,7 +17,8 @@ if __name__ == '__main__':
     # dbse.run()
     # sce.run()
     # ace.run()
-    gme.run()
+    # gme.run()
+    bgme.run()
 
 
 
