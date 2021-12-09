@@ -282,7 +282,6 @@ def draw_silhouette_diagram():
     plt.show()
 
 
-
 def kmeans_cluster_count():
     X, _ = create_blobs()
     kmeans_k3 = KMeans(n_clusters=3, random_state=42)

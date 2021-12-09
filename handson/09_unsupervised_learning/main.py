@@ -5,6 +5,7 @@ import spectral_clustering_exercises as sce
 import agglomerative_clustering_exercises as ace
 import gaussian_mixtures_exercises as gme
 import bayesian_gaussian_mixture_exercises as bgme
+import olivetti_faces_clusterer as ofc
 
 
 
@@ -18,7 +19,8 @@ if __name__ == '__main__':
     # sce.run()
     # ace.run()
     # gme.run()
-    bgme.run()
+    # bgme.run()
+    ofc.run()
 
 
 
