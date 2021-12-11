@@ -15,6 +15,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.datasets import fetch_olivetti_faces
+from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
 
@@ -44,6 +45,24 @@ def load_faces_stratified_shuffle():
     y_valid = y_train_valid[valid_idx]
 
     return X_train, X_valid, X_test, y_train, y_valid, y_test
+
+
+def pca_dimensionality_reduction(X_train, X_test, X_valid=None):
+    """
+    Dimensionality reduction will speed up the training
+    :param X_train:
+    :param X_test:
+    :param X_valid:
+    :return:
+    """
+    pca = PCA(0.99)
+    X_train = pca.fit_transform(X_train)
+    X_test = pca.fit_transform(X_test)
+
+    if X_valid is not None:
+        X_valid = pca.fit_transform(X_valid)
+
+    return X_train, X_valid, X_test
 
 
 def kmeans_cluster_experiment(X, y):
@@ -108,9 +127,10 @@ def visualize_images(kmeans, images, labels, k=10):
 def run():
     X_train, X_test, y_train, y_test = load_faces()
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
+    X_train_pca, X_valid_pca, X_test_pca = pca_dimensionality_reduction(X_train=X_train, X_valid=X_valid, X_test=X_test)
 
 
-    kmeans_cluster_experiment(X_train, y_train)
+    kmeans_cluster_experiment(X_train_pca, y_train)
 
     #kmeans = train_kmeans(X_train, y_train, n_clusters=50)
 
