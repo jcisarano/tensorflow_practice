@@ -48,7 +48,7 @@ def load_faces_stratified_shuffle():
 
 def kmeans_cluster_experiment(X, y):
     k_range = range(10, 150, 5)
-    kmeans_per_k = [KMeans(n_clusters=k, random_state=42, verbose=1).fit(X)
+    kmeans_per_k = [KMeans(n_clusters=k, random_state=42).fit(X)
                     for k in k_range]
     scores = [silhouette_score(X, model.labels_)
               for model in kmeans_per_k]
@@ -65,6 +65,8 @@ def kmeans_cluster_experiment(X, y):
     plt.ylabel("Silhouette score", fontsize=14)
     # plt.axis([1, 150, 0.55, 0.7])
     plt.show()
+
+    print("Best k by silhouette score:", best_kval)
 
 
 
