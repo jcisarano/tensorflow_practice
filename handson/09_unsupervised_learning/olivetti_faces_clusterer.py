@@ -126,11 +126,14 @@ def visualize_images(kmeans, images, labels, k=10):
 
 def run():
     X_train, X_test, y_train, y_test = load_faces()
-    X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
-    X_train_pca, X_valid_pca, X_test_pca = pca_dimensionality_reduction(X_train=X_train, X_valid=X_valid, X_test=X_test)
-
-
+    X_train_pca, _, X_test_pca = pca_dimensionality_reduction(X_train=X_train, X_test=X_test)
     kmeans_cluster_experiment(X_train_pca, y_train)
+    # kmeans_cluster_experiment(X_train, y_train)
+
+
+    # X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
+    # X_train_pca, X_valid_pca, X_test_pca = pca_dimensionality_reduction(X_train=X_train, X_valid=X_valid, X_test=X_test)
+    # kmeans_cluster_experiment(X_train_pca, y_train)
 
     #kmeans = train_kmeans(X_train, y_train, n_clusters=50)
 
