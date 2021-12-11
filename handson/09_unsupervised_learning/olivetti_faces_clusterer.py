@@ -87,6 +87,17 @@ def kmeans_cluster_experiment(X, y):
 
     print("Best k by silhouette score:", best_kval)
 
+    # plot inertia values
+    inertias = [model.inertia_ for model in kmeans_per_k]
+    best_inertia = inertias[best_idx]
+
+    plt.figure(figsize=(8, 3.5))
+    plt.plot(k_range, inertias, "bo-")
+    plt.plot(best_kval, best_inertia, "ro")
+    plt.xlabel("k", fontsize=14)
+    plt.ylabel("Inertia values", fontsize=14)
+    plt.show()
+
 
 
 def train_kmeans(X, y, n_clusters=10, random_state=42):
