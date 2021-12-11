@@ -11,9 +11,11 @@ train a model that can predict which person is represented in each picture.
     discussed in this chapter).
 4) Visualize the clusters. Do you see the same faces in each cluster?
 """
+import numpy as np
 from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.datasets import fetch_olivetti_faces
+from sklearn.metrics import silhouette_score
 from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
 
 
@@ -21,8 +23,6 @@ def load_faces():
     (X, y) = fetch_olivetti_faces(return_X_y=True)
     # stratification is done by default
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
-
-    print(y_test.shape)
 
     return X_train, X_test, y_train, y_test
 
@@ -37,13 +37,35 @@ def load_faces_stratified_shuffle():
     y_test = olivetti.data[test_idx]
 
     strat_split = StratifiedShuffleSplit(n_splits=1, test_size=80, random_state=43)
-    train_idx, valid_idx = next(strat_split(x_train_valid, y_train_valid))
+    train_idx, valid_idx = next(strat_split.split(x_train_valid, y_train_valid))
     X_train = x_train_valid[train_idx]
     y_train = y_train_valid[train_idx]
     X_valid = x_train_valid[valid_idx]
     y_valid = y_train_valid[valid_idx]
 
     return X_train, X_valid, X_test, y_train, y_valid, y_test
+
+
+def kmeans_cluster_experiment(X, y):
+    k_range = range(10, 50, 5)
+    kmeans_per_k = [KMeans(n_clusters=k, random_state=42, verbose=1).fit(X)
+                    for k in k_range]
+    scores = [silhouette_score(X, model.labels_)
+              for model in kmeans_per_k]
+
+    best_idx = np.argmax(scores)
+    best_kval = k_range[best_idx]
+    best_score = scores[best_idx]
+
+    # plot silhouette graph
+    plt.figure(figsize=(8, 3.5))
+    plt.plot(k_range, scores, "bo-")
+    plt.plot(best_kval, best_score, "ro")
+    plt.xlabel("k", fontsize=14)
+    plt.ylabel("Silhouette score", fontsize=14)
+    # plt.axis([1, 150, 0.55, 0.7])
+    plt.show()
+
 
 
 def train_kmeans(X, y, n_clusters=10, random_state=42):
@@ -83,10 +105,14 @@ def visualize_images(kmeans, images, labels, k=10):
 
 def run():
     X_train, X_test, y_train, y_test = load_faces()
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
 
-    kmeans = train_kmeans(X_train, y_train, n_clusters=50)
 
-    print(kmeans)
+    kmeans_cluster_experiment(X_train, y_train)
 
-    visualize_images(kmeans, X_test, y_test)
+    #kmeans = train_kmeans(X_train, y_train, n_clusters=50)
+
+    #print(kmeans)
+
+    #visualize_images(kmeans, X_test, y_test)
 
