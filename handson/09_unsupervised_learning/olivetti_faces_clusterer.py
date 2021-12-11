@@ -39,18 +39,33 @@ def visualize_images(kmeans, images, labels, k=10):
     y_pred = kmeans.predict(images)
 
     n_cols = 10
-    plt.figure(figsize=(10, 10))
-    for idx, X_representative_digit in enumerate(images):
-        plt.subplot(len(images) // n_cols, n_cols, idx+1)
-        plt.imshow(X_representative_digit.reshape(64, 64), cmap="gray")
-        plt.axis("off")
+    count = 0
+    plt.figure(figsize=(10, 12))
+    for ii in range(kmeans.n_clusters):
+        for idx, img in enumerate(images):
+            if y_pred[idx] != ii:
+                continue
+            plt.subplot(len(images) // n_cols, n_cols, count+1)
+            plt.subplots_adjust(top=0.99, bottom=0.01, left=0.1, right=0.90)
+            plt.imshow(img.reshape(64, 64), cmap="gray")
+            plt.axis("off")
+            plt.title("Cluster {}({})".format(ii, labels[idx]), fontsize=8)
+            count = count+1
+
+    #n_cols = 10
+    #plt.figure(figsize=(10, 10))
+    #for idx, img in enumerate(images):
+    #    plt.subplot(len(images) // n_cols, n_cols, idx+1)
+    #    plt.imshow(img.reshape(64, 64), cmap="gray")
+    #    plt.axis("off")
 
     plt.show()
+
 
 def run():
     X_train, X_test, y_train, y_test = load_faces()
 
-    kmeans = train_kmeans(X_train, y_train)
+    kmeans = train_kmeans(X_train, y_train, n_clusters=50)
 
     print(kmeans)
 
