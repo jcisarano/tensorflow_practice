@@ -131,19 +131,19 @@ def visualize_images(kmeans, images, labels, k=10):
 
 
 def visualize_by_clusters(kmeans, X_train, y_train):
-    n_cols = 10
+    n_cols = 20
     count = 0
-    plt.figure(figsize=(10, 12))
+    plt.figure(figsize=(16, 12))
     for cluster_id in np.unique(kmeans.labels_):
         in_cluster = kmeans.labels_ == cluster_id
         faces = X_train[in_cluster]
         labels = y_train[in_cluster]
-        for idx, img in enumerate(faces):
+        for (img, label) in zip(faces, labels):
             plt.subplot(len(X_train) // n_cols, n_cols, count+1)
-            plt.subplots_adjust(top=0.99, bottom=0.01, left=0.1, right=0.90)
+            plt.subplots_adjust(top=0.99, bottom=0.01, left=0.01, right=0.99)
             plt.imshow(img.reshape(64, 64), cmap="gray")
             plt.axis("off")
-            plt.title("Cluster {}({})".format(cluster_id, labels[idx]), fontsize=8)
+            plt.title("Cluster {}({})".format(cluster_id, label), fontsize=8)
             count = count+1
     print(count)
     plt.show()
