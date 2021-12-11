@@ -65,7 +65,7 @@ def pca_dimensionality_reduction(X_train, X_test, X_valid=None):
     return X_train, X_valid, X_test
 
 
-def kmeans_cluster_experiment(X, y):
+def kmeans_cluster_experiment(X, y, showPlots=False):
     k_range = range(10, 150, 5)
     kmeans_per_k = [KMeans(n_clusters=k, random_state=42).fit(X)
                     for k in k_range]
@@ -77,13 +77,13 @@ def kmeans_cluster_experiment(X, y):
     best_score = scores[best_idx]
 
     # plot silhouette graph
-    plt.figure(figsize=(8, 3.5))
-    plt.plot(k_range, scores, "bo-")
-    plt.plot(best_kval, best_score, "ro")
-    plt.xlabel("k", fontsize=14)
-    plt.ylabel("Silhouette score", fontsize=14)
-    # plt.axis([1, 150, 0.55, 0.7])
-    plt.show()
+    if showPlots:
+        plt.figure(figsize=(8, 3.5))
+        plt.plot(k_range, scores, "bo-")
+        plt.plot(best_kval, best_score, "ro")
+        plt.xlabel("k", fontsize=14)
+        plt.ylabel("Silhouette score", fontsize=14)
+        plt.show()
 
     print("Best k by silhouette score:", best_kval)
 
@@ -91,13 +91,15 @@ def kmeans_cluster_experiment(X, y):
     inertias = [model.inertia_ for model in kmeans_per_k]
     best_inertia = inertias[best_idx]
 
-    plt.figure(figsize=(8, 3.5))
-    plt.plot(k_range, inertias, "bo-")
-    plt.plot(best_kval, best_inertia, "ro")
-    plt.xlabel("k", fontsize=14)
-    plt.ylabel("Inertia values", fontsize=14)
-    plt.show()
+    if showPlots:
+        plt.figure(figsize=(8, 3.5))
+        plt.plot(k_range, inertias, "bo-")
+        plt.plot(best_kval, best_inertia, "ro")
+        plt.xlabel("k", fontsize=14)
+        plt.ylabel("Inertia values", fontsize=14)
+        plt.show()
 
+    return kmeans_per_k[best_idx]
 
 
 def train_kmeans(X, y, n_clusters=10, random_state=42):
@@ -125,30 +127,44 @@ def visualize_images(kmeans, images, labels, k=10):
             plt.title("Cluster {}({})".format(ii, labels[idx]), fontsize=8)
             count = count+1
 
-    #n_cols = 10
-    #plt.figure(figsize=(10, 10))
-    #for idx, img in enumerate(images):
-    #    plt.subplot(len(images) // n_cols, n_cols, idx+1)
-    #    plt.imshow(img.reshape(64, 64), cmap="gray")
-    #    plt.axis("off")
+    plt.show()
 
+
+def visualize_by_clusters(kmeans, X_train, y_train):
+    n_cols = 10
+    count = 0
+    plt.figure(figsize=(10, 12))
+    for cluster_id in np.unique(kmeans.labels_):
+        in_cluster = kmeans.labels_ == cluster_id
+        faces = X_train[in_cluster]
+        labels = y_train[in_cluster]
+        for idx, img in enumerate(faces):
+            plt.subplot(len(X_train) // n_cols, n_cols, count+1)
+            plt.subplots_adjust(top=0.99, bottom=0.01, left=0.1, right=0.90)
+            plt.imshow(img.reshape(64, 64), cmap="gray")
+            plt.axis("off")
+            plt.title("Cluster {}({})".format(cluster_id, labels[idx]), fontsize=8)
+            count = count+1
+    print(count)
     plt.show()
 
 
 def run():
-    X_train, X_test, y_train, y_test = load_faces()
-    X_train_pca, _, X_test_pca = pca_dimensionality_reduction(X_train=X_train, X_test=X_test)
-    kmeans_cluster_experiment(X_train_pca, y_train)
+    # X_train, X_test, y_train, y_test = load_faces()
+    # X_train_pca, _, X_test_pca = pca_dimensionality_reduction(X_train=X_train, X_test=X_test)
+    # kmeans = kmeans_cluster_experiment(X_train_pca, y_train)
     # kmeans_cluster_experiment(X_train, y_train)
 
 
-    # X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
-    # X_train_pca, X_valid_pca, X_test_pca = pca_dimensionality_reduction(X_train=X_train, X_valid=X_valid, X_test=X_test)
-    # kmeans_cluster_experiment(X_train_pca, y_train)
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
+    X_train_pca, X_valid_pca, X_test_pca = pca_dimensionality_reduction(X_train=X_train, X_valid=X_valid, X_test=X_test)
+    kmeans = kmeans_cluster_experiment(X_train_pca, y_train)
 
-    #kmeans = train_kmeans(X_train, y_train, n_clusters=50)
+    # use best value from experiments
+    # kmeans = train_kmeans(X_train, y_train, n_clusters=120)
 
     #print(kmeans)
 
-    #visualize_images(kmeans, X_test, y_test)
+    # visualize_images(kmeans, X_test, y_test)
+    visualize_by_clusters(kmeans, X_train, y_train)
 
