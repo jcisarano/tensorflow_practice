@@ -86,6 +86,16 @@ def train_gaussian_mixture(pca, X_train, X_validation, y_train, y_validation):
 
 
 def modify_faces_and_predict(X_train, X_test, y_train, y_test):
+    """
+    Take some of the face images from the dataset and modify them by rotating, flipping and darkening.
+    Then score them with a GaussianMixture classifier trained on the standard training set.
+    Compare the results to scores from the standard dataset.
+    :param X_train:
+    :param X_test:
+    :param y_train:
+    :param y_test:
+    :return:
+    """
     n_rotated = 4
     rotated = np.transpose(X_train[:n_rotated].reshape(-1, 64, 64), axes=[0, 2, 1])
     rotated = rotated.reshape(-1, 64*64)
@@ -101,19 +111,31 @@ def modify_faces_and_predict(X_train, X_test, y_train, y_test):
     darkened[:, 1:-1] *= 0.3
     y_darkened = y_train[:n_darkened]
 
-    y_bad_faces = np.r_[rotated, flipped, darkened]
+    X_bad_faces = np.r_[rotated, flipped, darkened]
     y_bad = np.concatenate([y_rotated, y_flipped, y_darkened])
 
     n_cols = 5
     plt.figure(figsize=(5, 3))
     plt.suptitle("Modified images")
-    for idx, img in enumerate(y_bad_faces):
+    for idx, img in enumerate(X_bad_faces):
         plt.subplot(len(y_bad)//n_cols, n_cols, idx+1)
         plt.imshow(img.reshape(64, 64), cmap="gray")
         plt.title(y_bad[idx])
         plt.axis("off")
     plt.show()
 
+    # now score the modified images and the original ones
+    # the modified image scores should be much lower than the originals
+    pca = PCA(0.99)
+    X_bad_faces_pca = pca.fit_transform(X_bad_faces)
+    X_train_pca = pca.transform(X_train)
+    gm = GaussianMixture(n_components=40, n_init=10, random_state=42)
+    gm.fit(X_train_pca, y_train)
+    bad_scores = gm.score_samples(X_bad_faces_pca)
+    # score first 10 originals
+    good_scores = gm.score_samples(X_train_pca[:10])
+    print("Scores on bad faces", bad_scores)
+    print("Scores on good faces", good_scores)
 
 
 
