@@ -42,7 +42,7 @@ def train_random_forest(X_train, X_test, y_train, y_test):
 
 
 def random_forest_kmeans_preprocessing(X_train, X_test, y_train, y_test):
-    kmeans = KMeans(n_clusters=120, n_init=10, random_state=42)
+    kmeans = KMeans(n_clusters=115, n_init=10, random_state=42)
     kmeans.fit(X_train)
     X_train_reduced = kmeans.transform(X_train)
     X_test_reduced = kmeans.transform((X_test))
@@ -62,18 +62,39 @@ def random_forest_kmeans_preprocessing(X_train, X_test, y_train, y_test):
     print("Rand forest with K-Means preprocessing in pipeline", score)
 
 
+
 def random_forest_kmeans_experiments(X_train, X_test, y_train, y_test):
     pipeline = Pipeline([
         ("k_means", KMeans(n_clusters=10, n_init=10, random_state=42)),
         ("clf", RandomForestClassifier(n_estimators=150, random_state=43))
     ])
 
-    param_grid = dict(k_means__n_clusters=range(10, 180, 5))
+    param_grid = dict(k_means__n_clusters=range(10, 150, 5))
     grid_clf = GridSearchCV(pipeline, param_grid, cv=3, verbose=2)
     grid_clf.fit(X_train, y_train)
 
     print("Grid clf best params:", grid_clf.best_params_)
-    print("Best score", grid_clf.score(X_test, y_test))
+    print("Best score:", grid_clf.score(X_test, y_test))
+
+    # try it again manually, shouldn't the result be the same?
+    for k in range(10, 150, 5):
+        kmeans = KMeans(n_clusters=k, n_init=10, random_state=42)
+        kmeans.fit(X_train)
+        X_train_dim_red = kmeans.transform(X_train)
+        X_test_dim_red = kmeans.transform(X_test)
+        clf = RandomForestClassifier(n_estimators=150, random_state=43)
+        clf.fit(X_train_dim_red, y_train)
+        score = clf.score(X_test_dim_red, y_test)
+        print("k={}, score={}".format(k, score))
+
+    # same thing, but using pipeline:
+    for k in range(10, 150, 5):
+        pipeline = Pipeline([
+            ("k_means", KMeans(n_clusters=k, n_init=10, random_state=42)),
+            ("clf", RandomForestClassifier(n_estimators=150, random_state=43))
+        ])
+        pipeline.fit(X_train, y_train)
+        print("Pipeline version, k={} and score={}".format(k, pipeline.score(X_test, y_test)))
 
 
 
