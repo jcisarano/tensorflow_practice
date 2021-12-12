@@ -63,10 +63,10 @@ def pca_dim_reduction(X_train, X_test, X_validation=None):
     pca = PCA(0.99)
 
     X_train_pca = pca.fit_transform(X_train)
-    X_test_pca = pca.fit_transform(X_test)
+    X_test_pca = pca.transform(X_test)
     X_validation_pca = None
     if X_validation is not None:
-        X_validation_pca = pca.fit_transform(X_validation)
+        X_validation_pca = pca.transform(X_validation)
 
     return X_train_pca, X_test_pca, X_validation_pca
 
@@ -77,6 +77,7 @@ def run():
     train_log_reg(X_train, X_valid, y_train, y_valid)
     train_random_forest(X_train, X_valid, y_train, y_valid)
 
-    # X_train_pca, X_test_pca, X_validation_pca = pca_dim_reduction(X_train, X_test, X_valid)
-    # train_random_forest(X_train_pca, X_validation_pca, y_train, y_test)
+    X_train_pca, X_test_pca, X_validation_pca = pca_dim_reduction(X_train, X_test, X_valid)
+    print(X_train_pca.shape, X_test_pca.shape, X_validation_pca.shape)
+    train_random_forest(X_train_pca, X_validation_pca, y_train, y_valid)
 
