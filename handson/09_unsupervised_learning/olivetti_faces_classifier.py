@@ -14,7 +14,8 @@ from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import silhouette_score
-from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
+from sklearn.model_selection import train_test_split, StratifiedShuffleSplit, GridSearchCV
+from sklearn.pipeline import Pipeline
 
 
 def load_faces():
@@ -38,6 +39,42 @@ def train_random_forest(X_train, X_test, y_train, y_test):
     rand_forest.fit(X_train, y_train)
     score = rand_forest.score(X_test, y_test)
     print("Rand forest baseline score:", score)
+
+
+def random_forest_kmeans_preprocessing(X_train, X_test, y_train, y_test):
+    kmeans = KMeans(n_clusters=120, n_init=10, random_state=42)
+    kmeans.fit(X_train)
+    X_train_reduced = kmeans.transform(X_train)
+    X_test_reduced = kmeans.transform((X_test))
+
+    clf = RandomForestClassifier(n_estimators=150, random_state=42)
+    clf.fit(X_train_reduced, y_train)
+    score = clf.score(X_test_reduced, y_test)
+    print("Rand forest with K-Means dimensionality reduction", score)
+
+    # try it again using pipeline, the results should be the same:
+    pipeline = Pipeline([
+        ("kmeans", KMeans(n_clusters=120, n_init=10, random_state=42)),
+        ("random_forest", RandomForestClassifier(n_estimators=150, random_state=43))
+    ])
+    pipeline.fit(X_train, y_train)
+    score = pipeline.score(X_test, y_test)
+    print("Rand forest with K-Means preprocessing in pipeline", score)
+
+
+def random_forest_kmeans_experiments(X_train, X_test, y_train, y_test):
+    pipeline = Pipeline([
+        ("k_means", KMeans(n_clusters=10, n_init=10, random_state=42)),
+        ("clf", RandomForestClassifier(n_estimators=150, random_state=43))
+    ])
+
+    param_grid = dict(k_means__n_clusters=range(10, 180, 5))
+    grid_clf = GridSearchCV(pipeline, param_grid, cv=3, verbose=2)
+    grid_clf.fit(X_train, y_train)
+
+    print("Grid clf best params:", grid_clf.best_params_)
+    print("Best score", grid_clf.score(X_test, y_test))
+
 
 
 def load_faces_stratified_shuffle():
@@ -71,7 +108,6 @@ def pca_dim_reduction(X_train, X_test, X_validation=None):
     return X_train_pca, X_test_pca, X_validation_pca
 
 
-
 def run():
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
     train_log_reg(X_train, X_valid, y_train, y_valid)
@@ -80,4 +116,6 @@ def run():
     X_train_pca, X_test_pca, X_validation_pca = pca_dim_reduction(X_train, X_test, X_valid)
     print(X_train_pca.shape, X_test_pca.shape, X_validation_pca.shape)
     train_random_forest(X_train_pca, X_validation_pca, y_train, y_valid)
+    random_forest_kmeans_preprocessing(X_train_pca, X_validation_pca, y_train, y_valid)
+    random_forest_kmeans_experiments(X_train_pca, X_validation_pca, y_train, y_valid)
 

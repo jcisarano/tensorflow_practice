@@ -174,7 +174,7 @@ def kmeans_clustering():
     print("Baseline score 50 training instances:", log_reg.score(X_test, y_test))
 
     """
-    Now use K-Means to cluster the training set into 50 custers and find the image for each cluster closest to the
+    Now use K-Means to cluster the training set into 50 clusters and find the image for each cluster closest to the
     centroid. These will be used as representative images, the best examples of each cluster.
     """
     k = 50
