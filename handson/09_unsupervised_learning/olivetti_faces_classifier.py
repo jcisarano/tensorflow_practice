@@ -11,6 +11,8 @@ from matplotlib import pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.datasets import fetch_olivetti_faces
 from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import silhouette_score
 from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
 
@@ -21,6 +23,21 @@ def load_faces():
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
 
     return X_train, X_test, y_train, y_test
+
+
+def train_log_reg(X_train, X_test, y_train, y_test):
+    log_reg = LogisticRegression(multi_class="ovr", solver="lbfgs", max_iter=5000, random_state=42)
+    log_reg.fit(X_train, y_train)
+
+    score = log_reg.score(X_test, y_test)
+    print("Log reg baseline score:", score)
+
+
+def train_random_forest(X_train, X_test, y_train, y_test):
+    rand_forest = RandomForestClassifier(n_estimators=150, random_state=42)
+    rand_forest.fit(X_train, y_train)
+    score = rand_forest.score(X_test, y_test)
+    print("Rand forest baseline score:", score)
 
 
 def load_faces_stratified_shuffle():
@@ -41,5 +58,25 @@ def load_faces_stratified_shuffle():
 
     return X_train, X_valid, X_test, y_train, y_valid, y_test
 
+
+def pca_dim_reduction(X_train, X_test, X_validation=None):
+    pca = PCA(0.99)
+
+    X_train_pca = pca.fit_transform(X_train)
+    X_test_pca = pca.fit_transform(X_test)
+    X_validation_pca = None
+    if X_validation is not None:
+        X_validation_pca = pca.fit_transform(X_validation)
+
+    return X_train_pca, X_test_pca, X_validation_pca
+
+
+
 def run():
-    print("olivetti 2")
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
+    train_log_reg(X_train, X_valid, y_train, y_valid)
+    train_random_forest(X_train, X_valid, y_train, y_valid)
+
+    # X_train_pca, X_test_pca, X_validation_pca = pca_dim_reduction(X_train, X_test, X_valid)
+    # train_random_forest(X_train_pca, X_validation_pca, y_train, y_test)
+

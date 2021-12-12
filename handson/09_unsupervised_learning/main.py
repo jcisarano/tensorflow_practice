@@ -6,7 +6,7 @@ import agglomerative_clustering_exercises as ace
 import gaussian_mixtures_exercises as gme
 import bayesian_gaussian_mixture_exercises as bgme
 import olivetti_faces_clusterer as ofc
-
+import olivetti_faces_classifier as ofc1
 
 
 
@@ -20,7 +20,8 @@ if __name__ == '__main__':
     # ace.run()
     # gme.run()
     # bgme.run()
-    ofc.run()
+    # ofc.run()
+    ofc1.run()
 
 
 
