@@ -6,8 +6,10 @@
 3) Try to modify some images (e.g., rotate, flip, darken) and see if the model can detect the anomalies (i.e., compare
     the output of the score_samples() method for normal images and for anomalies).
 """
+import matplotlib.pyplot as plt
 from sklearn.datasets import fetch_olivetti_faces
 from sklearn.decomposition import PCA
+from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
 
 
@@ -42,7 +44,7 @@ def load_faces_stratified_shuffle():
     return X_train, X_valid, X_test, y_train, y_valid, y_test
 
 
-def pca_dim_reduction(X_train, X_test, X_validation=None):
+def pca_dim_reduction(X_train, X_validation, X_test):
     """
     Use PCA to reduce dimensionality and improve training speed
     :param X_train:
@@ -59,8 +61,32 @@ def pca_dim_reduction(X_train, X_test, X_validation=None):
     if X_validation is not None:
         X_validation_pca = pca.transform(X_validation)
 
-    return X_train_pca, X_test_pca, X_validation_pca
+    return pca, X_train_pca, X_validation_pca, X_test_pca
+
+
+def train_gaussian_mixture(pca, X_train, X_validation, y_train, y_validation):
+    clf = GaussianMixture(n_components=40, n_init=10, random_state=42)
+    clf.fit(X_train, y_train)
+    print(clf)
+    X_faces_red, y_faces_red = clf.sample(n_samples=20)
+    print(X_faces_red.shape)
+
+    gen_faces = pca.inverse_transform(X_faces_red)
+
+    n_cols = 5
+    plt.figure(figsize=(12, 12))
+    plt.suptitle("Faces sampled from GaussianMixture", fontsize=16)
+    for idx, img in enumerate(gen_faces):
+        plt.subplot(gen_faces.shape[0] // n_cols, n_cols, idx+1)
+        plt.imshow(img.reshape(64, 64), cmap="gray")
+        plt.axis("off")
+    plt.show()
 
 
 def run():
-    print("oh so gaussian!")
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
+    pca, X_train_pca, X_valid_pca, X_test_pca = pca_dim_reduction(X_train, X_valid, X_test)
+
+    # train_gaussian_mixture(X_train, X_valid, y_train, y_valid)
+    train_gaussian_mixture(pca, X_train_pca, X_valid_pca, y_train, y_valid)
+
