@@ -7,6 +7,7 @@
     the output of the score_samples() method for normal images and for anomalies).
 """
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.datasets import fetch_olivetti_faces
 from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture
@@ -71,6 +72,7 @@ def train_gaussian_mixture(pca, X_train, X_validation, y_train, y_validation):
     X_faces_red, y_faces_red = clf.sample(n_samples=20)
     print(X_faces_red.shape)
 
+    # undo the pca reduction for the plot
     gen_faces = pca.inverse_transform(X_faces_red)
 
     n_cols = 5
@@ -83,10 +85,45 @@ def train_gaussian_mixture(pca, X_train, X_validation, y_train, y_validation):
     plt.show()
 
 
+def modify_faces_and_predict(X_train, X_test, y_train, y_test):
+    n_rotated = 4
+    rotated = np.transpose(X_train[:n_rotated].reshape(-1, 64, 64), axes=[0, 2, 1])
+    rotated = rotated.reshape(-1, 64*64)
+    y_rotated = y_train[:n_rotated]
+
+    n_flipped = 3
+    flipped = X_train[:n_flipped].reshape(-1, 64, 64)[:, ::-1]
+    flipped = flipped.reshape(-1, 64*64)
+    y_flipped = y_train[:n_flipped]
+
+    n_darkened = 3
+    darkened = X_train[:n_darkened].copy()
+    darkened[:, 1:-1] *= 0.3
+    y_darkened = y_train[:n_darkened]
+
+    y_bad_faces = np.r_[rotated, flipped, darkened]
+    y_bad = np.concatenate([y_rotated, y_flipped, y_darkened])
+
+    n_cols = 5
+    plt.figure(figsize=(5, 3))
+    plt.suptitle("Modified images")
+    for idx, img in enumerate(y_bad_faces):
+        plt.subplot(len(y_bad)//n_cols, n_cols, idx+1)
+        plt.imshow(img.reshape(64, 64), cmap="gray")
+        plt.title(y_bad[idx])
+        plt.axis("off")
+    plt.show()
+
+
+
+
+
 def run():
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
     pca, X_train_pca, X_valid_pca, X_test_pca = pca_dim_reduction(X_train, X_valid, X_test)
 
     # train_gaussian_mixture(X_train, X_valid, y_train, y_valid)
-    train_gaussian_mixture(pca, X_train_pca, X_valid_pca, y_train, y_valid)
+    # train_gaussian_mixture(pca, X_train_pca, X_valid_pca, y_train, y_valid)
+
+    modify_faces_and_predict(X_train, X_valid, y_train, y_valid)
 
