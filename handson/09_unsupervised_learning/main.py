@@ -7,6 +7,7 @@ import gaussian_mixtures_exercises as gme
 import bayesian_gaussian_mixture_exercises as bgme
 import olivetti_faces_clusterer as ofc
 import olivetti_faces_classifier as ofc1
+import olivetti_gaussian_mixture as ogm
 
 
 
@@ -21,7 +22,8 @@ if __name__ == '__main__':
     # gme.run()
     # bgme.run()
     # ofc.run()
-    ofc1.run()
+    # ofc1.run()
+    ogm.run()
 
 
 

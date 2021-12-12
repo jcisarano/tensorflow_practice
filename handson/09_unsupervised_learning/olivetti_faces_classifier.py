@@ -172,7 +172,7 @@ def kmeans_preprocess_and_append(X_train, X_test, X_validation=None, n_clusters=
     X_test_red_dim = np.c_[X_test, X_test_red_dim]
     X_train_red_dim = np.c_[X_train, X_train_red_dim]
 
-    return  X_train_red_dim, X_test_red_dim, X_validation_red_dim
+    return X_train_red_dim, X_test_red_dim, X_validation_red_dim
 
 
 def pca_dim_reduction(X_train, X_test, X_validation=None):
