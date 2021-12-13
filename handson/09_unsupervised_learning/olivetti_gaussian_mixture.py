@@ -138,8 +138,6 @@ def modify_faces_and_predict(X_train, X_test, y_train, y_test):
     print("Scores on good faces", good_scores)
 
 
-
-
 def run():
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
     pca, X_train_pca, X_valid_pca, X_test_pca = pca_dim_reduction(X_train, X_valid, X_test)

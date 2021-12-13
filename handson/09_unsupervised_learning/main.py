@@ -8,6 +8,7 @@ import bayesian_gaussian_mixture_exercises as bgme
 import olivetti_faces_clusterer as ofc
 import olivetti_faces_classifier as ofc1
 import olivetti_gaussian_mixture as ogm
+import anomaly_detection as ad
 
 
 
@@ -23,7 +24,8 @@ if __name__ == '__main__':
     # bgme.run()
     # ofc.run()
     # ofc1.run()
-    ogm.run()
+    # ogm.run()
+    ad.run()
 
 
 
