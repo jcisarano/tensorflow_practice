@@ -58,6 +58,10 @@ def visualize_data(train_data, test_data, ds_info):
         plt.title(f"class: {ds_info.features['label'].names[label.numpy()]}")
         plt.axis(False)
     plt.show()
+    print(f"Image before preprocessing:\n{image[:2]}...,\nShape: {image.shape},\nDataType: {image.dtype}\n")
+    preprocessed_img = preprocess_img(image, label)
+    print(f"Image after preprocessing:\n{preprocessed_img[:2]}...,\nShape: {preprocessed_img.shape},\n"
+          f"DataType: {preprocessed_img.dtype}\n")
 
 
 def preprocess_img(image, label, target_img_shape=224):
@@ -88,10 +92,6 @@ def run():
 
     visualize_data(train_data, test_data, ds_info)
 
-    sample = train_data.take(1)
-    for image, label in sample:
-        print(f"Image before preprocessing:\n{image[:2]}...,\nShape: {image.shape},\nDataType: {image.dtype}\n")
-        preprocessed_img = preprocess_img(image, label)
-        print(f"Image after preprocessing:\n{preprocessed_img[:2]}...,\nShape: {preprocessed_img.shape},\nDataType: {preprocessed_img.dtype}\n")
+
 
 
