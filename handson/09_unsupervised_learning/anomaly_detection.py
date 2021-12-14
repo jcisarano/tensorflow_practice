@@ -50,7 +50,7 @@ def pca_dim_red(X_train, X_valid, X_test):
     return X_train_reduced, X_valid_reduced, X_test_reduced
 
 
-def pca_reconstruction_error(X_train, X_train_reduced):
+def calc_pca_reconstruction_error(X_train, X_train_reduced):
     pca = PCA(0.99)
     pca.fit(X_train)
 
@@ -64,7 +64,12 @@ def pca_reconstruction_error(X_train, X_train_reduced):
     X_train_mse = np.square(X_train_reconstruct - X_train).mean(axis=-1)
     print("X_train reconstruction error manual:", X_train_mse.mean())
 
-    return X_train_reconstruct
+
+def pca_reconstruct(X_train, X_train_reduced):
+    pca = PCA(0.99)
+    pca.fit(X_train)
+    reconstructed = pca.inverse_transform(X_train_reduced)
+    return reconstructed
 
 
 def modify_faces(X, y):
@@ -105,10 +110,13 @@ def run():
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
     X_train_reduced, X_valid_reduced, X_test_reduced = pca_dim_red(X_train, X_valid, X_test)
 
-    pca_reconstruction_error(X_train, X_train_reduced)
+    calc_pca_reconstruction_error(X_train, X_train_reduced)
 
     X_mod, y_mod = modify_faces(X_train, y_train)
     plot_faces(X_mod, y_mod)
+
+    # X_faces_reconstruct = pca_reconstruct(X_train, X_mod)
+    # plot_faces(X_faces_reconstruct, y_mod)
 
 
 
