@@ -45,6 +45,7 @@ def visualize_data(train_data, test_data, ds_info):
     """
     print(ds_info.features["label"].names[:10])
     train_one_sample = train_data.take(1)
+    plt.figure(figsize=(8, 5))
     for image, label in train_one_sample:
         print(f"""
         Image shape: {image.shape}
@@ -53,15 +54,19 @@ def visualize_data(train_data, test_data, ds_info):
         Class name (str form): {ds_info.features["label"].names[label.numpy()]}
         """)
         # print(image)
-        plt.figure()
+        plt.subplot(121)
         plt.imshow(image)
         plt.title(f"class: {ds_info.features['label'].names[label.numpy()]}")
         plt.axis(False)
-    plt.show()
-    print(f"Image before preprocessing:\n{image[:2]}...,\nShape: {image.shape},\nDataType: {image.dtype}\n")
-    preprocessed_img = preprocess_img(image, label)
-    print(f"Image after preprocessing:\n{preprocessed_img[:2]}...,\nShape: {preprocessed_img.shape},\n"
-          f"DataType: {preprocessed_img.dtype}\n")
+        print(f"Image before preprocessing:\n{image[:2]}...,\nShape: {image.shape},\nDataType: {image.dtype}\n")
+        preprocessed_img = preprocess_img(image, label)
+        print(f"Image after preprocessing:\n{preprocessed_img[:2]}...,\nShape: {preprocessed_img.shape},\n"
+              f"DataType: {preprocessed_img.dtype}\n")
+        plt.subplot(122)
+        plt.imshow(preprocessed_img / 255.)
+        plt.title(f"Preprocessed version")
+        plt.axis(False)
+        plt.show()
 
 
 def preprocess_img(image, label, target_img_shape=224):
@@ -91,7 +96,3 @@ def run():
                                                  )
 
     visualize_data(train_data, test_data, ds_info)
-
-
-
-
