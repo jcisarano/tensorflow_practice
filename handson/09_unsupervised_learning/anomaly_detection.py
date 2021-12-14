@@ -7,6 +7,7 @@ Some dimensionality reduction techniques can also be used for anomaly detection.
     to reconstruct a normal face.
 """
 from sklearn.datasets import fetch_olivetti_faces
+from sklearn.decomposition import PCA
 from sklearn.model_selection import StratifiedShuffleSplit
 
 
@@ -29,7 +30,26 @@ def load_faces_stratified_shuffle():
     return X_train, X_valid, X_test, y_train, y_valid, y_test
 
 
+def pca_dim_red(X_train, X_valid, X_test):
+    """
+    Dimensionality reduction using PCA
+    :param X_train:
+    :param X_valid:
+    :param X_test:
+    :return:
+    """
+    # 0.99 means that 99% of variance is retained
+    pca = PCA(0.99)
+    X_train_reduced = pca.fit_transform(X_train)
+    X_valid_reduced = pca.transform(X_valid)
+    X_test_reduced = pca.transform(X_test)
+
+    return X_train_reduced, X_valid_reduced, X_test_reduced
+
 def run():
     print("anomaly detection")
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_faces_stratified_shuffle()
+    X_train_reduced, X_valid_reduced, X_test_reduced = pca_dim_red(X_train, X_valid, X_test)
+
+
 
