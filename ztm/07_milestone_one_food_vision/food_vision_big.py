@@ -27,6 +27,10 @@ Our function will need to:
     2) change datatype from unit8 to float32
 """
 
+"""
+*** Very important resource on data import pipeline in TensorFlow: https://www.tensorflow.org/guide/data ***
+"""
+
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
@@ -78,7 +82,7 @@ def preprocess_img(image, label, target_img_shape=224):
     :return:
     """
     image = tf.image.resize(image, [target_img_shape, target_img_shape])
-    return tf.cast(image, tf.float32)
+    return tf.cast(image, tf.float32), label
 
 
 def run():
@@ -95,4 +99,16 @@ def run():
                                                  with_info=True  # includes meta data
                                                  )
 
-    visualize_data(train_data, test_data, ds_info)
+    # visualize_data(train_data, test_data, ds_info)
+
+    # map preprocessing function to training data (and parallelize)
+    train_data = train_data.map(map_func=preprocess_img, num_parallel_calls=tf.data.AUTOTUNE)
+    # shuffle train_data and turn it into batches and prefetch it (to load faster)
+    # 1000 is good value, but larger vals can be limited by available RAM
+    train_data = train_data.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
+
+    # Map preprocessing function also for test_data
+    test_data = test_data.map(map_func=preprocess_img, num_parallel_calls=tf.data.AUTOTUNE)
+    test_data = test_data.batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
+
+    print(train_data, test_data)
