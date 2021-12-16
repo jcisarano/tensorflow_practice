@@ -94,7 +94,8 @@ def preprocess_datasets(train_data, test_data):
     # shuffle train_data and turn it into batches and prefetch it (to load faster)
     # 1000 is good value, but larger vals can be limited by available RAM
     # batching & prefetching with autotune makes the best possible use of all available CPU and GPU threads
-    tratrain_data_batchedin_data = train_data_batched.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
+    tratrain_data_batchedin_data = train_data_batched.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(
+        buffer_size=tf.data.AUTOTUNE)
 
     # Map preprocessing function also for test_data
     test_data_batched = test_data.map(map_func=preprocess_img, num_parallel_calls=tf.data.AUTOTUNE)
@@ -122,10 +123,21 @@ def create_and_fit_model(ds_info):
                   metrics=["accuracy"])
     print(model.summary())
 
+    # is the model really using mixed precision?
     for layer in model.layers:
-        print(layer.dtype)
+        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+                                                                                               layer.trainable,
+                                                                                               layer.dtype,
+                                                                                               layer.dtype_policy))
+
+    for layer in model.layers[1].layers:
+        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+                                                                                               layer.trainable,
+                                                                                               layer.dtype,
+                                                                                               layer.dtype_policy))
 
     return model
+
 
 def run():
     # a new way to load food101 dataset, from tensorflow_datasets
@@ -153,10 +165,10 @@ def run():
     # create_tensorboard_callback()
     checkpoint_path = "model_checkpoints/cp.ckpt"
     model_checkpoint = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
-                                                monitor="val_acc",
-                                                save_best_only=True,
-                                                save_weights_only=True,
-                                                verbose=0)
+                                                          monitor="val_acc",
+                                                          save_best_only=True,
+                                                          save_weights_only=True,
+                                                          verbose=0)
 
     # Set up TensorFlow mixed precision training (see https://www.tensorflow.org/guide/mixed_precision)
     # mixed precision uses a combination of float32 and float16 data types to speed up processing
@@ -164,5 +176,3 @@ def run():
     print(mixed_precision.global_policy())
 
     model = create_and_fit_model(ds_info)
-
-
