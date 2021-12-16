@@ -153,9 +153,9 @@ def fit_model_with_callbacks(model, train_data, test_data):
                                                           save_weights_only=True,
                                                           verbose=0)
     history = model.fit(train_data,
-                        epochs=10,
+                        epochs=3,
                         validation_data=test_data,
-                        validation_steps=int(0.25 * len(test_data)),
+                        validation_steps=int(0.15 * len(test_data)),
                         callbacks=[tensorboard_callback, model_checkpoint],
                         workers=-1)
 
