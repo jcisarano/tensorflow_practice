@@ -94,7 +94,7 @@ def preprocess_datasets(train_data, test_data):
     # shuffle train_data and turn it into batches and prefetch it (to load faster)
     # 1000 is good value, but larger vals can be limited by available RAM
     # batching & prefetching with autotune makes the best possible use of all available CPU and GPU threads
-    tratrain_data_batchedin_data = train_data_batched.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(
+    train_data_batched = train_data_batched.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(
         buffer_size=tf.data.AUTOTUNE)
 
     # Map preprocessing function also for test_data
@@ -104,7 +104,7 @@ def preprocess_datasets(train_data, test_data):
     return train_data_batched, test_data_batched
 
 
-def create_and_fit_model(ds_info):
+def create_and_compile_model(ds_info):
     input_shape = (224, 224, 3)
     base_model = tf.keras.applications.EfficientNetB0(include_top=False)
     base_model.trainable = False
@@ -139,6 +139,28 @@ def create_and_fit_model(ds_info):
     return model
 
 
+def fit_model_with_callbacks(model, train_data, test_data):
+
+    # Create callbacks to help while training:
+    #   Tensorboard callback to log training results (to visualize them later)
+    #   ModelCheckpoint callback to save model progress after feature extraction
+    dir_name = "tensorboard"
+    experiment_name = "food_vision_big"
+    tensorboard_callback = create_tensorboard_callback(dir_name, experiment_name)
+    checkpoint_path = "model_checkpoints/cp.ckpt"
+    model_checkpoint = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
+                                                          monitor="val_acc",
+                                                          save_best_only=True,
+                                                          save_weights_only=True,
+                                                          verbose=0)
+    model.fit(train_data,
+              epochs=10,
+              validation_data=test_data,
+              validation_steps=int(0.25 * len(test_data)),
+              callbacks=[tensorboard_callback, model_checkpoint],
+              workers=-1)
+
+
 def run():
     # a new way to load food101 dataset, from tensorflow_datasets
     datasets_list = tfds.list_builders()
@@ -159,20 +181,11 @@ def run():
 
     print(train_data, test_data)
 
-    # Create callbacks to help while training:
-    #   Tensorboard callback to log training results (to visualize them later)
-    #   ModelCheckpoint callback to save model progress after feature extraction
-    # create_tensorboard_callback()
-    checkpoint_path = "model_checkpoints/cp.ckpt"
-    model_checkpoint = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
-                                                          monitor="val_acc",
-                                                          save_best_only=True,
-                                                          save_weights_only=True,
-                                                          verbose=0)
-
     # Set up TensorFlow mixed precision training (see https://www.tensorflow.org/guide/mixed_precision)
     # mixed precision uses a combination of float32 and float16 data types to speed up processing
     mixed_precision.set_global_policy("mixed_float16")
     print(mixed_precision.global_policy())
 
-    model = create_and_fit_model(ds_info)
+    model = create_and_compile_model(ds_info)
+    fit_model_with_callbacks(model, train_data, test_data)
+
