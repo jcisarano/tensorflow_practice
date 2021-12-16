@@ -32,6 +32,9 @@ Our function will need to:
 """
 
 import tensorflow as tf
+from tensorflow.keras import mixed_precision
+from tensorflow.keras import layers
+from tensorflow.keras.layers.experimental import preprocessing
 import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
 
@@ -133,6 +136,26 @@ def run():
 
     # Set up TensorFlow mixed precision training (see https://www.tensorflow.org/guide/mixed_precision)
     # mixed precision uses a combination of float32 and float16 data types to speed up processing
-    from tensorflow.keras import mixed_precision
     mixed_precision.set_global_policy("mixed_float16")
     print(mixed_precision.global_policy())
+
+    input_shape = (224, 224, 3)
+    base_model = tf.keras.applications.EfficientNetB0(include_top=False)
+    base_model.trainable = False
+
+    inputs = layers.Input(shape=input_shape, name="input_layer")
+    # Rescaling is not needed with EfficientNetB0 (it is built in)
+    # x = preprocessing.Rescaling(1./255)
+    x = base_model(inputs, training=False)
+    x = layers.GlobalAveragePooling2D()(x)
+    x = layers.Dense(len(ds_info.features["label"].names))(x)
+    outputs = layers.Activation("softmax", dtype=tf.float32, name="softmax_float32")(x)
+    model = tf.keras.Model(inputs, outputs)
+
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    print(model.summary())
+
+    for layer in model.layers:
+        print(layer.dtype)
