@@ -103,6 +103,30 @@ def preprocess_datasets(train_data, test_data):
     return train_data_batched, test_data_batched
 
 
+def create_and_fit_model(ds_info):
+    input_shape = (224, 224, 3)
+    base_model = tf.keras.applications.EfficientNetB0(include_top=False)
+    base_model.trainable = False
+
+    inputs = layers.Input(shape=input_shape, name="input_layer")
+    # Rescaling is not needed with EfficientNetB0 (it is built in)
+    # x = preprocessing.Rescaling(1./255)
+    x = base_model(inputs, training=False)
+    x = layers.GlobalAveragePooling2D()(x)
+    x = layers.Dense(len(ds_info.features["label"].names))(x)
+    outputs = layers.Activation("softmax", dtype=tf.float32, name="softmax_float32")(x)
+    model = tf.keras.Model(inputs, outputs)
+
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    print(model.summary())
+
+    for layer in model.layers:
+        print(layer.dtype)
+
+    return model
+
 def run():
     # a new way to load food101 dataset, from tensorflow_datasets
     datasets_list = tfds.list_builders()
@@ -139,23 +163,6 @@ def run():
     mixed_precision.set_global_policy("mixed_float16")
     print(mixed_precision.global_policy())
 
-    input_shape = (224, 224, 3)
-    base_model = tf.keras.applications.EfficientNetB0(include_top=False)
-    base_model.trainable = False
+    model = create_and_fit_model(ds_info)
 
-    inputs = layers.Input(shape=input_shape, name="input_layer")
-    # Rescaling is not needed with EfficientNetB0 (it is built in)
-    # x = preprocessing.Rescaling(1./255)
-    x = base_model(inputs, training=False)
-    x = layers.GlobalAveragePooling2D()(x)
-    x = layers.Dense(len(ds_info.features["label"].names))(x)
-    outputs = layers.Activation("softmax", dtype=tf.float32, name="softmax_float32")(x)
-    model = tf.keras.Model(inputs, outputs)
 
-    model.compile(loss="sparse_categorical_crossentropy",
-                  optimizer=tf.keras.optimizers.Adam(),
-                  metrics=["accuracy"])
-    print(model.summary())
-
-    for layer in model.layers:
-        print(layer.dtype)
