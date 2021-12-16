@@ -85,6 +85,20 @@ def preprocess_img(image, label, target_img_shape=224):
     return tf.cast(image, tf.float32), label
 
 
+def preprocess_datasets(train_data, test_data):
+    # map preprocessing function to whole training data set (and parallelize)
+    train_data_batched = train_data.map(map_func=preprocess_img, num_parallel_calls=tf.data.AUTOTUNE)
+    # shuffle train_data and turn it into batches and prefetch it (to load faster)
+    # 1000 is good value, but larger vals can be limited by available RAM
+    tratrain_data_batchedin_data = train_data_batched.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
+
+    # Map preprocessing function also for test_data
+    test_data_batched = test_data.map(map_func=preprocess_img, num_parallel_calls=tf.data.AUTOTUNE)
+    test_data_batched = test_data_batched.batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
+
+    return train_data_batched, test_data_batched
+
+
 def run():
     # a new way to load food101 dataset, from tensorflow_datasets
     datasets_list = tfds.list_builders()
@@ -101,14 +115,6 @@ def run():
 
     # visualize_data(train_data, test_data, ds_info)
 
-    # map preprocessing function to training data (and parallelize)
-    train_data = train_data.map(map_func=preprocess_img, num_parallel_calls=tf.data.AUTOTUNE)
-    # shuffle train_data and turn it into batches and prefetch it (to load faster)
-    # 1000 is good value, but larger vals can be limited by available RAM
-    train_data = train_data.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
-
-    # Map preprocessing function also for test_data
-    test_data = test_data.map(map_func=preprocess_img, num_parallel_calls=tf.data.AUTOTUNE)
-    test_data = test_data.batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
+    train_data, test_data = preprocess_datasets(train_data, test_data)
 
     print(train_data, test_data)
