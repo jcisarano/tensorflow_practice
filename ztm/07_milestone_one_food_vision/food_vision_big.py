@@ -125,8 +125,14 @@ def run():
     #   ModelCheckpoint callback to save model progress after feature extraction
     # create_tensorboard_callback()
     checkpoint_path = "model_checkpoints/cp.ckpt"
-    model_checkpoint = tf.keras.ModelCheckpoint(checkpoint_path,
+    model_checkpoint = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
                                                 monitor="val_acc",
                                                 save_best_only=True,
                                                 save_weights_only=True,
                                                 verbose=0)
+
+    # Set up TensorFlow mixed precision training (see https://www.tensorflow.org/guide/mixed_precision)
+    # mixed precision uses a combination of float32 and float16 data types to speed up processing
+    from tensorflow.keras import mixed_precision
+    mixed_precision.set_global_policy("mixed_float16")
+    print(mixed_precision.global_policy())
