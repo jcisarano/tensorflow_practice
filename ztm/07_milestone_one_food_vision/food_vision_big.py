@@ -148,16 +148,20 @@ def fit_model_with_callbacks(model, train_data, test_data):
     tensorboard_callback = create_tensorboard_callback(dir_name, experiment_name)
     checkpoint_path = "model_checkpoints/cp.ckpt"
     model_checkpoint = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
-                                                          monitor="val_acc",
+                                                          monitor="val_accuracy",
                                                           save_best_only=True,
                                                           save_weights_only=True,
                                                           verbose=0)
     history = model.fit(train_data,
                         epochs=3,
+                        steps_per_epoch=len(train_data),
                         validation_data=test_data,
                         validation_steps=int(0.15 * len(test_data)),
                         callbacks=[tensorboard_callback, model_checkpoint],
                         workers=-1)
+
+    results = model.evaluate(test_data)
+    print(results)
 
 
 def run():
