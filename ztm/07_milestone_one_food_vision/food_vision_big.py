@@ -35,7 +35,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
 
-from helper_functions import compare_histories
+from helper_functions import compare_histories, create_tensorboard_callback
 
 
 def visualize_data(train_data, test_data, ds_info):
@@ -90,6 +90,7 @@ def preprocess_datasets(train_data, test_data):
     train_data_batched = train_data.map(map_func=preprocess_img, num_parallel_calls=tf.data.AUTOTUNE)
     # shuffle train_data and turn it into batches and prefetch it (to load faster)
     # 1000 is good value, but larger vals can be limited by available RAM
+    # batching & prefetching with autotune makes the best possible use of all available CPU and GPU threads
     tratrain_data_batchedin_data = train_data_batched.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
 
     # Map preprocessing function also for test_data
@@ -118,3 +119,14 @@ def run():
     train_data, test_data = preprocess_datasets(train_data, test_data)
 
     print(train_data, test_data)
+
+    # Create callbacks to help while training:
+    #   Tensorboard callback to log training results (to visualize them later)
+    #   ModelCheckpoint callback to save model progress after feature extraction
+    # create_tensorboard_callback()
+    checkpoint_path = "model_checkpoints/cp.ckpt"
+    model_checkpoint = tf.keras.ModelCheckpoint(checkpoint_path,
+                                                monitor="val_acc",
+                                                save_best_only=True,
+                                                save_weights_only=True,
+                                                verbose=0)

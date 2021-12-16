@@ -147,7 +147,7 @@ import datetime
 
 def create_tensorboard_callback(dir_name, experiment_name):
     """
-    Creates a TensorBoard callback instand to store log files.
+    Creates a TensorBoard callback instance to store log files.
 
     Stores log files with the filepath:
       "dir_name/experiment_name/current_datetime/"
