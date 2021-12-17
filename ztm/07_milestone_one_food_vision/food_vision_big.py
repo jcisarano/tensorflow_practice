@@ -40,6 +40,8 @@ import tensorflow_datasets as tfds
 
 from helper_functions import compare_histories, create_tensorboard_callback
 
+CHECKPOINT_PATH: str = "model_checkpoints/cp.ckpt"
+
 
 def visualize_data(train_data, test_data, ds_info):
     """
@@ -146,8 +148,8 @@ def fit_model_with_callbacks(model, train_data, test_data):
     dir_name = "tensorboard"
     experiment_name = "food_vision_big"
     tensorboard_callback = create_tensorboard_callback(dir_name, experiment_name)
-    checkpoint_path = "model_checkpoints/cp.ckpt"
-    model_checkpoint = tf.keras.callbacks.ModelCheckpoint(checkpoint_path,
+    # checkpoint_path = "model_checkpoints/cp.ckpt"
+    model_checkpoint = tf.keras.callbacks.ModelCheckpoint(CHECKPOINT_PATH,
                                                           monitor="val_accuracy",
                                                           save_best_only=True,
                                                           save_weights_only=True,
@@ -162,6 +164,12 @@ def fit_model_with_callbacks(model, train_data, test_data):
 
     results = model.evaluate(test_data)
     print(results)
+
+
+def load_saved_model(model, test_data, filepath=CHECKPOINT_PATH):
+    print("Base model eval:", model.evaluate(test_data))
+    model.load_weights(CHECKPOINT_PATH)
+    print("Loaded model eval:", model.evaluate(test_data))
 
 
 def run():
@@ -190,4 +198,5 @@ def run():
     print(mixed_precision.global_policy())
 
     model = create_and_compile_model(ds_info)
-    fit_model_with_callbacks(model, train_data, test_data)
+    # fit_model_with_callbacks(model, train_data, test_data)
+    load_saved_model(model, test_data)
