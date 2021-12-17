@@ -171,6 +171,21 @@ def load_saved_model(model, test_data, filepath=CHECKPOINT_PATH):
     model.load_weights(CHECKPOINT_PATH)
     print("Loaded model eval:", model.evaluate(test_data))
 
+    print(model.summary())
+
+    # is the model really using mixed precision?
+    for layer in model.layers:
+        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+                                                                                               layer.trainable,
+                                                                                               layer.dtype,
+                                                                                               layer.dtype_policy))
+
+    for layer in model.layers[1].layers:
+        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+                                                                                               layer.trainable,
+                                                                                               layer.dtype,
+                                                                                               layer.dtype_policy))
+
 
 def run():
     # a new way to load food101 dataset, from tensorflow_datasets
