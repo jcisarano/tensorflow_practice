@@ -169,22 +169,25 @@ def fit_model_with_callbacks(model, train_data, test_data):
 def load_saved_model(model, test_data, filepath=CHECKPOINT_PATH):
     print("Base model eval:", model.evaluate(test_data))
     model.load_weights(CHECKPOINT_PATH)
-    print("Loaded model eval:", model.evaluate(test_data))
 
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    print("Loaded model eval:", model.evaluate(test_data))
     print(model.summary())
 
     # is the model really using mixed precision?
-    for layer in model.layers:
-        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
-                                                                                               layer.trainable,
-                                                                                               layer.dtype,
-                                                                                               layer.dtype_policy))
+    # for layer in model.layers:
+    #    print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+    #                                                                                           layer.trainable,
+    #                                                                                           layer.dtype,
+    #                                                                                           layer.dtype_policy))
 
-    for layer in model.layers[1].layers:
-        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
-                                                                                               layer.trainable,
-                                                                                               layer.dtype,
-                                                                                               layer.dtype_policy))
+    # for layer in model.layers[1].layers:
+    #    print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+    #                                                                                           layer.trainable,
+    #                                                                                           layer.dtype,
+    #                                                                                           layer.dtype_policy))
 
 
 def run():
