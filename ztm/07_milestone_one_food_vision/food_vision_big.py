@@ -167,13 +167,16 @@ def fit_model_with_callbacks(model, train_data, test_data):
 
 
 def load_saved_model(model, test_data, filepath=CHECKPOINT_PATH):
-    print("Base model eval:", model.evaluate(test_data))
+    base_results = model.evaluate(test_data)
+    print("Base model eval:", base_results)
     model.load_weights(CHECKPOINT_PATH)
 
+    # need to compile again after loading checkpoint? results seem the same either way
     model.compile(loss="sparse_categorical_crossentropy",
                   optimizer=tf.keras.optimizers.Adam(),
                   metrics=["accuracy"])
-    print("Loaded model eval:", model.evaluate(test_data))
+    loaded_results = model.evaluate(test_data)
+    print("Loaded model eval:", loaded_results)
     print(model.summary())
 
     # is the model really using mixed precision?
