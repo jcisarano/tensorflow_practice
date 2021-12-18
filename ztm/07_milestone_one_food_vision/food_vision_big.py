@@ -42,6 +42,7 @@ from helper_functions import compare_histories, create_tensorboard_callback
 
 CHECKPOINT_PATH: str = "model_checkpoints/cp.ckpt"
 CHECKPOINT_PATH_LOADED_MODEL: str = "model_checkpoints/cp_lm.ckpt"
+FINE_TUNING_SAVE_PATH: str = "fine_tune_saved_model"
 
 
 def visualize_data(train_data, test_data, ds_info):
@@ -241,6 +242,9 @@ def load_saved_model(train_data, test_data):
               callbacks=[early_stopping, model_checkpoint],
               workers=-1)
 
+    model.save(FINE_TUNING_SAVE_PATH)
+
+    print("Eval fine-tuned model against test data:", model.evaluate(test_data))
 
 def run():
     # a new way to load food101 dataset, from tensorflow_datasets
