@@ -166,7 +166,7 @@ def fit_model_with_callbacks(model, train_data, test_data):
     print(results)
 
 
-def load_saved_model(model, test_data, filepath=CHECKPOINT_PATH):
+def load_saved_model_checkpoint(model, test_data, filepath=CHECKPOINT_PATH):
     base_results = model.evaluate(test_data)
     print("Base model eval:", base_results)
     model.load_weights(CHECKPOINT_PATH)
@@ -191,6 +191,31 @@ def load_saved_model(model, test_data, filepath=CHECKPOINT_PATH):
     #                                                                                           layer.trainable,
     #                                                                                           layer.dtype,
     #                                                                                           layer.dtype_policy))
+
+
+def load_saved_model(test_data):
+    path = "saved_model/"
+    model = tf.keras.models.load_model(path)
+    # model.compile(loss="sparse_categorical_crossentropy",
+    #               optimizer=tf.keras.optimizers.Adam(),
+    #               metrics=["accuracy"])
+    print(model.summary())
+    print(model.evaluate(test_data))
+
+    # is the model really using mixed precision?
+    for layer in model.layers:
+       print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+                                                                                              layer.trainable,
+                                                                                              layer.dtype,
+                                                                                              layer.dtype_policy)
+             )
+
+    for layer in model.layers[1].layers:
+       print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+                                                                                              layer.trainable,
+                                                                                              layer.dtype,
+                                                                                              layer.dtype_policy)
+             )
 
 
 def run():
@@ -218,6 +243,7 @@ def run():
     mixed_precision.set_global_policy("mixed_float16")
     print(mixed_precision.global_policy())
 
-    model = create_and_compile_model(ds_info)
+    # model = create_and_compile_model(ds_info)
     # fit_model_with_callbacks(model, train_data, test_data)
-    load_saved_model(model, test_data)
+    # load_saved_model_checkpoint(model, test_data)
+    load_saved_model(test_data)
