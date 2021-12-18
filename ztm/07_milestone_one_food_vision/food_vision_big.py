@@ -219,6 +219,10 @@ def load_saved_model(train_data, test_data):
     #                                                                                            layer.dtype_policy)
     #          )
 
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+                  metrics=["accuracy"])
+
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss", min_delta=0, patience=3, verbose=1
     )
