@@ -225,7 +225,9 @@ def load_saved_model(train_data, test_data):
                   metrics=["accuracy"])
 
     early_stopping = tf.keras.callbacks.EarlyStopping(
-        monitor="val_loss", min_delta=0, patience=3, verbose=1
+        monitor="val_loss",
+        patience=3,
+        verbose=1
     )
 
     model_checkpoint = tf.keras.callbacks.ModelCheckpoint(CHECKPOINT_PATH_LOADED_MODEL,
