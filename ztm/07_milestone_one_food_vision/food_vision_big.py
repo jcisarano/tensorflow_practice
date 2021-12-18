@@ -204,18 +204,19 @@ def load_saved_model(test_data):
 
     # is the model really using mixed precision?
     for layer in model.layers:
-       print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
-                                                                                              layer.trainable,
-                                                                                              layer.dtype,
-                                                                                              layer.dtype_policy)
-             )
+        layer.trainable = True
+        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+                                                                                               layer.trainable,
+                                                                                               layer.dtype,
+                                                                                               layer.dtype_policy)
+              )
 
     for layer in model.layers[1].layers:
-       print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
-                                                                                              layer.trainable,
-                                                                                              layer.dtype,
-                                                                                              layer.dtype_policy)
-             )
+        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+                                                                                               layer.trainable,
+                                                                                               layer.dtype,
+                                                                                               layer.dtype_policy)
+              )
 
 
 def run():
