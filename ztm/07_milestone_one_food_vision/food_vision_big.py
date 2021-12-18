@@ -236,12 +236,20 @@ def load_saved_model(train_data, test_data):
                                                           save_weights_only=True,
                                                           verbose=0)
 
+    reduce_learning_rate = tf.keras.callbacks.ReduceLROnPlateau(
+        monitor="val_loss",
+        factor=0.2,  # multiply by 0.2 (reduce by 5x)
+        patience=2,
+        verbose=1,
+        min_lr=1e-7
+    )
+
     model.fit(train_data,
               epochs=100,
               steps_per_epoch=len(train_data),
               validation_data=test_data,
               validation_steps=int(0.15 * len(test_data)),
-              callbacks=[early_stopping, model_checkpoint],
+              callbacks=[early_stopping, model_checkpoint, reduce_learning_rate],
               workers=-1)
 
     model.save(FINE_TUNING_SAVE_PATH)
