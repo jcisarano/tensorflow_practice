@@ -41,6 +41,7 @@ import tensorflow_datasets as tfds
 from helper_functions import compare_histories, create_tensorboard_callback
 
 CHECKPOINT_PATH: str = "model_checkpoints/cp.ckpt"
+CHECKPOINT_PATH_LOADED_MODEL: str = "model_checkpoints/cp_lm.ckpt"
 
 
 def visualize_data(train_data, test_data, ds_info):
@@ -193,30 +194,48 @@ def load_saved_model_checkpoint(model, test_data, filepath=CHECKPOINT_PATH):
     #                                                                                           layer.dtype_policy))
 
 
-def load_saved_model(test_data):
+def load_saved_model(train_data, test_data):
     path = "saved_model/"
     model = tf.keras.models.load_model(path)
     # model.compile(loss="sparse_categorical_crossentropy",
     #               optimizer=tf.keras.optimizers.Adam(),
     #               metrics=["accuracy"])
     print(model.summary())
-    print(model.evaluate(test_data))
+    # print(model.evaluate(test_data))
 
     # is the model really using mixed precision?
     for layer in model.layers:
         layer.trainable = True
-        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
-                                                                                               layer.trainable,
-                                                                                               layer.dtype,
-                                                                                               layer.dtype_policy)
-              )
+        # print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+        #                                                                                        layer.trainable,
+        #                                                                                        layer.dtype,
+        #                                                                                        layer.dtype_policy)
+        #      )
 
-    for layer in model.layers[1].layers:
-        print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
-                                                                                               layer.trainable,
-                                                                                               layer.dtype,
-                                                                                               layer.dtype_policy)
-              )
+    # for layer in model.layers[1].layers:
+    #     print("{} layer is trainable: {}, var storage dtype: {}, var compute dtype: {}".format(layer.name,
+    #                                                                                            layer.trainable,
+    #                                                                                            layer.dtype,
+    #                                                                                            layer.dtype_policy)
+    #          )
+
+    early_stopping = tf.keras.callbacks.EarlyStopping(
+        monitor="val_loss", min_delta=0, patience=3, verbose=1
+    )
+
+    model_checkpoint = tf.keras.callbacks.ModelCheckpoint(CHECKPOINT_PATH_LOADED_MODEL,
+                                                          monitor="val_accuracy",
+                                                          save_best_only=True,
+                                                          save_weights_only=True,
+                                                          verbose=0)
+
+    model.fit(train_data,
+              epochs=100,
+              steps_per_epoch=len(train_data),
+              validation_data=test_data,
+              validation_steps=int(0.15 * len(test_data)),
+              callbacks=[early_stopping, model_checkpoint],
+              workers=-1)
 
 
 def run():
@@ -247,4 +266,4 @@ def run():
     # model = create_and_compile_model(ds_info)
     # fit_model_with_callbacks(model, train_data, test_data)
     # load_saved_model_checkpoint(model, test_data)
-    load_saved_model(test_data)
+    load_saved_model(train_data, test_data)
