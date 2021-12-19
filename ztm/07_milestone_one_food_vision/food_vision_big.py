@@ -272,10 +272,11 @@ def eval_saved_model(train_data, test_data, ds_info, path=FINE_TUNING_SAVE_PATH)
     img_data = test_data.take(1)
 
     # seems like the batches are shuffled each time they are fetched, since these labels don't match
-    for img, label in img_data:
-        print("label", label)
-    print(y_train[:32])
-    print(y_pred.shape)
+    # must turn off shuffle_files in data batch function to fix this
+    # for img, label in img_data:
+    #     print("label", label)
+    # print(y_train[:32])
+    # print(y_pred.shape)
 
     print(classification_report(y_train, y_pred))
     # print(y_train)
@@ -289,14 +290,15 @@ def run():
 
     # load the full dataset, but it will take some time because the dataset is 5-6 gb
     # other datasets can be much larger, so check the dataset size first
+    # must turn off shuffle_files for testing, or predictions aren't in the same order as test data batches
     (train_data, test_data), ds_info = tfds.load(name="food101",
                                                  split=["train", "validation"],
-                                                 shuffle_files=True,
+                                                 shuffle_files=False,
                                                  as_supervised=True,  # includes labels in tuple (data,labels)
                                                  with_info=True,  # includes meta data
                                                  )
 
-    visualize_data(train_data, test_data, ds_info)
+    # visualize_data(train_data, test_data, ds_info)
 
     train_data, test_data = preprocess_datasets(train_data, test_data)
 
