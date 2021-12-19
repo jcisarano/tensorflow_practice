@@ -37,8 +37,10 @@ from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental import preprocessing
 import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
+import numpy as np
 
 from helper_functions import compare_histories, create_tensorboard_callback
+from sklearn.metrics import classification_report
 
 CHECKPOINT_PATH: str = "model_checkpoints/cp.ckpt"
 CHECKPOINT_PATH_LOADED_MODEL: str = "model_checkpoints/cp_lm.ckpt"
@@ -260,10 +262,24 @@ def train_saved_model(train_data, test_data):
     print("Eval fine-tuned model against test data:", model.evaluate(test_data))
 
 
-def eval_saved_model(test_data, path=FINE_TUNING_SAVE_PATH):
+def eval_saved_model(train_data, test_data, ds_info, path=FINE_TUNING_SAVE_PATH):
     model = tf.keras.models.load_model(path)
-    print(model.summary())
+    # print(model.summary())
     # print(model.evaluate(test_data))
+    y_pred = model.predict(test_data)
+    y_pred = np.argmax(y_pred, axis=-1)
+    y_train = np.concatenate([y for x, y in test_data], axis=0)
+    img_data = test_data.take(1)
+
+    # seems like the batches are shuffled each time they are fetched, since these labels don't match
+    for img, label in img_data:
+        print("label", label)
+    print(y_train[:32])
+    print(y_pred.shape)
+
+    print(classification_report(y_train, y_pred))
+    # print(y_train)
+    # print(np.argmax(y_pred, axis=-1))
 
 
 def run():
@@ -277,22 +293,22 @@ def run():
                                                  split=["train", "validation"],
                                                  shuffle_files=True,
                                                  as_supervised=True,  # includes labels in tuple (data,labels)
-                                                 with_info=True  # includes meta data
+                                                 with_info=True,  # includes meta data
                                                  )
 
     visualize_data(train_data, test_data, ds_info)
 
     train_data, test_data = preprocess_datasets(train_data, test_data)
 
-    print(train_data, test_data)
+    # print(train_data, test_data)
 
     # Set up TensorFlow mixed precision training (see https://www.tensorflow.org/guide/mixed_precision)
     # mixed precision uses a combination of float32 and float16 data types to speed up processing
     mixed_precision.set_global_policy("mixed_float16")
-    print(mixed_precision.global_policy())
+    # print(mixed_precision.global_policy())
 
     # model = create_and_compile_model(ds_info)
     # fit_model_with_callbacks(model, train_data, test_data)
     # load_saved_model_checkpoint(model, test_data)
     # train_saved_model(train_data, test_data)
-    eval_saved_model(test_data)
+    eval_saved_model(train_data, test_data, ds_info)
