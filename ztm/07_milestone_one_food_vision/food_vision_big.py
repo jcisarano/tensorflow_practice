@@ -227,7 +227,8 @@ def load_saved_model(train_data, test_data):
     early_stopping = tf.keras.callbacks.EarlyStopping(
         monitor="val_loss",
         patience=3,
-        verbose=1
+        verbose=1,
+        restore_best_weights=True
     )
 
     model_checkpoint = tf.keras.callbacks.ModelCheckpoint(CHECKPOINT_PATH_LOADED_MODEL,
@@ -235,6 +236,8 @@ def load_saved_model(train_data, test_data):
                                                           save_best_only=True,
                                                           save_weights_only=True,
                                                           verbose=0)
+
+    tensorboard = create_tensorboard_callback("tensorboard", "fine_tune_saved_model")
 
     reduce_learning_rate = tf.keras.callbacks.ReduceLROnPlateau(
         monitor="val_loss",
@@ -249,12 +252,13 @@ def load_saved_model(train_data, test_data):
               steps_per_epoch=len(train_data),
               validation_data=test_data,
               validation_steps=int(0.15 * len(test_data)),
-              callbacks=[early_stopping, model_checkpoint, reduce_learning_rate],
+              callbacks=[early_stopping, model_checkpoint, reduce_learning_rate, tensorboard],
               workers=-1)
 
     model.save(FINE_TUNING_SAVE_PATH)
 
     print("Eval fine-tuned model against test data:", model.evaluate(test_data))
+
 
 def run():
     # a new way to load food101 dataset, from tensorflow_datasets
