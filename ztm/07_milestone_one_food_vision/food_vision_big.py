@@ -71,10 +71,10 @@ def visualize_data(train_data, test_data, ds_info):
         plt.axis(False)
         print(f"Image before preprocessing:\n{image[:2]}...,\nShape: {image.shape},\nDataType: {image.dtype}\n")
         preprocessed_img = preprocess_img(image, label)
-        print(f"Image after preprocessing:\n{preprocessed_img[:2]}...,\nShape: {preprocessed_img.shape},\n"
-              f"DataType: {preprocessed_img.dtype}\n")
+        print(f"Image after preprocessing:\n{preprocessed_img[:2]}...,\nShape: {preprocessed_img[0].shape},\n"
+              f"DataType: {preprocessed_img[0].dtype}\n")
         plt.subplot(122)
-        plt.imshow(preprocessed_img / 255.)
+        plt.imshow(preprocessed_img[0] / 255.)
         plt.title(f"Preprocessed version")
         plt.axis(False)
         plt.show()
@@ -195,7 +195,7 @@ def load_saved_model_checkpoint(model, test_data, filepath=CHECKPOINT_PATH):
     #                                                                                           layer.dtype_policy))
 
 
-def load_saved_model(train_data, test_data):
+def train_saved_model(train_data, test_data):
     path = "saved_model/"
     model = tf.keras.models.load_model(path)
     # model.compile(loss="sparse_categorical_crossentropy",
@@ -260,6 +260,12 @@ def load_saved_model(train_data, test_data):
     print("Eval fine-tuned model against test data:", model.evaluate(test_data))
 
 
+def eval_saved_model(test_data, path=FINE_TUNING_SAVE_PATH):
+    model = tf.keras.models.load_model(path)
+    print(model.summary())
+    # print(model.evaluate(test_data))
+
+
 def run():
     # a new way to load food101 dataset, from tensorflow_datasets
     datasets_list = tfds.list_builders()
@@ -274,7 +280,7 @@ def run():
                                                  with_info=True  # includes meta data
                                                  )
 
-    # visualize_data(train_data, test_data, ds_info)
+    visualize_data(train_data, test_data, ds_info)
 
     train_data, test_data = preprocess_datasets(train_data, test_data)
 
@@ -288,4 +294,5 @@ def run():
     # model = create_and_compile_model(ds_info)
     # fit_model_with_callbacks(model, train_data, test_data)
     # load_saved_model_checkpoint(model, test_data)
-    load_saved_model(train_data, test_data)
+    # train_saved_model(train_data, test_data)
+    eval_saved_model(test_data)
