@@ -74,7 +74,7 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
     fig.colorbar(cax)
 
     # Are there a list of classes?
-    if classes:
+    if classes is not None:
         labels = classes
     else:
         labels = np.arange(cm.shape[0])

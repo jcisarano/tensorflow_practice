@@ -39,7 +39,7 @@ import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
 import numpy as np
 
-from helper_functions import compare_histories, create_tensorboard_callback
+from helper_functions import compare_histories, create_tensorboard_callback, make_confusion_matrix
 from sklearn.metrics import classification_report
 
 CHECKPOINT_PATH: str = "model_checkpoints/cp.ckpt"
@@ -281,6 +281,9 @@ def eval_saved_model(train_data, test_data, ds_info, path=FINE_TUNING_SAVE_PATH)
     print(classification_report(y_train, y_pred))
     # print(y_train)
     # print(np.argmax(y_pred, axis=-1))
+
+    make_confusion_matrix(y_train, y_pred, ds_info.features["label"].names)
+    plt.show()
 
 
 def run():
