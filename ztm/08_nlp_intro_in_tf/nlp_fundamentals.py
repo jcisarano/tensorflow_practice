@@ -7,6 +7,7 @@ from helper_functions import create_tensorboard_callback, plot_loss_curves, comp
 
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
+from tensorflow.keras.layers import Embedding
 import pandas as pd
 import random
 from sklearn.model_selection import train_test_split
@@ -46,14 +47,38 @@ def tokenize_text_dataset(train_sentences, val_sentences, test_sentences, max_vo
                                         )
     text_vectorizer.adapt(train_sentences)
     words_in_vocab = text_vectorizer.get_vocabulary()
-    print("Vocab length: ", len(words_in_vocab))
-    print("Top 5 unique words in vocabulary: ", words_in_vocab[:5])
-    print("Bottom 5 unique words in vocabulary: ", words_in_vocab[-5:])
-    sample_sentence = "There's a flood in my street"
-    print(f"Vectorized sentence '{sample_sentence}'", text_vectorizer([sample_sentence]))
+    # print("Vocab length: ", len(words_in_vocab))
+    # print("Top 5 unique words in vocabulary: ", words_in_vocab[:5])
+    # print("Bottom 5 unique words in vocabulary: ", words_in_vocab[-5:])
+    # sample_sentence = "There's a flood in my street"
+    # print(f"Vectorized sentence '{sample_sentence}'", text_vectorizer([sample_sentence]))
 
-    random_sentence = random.choice(train_sentences)
-    print(f"Vectorized sentence '{random_sentence}'", text_vectorizer([random_sentence]))
+    # random_sentence = random.choice(train_sentences)
+    # print(f"Vectorized sentence '{random_sentence}'", text_vectorizer([random_sentence]))
+
+    return text_vectorizer
+
+
+def create_embedding_for_text_dataset(train_sentences, val_sentences, test_sentences, max_vocab_len=10000):
+    """
+    Convert positive integers (indexes) into dense vector of fixed size.
+    Parameters we care most about for embedding layer:
+    `input_dim` - size of vocabulary
+    `output_dim` - size of output embedding vector, e.g. a value of 100 means each token is represented by vector of 100
+    `input_length` - length of sequences passed to embedding layer
+    :return:
+    """
+    embedding = tf.keras.layers.Embedding(input_dim=max_vocab_len,
+                                          output_dim=128,
+                                          embeddings_initializer="uniform",
+                                          input_length=len(train_sentences)
+                                          )
+    text_vectorizer = tokenize_text_dataset(train_sentences, val_sentences, test_sentences)
+    # print(embedding)
+    # random_sentence = random.choice(train_sentences)
+    # print(f"Original sentence: {random_sentence}, Embedded version:", embedding(text_vectorizer([random_sentence])))
+
+    return embedding
 
 
 def visualize_train_data(train_df):
@@ -72,9 +97,11 @@ def visualize_train_data(train_df):
         print(f"Text: {text}")
         print("-----")
 
+
 def run():
     print("nlp fundies")
     train_sentences, val_sentences, test_sentences, train_labels, val_labels = load_data()
-    tokenize_text_dataset(train_sentences, val_sentences, test_sentences)
+    # tokenize_text_dataset(train_sentences, val_sentences, test_sentences)
+    create_embedding_for_text_dataset(train_sentences, val_sentences, test_sentences)
 
 
