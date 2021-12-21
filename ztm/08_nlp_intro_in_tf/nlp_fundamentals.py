@@ -5,6 +5,8 @@ at Kaggle: https://www.kaggle.com/c/nlp-getting-started
 
 from helper_functions import create_tensorboard_callback, plot_loss_curves, compare_histories
 
+import tensorflow as tf
+from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 import pandas as pd
 import random
 from sklearn.model_selection import train_test_split
@@ -25,7 +27,24 @@ def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH):
                                                                                 test_size=0.1,
                                                                                 random_state=42)
     # print(len(train_sentences), len(train_labels), len(val_sentences), len(val_labels))
-    print(train_sentences[:10], train_labels[:10])
+    # print(train_sentences[:10], train_labels[:10])
+
+    return train_sentences, val_sentences, test_df["text"], train_labels, val_labels
+
+
+def vectorize_text_dataset(train_sentences, val_sentences, test_sentences, max_vocab_len=10000):
+    avg_sentence_len = round(sum([len(i.split()) for i in train_sentences])/len(train_sentences))
+    print(avg_sentence_len)
+
+    text_vectorizer = TextVectorization(max_tokens=max_vocab_len,  # how many words in final vocab, None means unlimited
+                                        standardize="lower_and_strip_punctuation",
+                                        split="whitespace",
+                                        ngrams=None,
+                                        output_mode="int",
+                                        output_sequence_length=avg_sentence_len,  # max length of token sequence
+                                        pad_to_max_tokens=False,
+                                        )
+
 
 def visualize_train_data(train_df):
     # print(train_df.head)
@@ -45,6 +64,7 @@ def visualize_train_data(train_df):
 
 def run():
     print("nlp fundies")
-    load_data()
+    train_sentences, val_sentences, test_sentences, train_labels, val_labels = load_data()
+    vectorize_text_dataset(train_sentences, val_sentences, test_sentences)
 
 
