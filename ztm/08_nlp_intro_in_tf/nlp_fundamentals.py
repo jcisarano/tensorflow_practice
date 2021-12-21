@@ -32,9 +32,9 @@ def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH):
     return train_sentences, val_sentences, test_df["text"], train_labels, val_labels
 
 
-def vectorize_text_dataset(train_sentences, val_sentences, test_sentences, max_vocab_len=10000):
+def tokenize_text_dataset(train_sentences, val_sentences, test_sentences, max_vocab_len=10000):
     avg_sentence_len = round(sum([len(i.split()) for i in train_sentences])/len(train_sentences))
-    print(avg_sentence_len)
+    print("Avg sentence length: {avg_sentence_len}")
 
     text_vectorizer = TextVectorization(max_tokens=max_vocab_len,  # how many words in final vocab, None means unlimited
                                         standardize="lower_and_strip_punctuation",
@@ -44,6 +44,16 @@ def vectorize_text_dataset(train_sentences, val_sentences, test_sentences, max_v
                                         output_sequence_length=avg_sentence_len,  # max length of token sequence
                                         pad_to_max_tokens=False,
                                         )
+    text_vectorizer.adapt(train_sentences)
+    words_in_vocab = text_vectorizer.get_vocabulary()
+    print("Vocab length: ", len(words_in_vocab))
+    print("Top 5 unique words in vocabulary: ", words_in_vocab[:5])
+    print("Bottom 5 unique words in vocabulary: ", words_in_vocab[-5:])
+    sample_sentence = "There's a flood in my street"
+    print(f"Vectorized sentence '{sample_sentence}'", text_vectorizer([sample_sentence]))
+
+    random_sentence = random.choice(train_sentences)
+    print(f"Vectorized sentence '{random_sentence}'", text_vectorizer([random_sentence]))
 
 
 def visualize_train_data(train_df):
@@ -65,6 +75,6 @@ def visualize_train_data(train_df):
 def run():
     print("nlp fundies")
     train_sentences, val_sentences, test_sentences, train_labels, val_labels = load_data()
-    vectorize_text_dataset(train_sentences, val_sentences, test_sentences)
+    tokenize_text_dataset(train_sentences, val_sentences, test_sentences)
 
 
