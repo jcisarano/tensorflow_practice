@@ -24,9 +24,13 @@ def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH):
 
     train_df_shuffled = train_df.sample(frac=1, random_state=42)
 
+    # visualize_train_data(train_df_shuffled)
+
+
+def visualize_train_data(train_df):
     # visualize random training examples
     rand_index = random.randint(0, len(train_df)-5)
-    for row in train_df_shuffled[["text", "target"]][rand_index:rand_index+5].itertuples():
+    for row in train_df[["text", "target"]][rand_index:rand_index+5].itertuples():
         _, text, target = row
         print(f"Target: {target}", "(disaster)" if target > 0 else "(not disaster)")
         print(f"Text: {text}")
