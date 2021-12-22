@@ -12,6 +12,11 @@ import pandas as pd
 import random
 from sklearn.model_selection import train_test_split
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+
+
 TRAIN_PATH: str = "datasets/train.csv"
 TEST_PATH: str = "datasets/test.csv"
 
@@ -98,6 +103,31 @@ def visualize_train_data(train_df):
         print("-----")
 
 
+def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
+    """
+    This will be our baseline model for comparison of all other models. It uses sklearn's Multinomial Naive Bayes with
+    TF-IDF formula to convert words to numbers.
+
+    This is not a Deep Learning algorithm. It is common to use non-DL algorithms as a baseline because of their speed
+    and also as a generally good benchmark for improvement.
+
+    :return:
+    """
+    model = Pipeline([
+        ("tfidf", TfidfVectorizer()),  # convert words to numbers using TF-IDF
+        ("clf", MultinomialNB())  # model the text
+    ])
+
+    model.fit(train_sentences, train_labels)
+    print(model)
+
+    score = model.score(val_sentences, val_labels)
+    print(f"Baseline Naive Bayes model achieves accuracy of {score*100:.2f}%")
+
+    preds = model.predict(val_sentences)
+    print(preds[:20])
+
+
 def run():
     print("nlp fundies")
     # load the data:
@@ -125,5 +155,5 @@ def run():
     3) Fit the model
     4) Evaluate the model
     """
-
+    fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
 
