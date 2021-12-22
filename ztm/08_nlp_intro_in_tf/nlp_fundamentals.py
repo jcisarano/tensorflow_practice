@@ -103,6 +103,19 @@ def visualize_train_data(train_df):
         print("-----")
 
 
+def evaluate(y_true, y_pred):
+    a = tf.keras.metrics.Accuracy()
+    a.update_state(y_true, y_pred)
+    accuracy = a.result().numpy()
+
+    p = tf.keras.metrics.Precision()
+    p.update_state(y_true, y_pred)
+    precision = p.result().numpy()
+
+    
+    print(precision)
+
+
 def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
     """
     This will be our baseline model for comparison of all other models. It uses sklearn's Multinomial Naive Bayes with
@@ -126,6 +139,7 @@ def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
 
     preds = model.predict(val_sentences)
     print(preds[:20])
+    evaluate(val_labels, preds)
 
 
 def run():
