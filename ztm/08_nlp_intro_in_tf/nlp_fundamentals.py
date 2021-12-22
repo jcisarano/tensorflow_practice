@@ -100,8 +100,30 @@ def visualize_train_data(train_df):
 
 def run():
     print("nlp fundies")
+    # load the data:
     train_sentences, val_sentences, test_sentences, train_labels, val_labels = load_data()
+
+    # Convert the text data to numbers because NN cannot handle text
+    # Make sure the tensors are the right shape (may need to pad sequences to a standard length)
     # tokenize_text_dataset(train_sentences, val_sentences, test_sentences)
     create_embedding_for_text_dataset(train_sentences, val_sentences, test_sentences)
+
+    """
+    Series of modeling experiments
+    Model 0: Naive Bayes will be the baseline
+    Model 1: Feed-Forward neural network (dense model)
+    Model 2: LSTM (RNN)
+    Model 3: GRU (RNN)
+    Model 4: Bidirectional-LSTM (RNN)
+    Model 5: 1D Convolutional Neural Network (CNN)
+    Model 6: TensorFlow Hub Pretrained Feature Extractor (transfer learning for NLP)
+    Model 7: Same as model 6 with 10% of training data
+    
+    Standard tensorflow modeling steps:
+    1) Create a model
+    2) Build the model
+    3) Fit the model
+    4) Evaluate the model
+    """
 
 
