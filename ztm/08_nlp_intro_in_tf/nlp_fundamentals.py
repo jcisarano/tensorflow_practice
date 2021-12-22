@@ -6,6 +6,7 @@ at Kaggle: https://www.kaggle.com/c/nlp-getting-started
 from helper_functions import create_tensorboard_callback, plot_loss_curves, compare_histories
 
 import tensorflow as tf
+import tensorflow_addons as tfa
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from tensorflow.keras.layers import Embedding
 import pandas as pd
@@ -16,6 +17,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 TRAIN_PATH: str = "datasets/train.csv"
 TEST_PATH: str = "datasets/test.csv"
@@ -39,7 +41,7 @@ def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH):
 
 
 def tokenize_text_dataset(train_sentences, val_sentences, test_sentences, max_vocab_len=10000):
-    avg_sentence_len = round(sum([len(i.split()) for i in train_sentences])/len(train_sentences))
+    avg_sentence_len = round(sum([len(i.split()) for i in train_sentences]) / len(train_sentences))
     print("Avg sentence length: {avg_sentence_len}")
 
     text_vectorizer = TextVectorization(max_tokens=max_vocab_len,  # how many words in final vocab, None means unlimited
@@ -95,15 +97,15 @@ def visualize_train_data(train_df):
     # print(train_df.target.value_counts())
 
     # visualize random training examples
-    rand_index = random.randint(0, len(train_df)-5)
-    for row in train_df[["text", "target"]][rand_index:rand_index+5].itertuples():
+    rand_index = random.randint(0, len(train_df) - 5)
+    for row in train_df[["text", "target"]][rand_index:rand_index + 5].itertuples():
         _, text, target = row
         print(f"Target: {target}", "(disaster)" if target > 0 else "(not disaster)")
         print(f"Text: {text}")
         print("-----")
 
 
-def evaluate(y_true, y_pred):
+def calculate_results_keras(y_true, y_pred, num_classes=2, threshold=0.5):
     a = tf.keras.metrics.Accuracy()
     a.update_state(y_true, y_pred)
     accuracy = a.result().numpy()
@@ -112,8 +114,35 @@ def evaluate(y_true, y_pred):
     p.update_state(y_true, y_pred)
     precision = p.result().numpy()
 
-    
-    print(precision)
+    r = tf.keras.metrics.Recall()
+    r.update_state(y_true, y_pred)
+    recall = r.result().numpy()
+
+    f = tfa.metrics.F1Score(num_classes=num_classes, threshold=threshold)
+    f.update_state(y_true, y_pred)
+    f1_score = f.result().numpy()
+    print(f1_score)
+
+    return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1_score}
+
+
+def calculate_results(y_true, y_pred):
+    """
+    Calculate model accuracy, precision, recall and f1 score for binary classification model
+
+    For more info see: https://scikit-learn.org/stable/modules/model_evaluation.html
+    :param y_true:
+    :param y_pred:
+    :return:
+    """
+    accuracy = accuracy_score(y_true, y_pred) * 100
+    precision, recall, f1_score, _ = precision_recall_fscore_support(y_true, y_pred, average="weighted")
+
+    return {"accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f1": f1_score
+            }
 
 
 def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
@@ -135,12 +164,12 @@ def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
     print(model)
 
     score = model.score(val_sentences, val_labels)
-    print(f"Baseline Naive Bayes model achieves accuracy of {score*100:.2f}%")
+    print(f"Baseline Naive Bayes model achieves accuracy of {score * 100:.2f}%")
 
     preds = model.predict(val_sentences)
     print(preds[:20])
-    evaluate(val_labels, preds)
-
+    results = calculate_results(y_true=val_labels, y_pred=preds)
+    print(results)
 
 def run():
     print("nlp fundies")
@@ -170,4 +199,3 @@ def run():
     4) Evaluate the model
     """
     fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
-
