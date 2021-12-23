@@ -118,10 +118,12 @@ def calculate_results_keras(y_true, y_pred, num_classes=2, threshold=0.5):
     r.update_state(y_true, y_pred)
     recall = r.result().numpy()
 
-    f = tfa.metrics.F1Score(num_classes=num_classes, threshold=threshold)
-    f.update_state(y_true, y_pred)
-    f1_score = f.result().numpy()
-    print(f1_score)
+    # TODO: fix error in F1Score() calculation
+    f1_score = None
+    # f = tfa.metrics.F1Score(num_classes=num_classes, threshold=threshold)
+    # f.update_state(y_true, y_pred)
+    # f1_score = f.result().numpy()
+    # print(f1_score)
 
     return {"accuracy": accuracy, "precision": precision, "recall": recall, "f1": f1_score}
 
@@ -170,6 +172,7 @@ def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
     print(preds[:20])
     results = calculate_results(y_true=val_labels, y_pred=preds)
     print(results)
+
 
 def run():
     print("nlp fundies")
