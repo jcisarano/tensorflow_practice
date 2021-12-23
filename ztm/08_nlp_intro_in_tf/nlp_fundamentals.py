@@ -18,9 +18,12 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+from helper_functions import create_tensorboard_callback
 
 TRAIN_PATH: str = "datasets/train.csv"
 TEST_PATH: str = "datasets/test.csv"
+
+SAVE_DIR: str = "model_logs"
 
 
 def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH):
@@ -80,7 +83,7 @@ def create_embedding_for_text_dataset(train_sentences, val_sentences, test_sente
                                           embeddings_initializer="uniform",
                                           input_length=len(train_sentences)
                                           )
-    text_vectorizer = tokenize_text_dataset(train_sentences, val_sentences, test_sentences)
+    # text_vectorizer = tokenize_text_dataset(train_sentences, val_sentences, test_sentences)
     # print(embedding)
     # random_sentence = random.choice(train_sentences)
     # print(f"Original sentence: {random_sentence}, Embedded version:", embedding(text_vectorizer([random_sentence])))
@@ -174,6 +177,32 @@ def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
     print(results)
 
 
+def fit_dense_model(X_train, y_train, X_val, y_val, X_test):
+    inputs = tf.keras.layers.Input(shape=(1,), dtype=tf.string)  # 1D inputs
+    text_vectorizer = tokenize_text_dataset(X_train, X_val, X_test)
+    x = text_vectorizer(inputs)  # turn input X into numbers
+    embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
+    x = embedding(x)
+    x = tf.keras.layers.GlobalAveragePooling1D()(x)
+    outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)  # binary output layer
+    model = tf.keras.Model(inputs, outputs, name="model_1_dense")
+    print(model.summary())
+
+    model.compile(loss="binary_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"]
+                  )
+
+    print(X_train.shape)
+    print(y_train.shape)
+    history = model.fit(x=X_train,
+                        y=y_train,
+                        epochs=5,
+                        # validation_data=(X_val, y_val),
+                        callbacks=[create_tensorboard_callback(dir_name=SAVE_DIR,
+                                                               experiment_name="model_1_dense")])
+
+
 def run():
     print("nlp fundies")
     # load the data:
@@ -201,4 +230,5 @@ def run():
     3) Fit the model
     4) Evaluate the model
     """
-    fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
+    # fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
+    fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
