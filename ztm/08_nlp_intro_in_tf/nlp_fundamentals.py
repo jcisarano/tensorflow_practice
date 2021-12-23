@@ -4,6 +4,8 @@ at Kaggle: https://www.kaggle.com/c/nlp-getting-started
 """
 import io
 
+from keras.layers import LSTM
+
 from helper_functions import create_tensorboard_callback, plot_loss_curves, compare_histories
 
 import tensorflow as tf
@@ -241,6 +243,34 @@ def fit_dense_model(X_train, y_train, X_val, y_val, X_test):
     save_vocab_and_weights(words_in_vocab, embed_weights)
 
 
+def fit_rnn(X_train, y_train, X_val, y_val, X_test):
+    """
+    RNNs are useful for sequence data, e.g. text strings.
+
+    RNN uses representation of a previous input to aid representation of later input.
+    RNN Structure:
+    Input (text) -> Tokenize -> Embedding -> Layers (RNN) -> Output (label probability
+    LSTM = Long short term memory
+    :return:
+    """
+    inputs = tf.keras.layers.Input(shape=(1,), dtype="string")
+    text_vectorizer = tokenize_text_dataset(train_sentences=X_train, val_sentences=X_val, test_sentences=X_test)
+    x = text_vectorizer(inputs)
+    embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
+    x = embedding(x)
+    print(x.shape)
+    x = tf.keras.layers.LSTM(units=64, return_sequences=True)(x)
+    print(x.shape)
+    x = tf.keras.layers.LSTM(units=64, activation="relu")(x)
+    print(x.shape)
+    outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
+    model = tf.keras.Model(inputs, outputs, name="model_2_LSTM")
+    print(model.summary())
+
+
+
+
+
 def run():
     print("nlp fundies")
     # load the data:
@@ -269,4 +299,5 @@ def run():
     4) Evaluate the model
     """
     # fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
-    fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
