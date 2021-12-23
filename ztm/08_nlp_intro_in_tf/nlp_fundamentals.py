@@ -48,7 +48,7 @@ def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH):
 
 def tokenize_text_dataset(train_sentences, val_sentences, test_sentences, max_vocab_len=10000):
     avg_sentence_len = round(sum([len(i.split()) for i in train_sentences]) / len(train_sentences))
-    print("Avg sentence length: {avg_sentence_len}")
+    print(f"Avg sentence length: {avg_sentence_len}")
 
     text_vectorizer = TextVectorization(max_tokens=max_vocab_len,  # how many words in final vocab, None means unlimited
                                         standardize="lower_and_strip_punctuation",
@@ -258,14 +258,31 @@ def fit_rnn(X_train, y_train, X_val, y_val, X_test):
     x = text_vectorizer(inputs)
     embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
     x = embedding(x)
-    print(x.shape)
-    x = tf.keras.layers.LSTM(units=64, return_sequences=True)(x)
-    print(x.shape)
+    # x = tf.keras.layers.LSTM(units=64, return_sequences=True)(x)  # when stacking RNN cells, return_sequences must be true
     x = tf.keras.layers.LSTM(units=64, activation="relu")(x)
-    print(x.shape)
+    # x = tf.keras.layers.Dense(64, activation="relu")(x)
     outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
     model = tf.keras.Model(inputs, outputs, name="model_2_LSTM")
-    print(model.summary())
+
+    model.compile(loss="binary_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+
+    history = model.fit(X_train,
+                        y_train,
+                        epochs=5,
+                        validation_data=(X_val, y_val),
+                        callbacks=[create_tensorboard_callback(SAVE_DIR,
+                                                               "model_2_LSTM")])
+
+    pred_probs = model.predict(X_val)
+    print(pred_probs[:10])
+
+    preds = tf.squeeze(tf.round(pred_probs))
+    print(preds[:10])
+
+    results = calculate_results(y_val, preds)
+    print(results)
 
 
 
