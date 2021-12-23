@@ -183,18 +183,19 @@ def fit_dense_model(X_train, y_train, X_val, y_val, X_test):
     x = text_vectorizer(inputs)  # turn input X into numbers
     embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
     x = embedding(x)
-    x = tf.keras.layers.GlobalAveragePooling1D()(x)
+    # x = tf.keras.layers.GlobalAveragePooling1D()(x)
+    x = tf.keras.layers.GlobalMaxPooling1D()(x)  # seems to improve over avg pooling by 1%
     outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)  # binary output layer
     model = tf.keras.Model(inputs, outputs, name="model_1_dense")
-    print(model.summary())
+    # print(model.summary())
 
     model.compile(loss="binary_crossentropy",
                   optimizer=tf.keras.optimizers.Adam(),
                   metrics=["accuracy"]
                   )
 
-    print(X_train.shape)
-    print(y_train.shape)
+    # print(X_train.shape)
+    # print(y_train.shape)
     history = model.fit(x=X_train,
                         y=y_train,
                         epochs=5,
@@ -202,6 +203,15 @@ def fit_dense_model(X_train, y_train, X_val, y_val, X_test):
                         callbacks=[create_tensorboard_callback(dir_name=SAVE_DIR,
                                                                experiment_name="model_1_dense")])
 
+    # print(model.evaluate(X_val, y_val))
+
+    pred_probs = model.predict(X_val)
+    # print(pred_probs.shape)
+    # print(pred_probs[:10])
+
+    preds = tf.squeeze(tf.round(pred_probs))  # convert probabilities to binary labels for evaluation
+    results = calculate_results(y_true=y_val, y_pred=preds)
+    print(results)
 
 def run():
     print("nlp fundies")
