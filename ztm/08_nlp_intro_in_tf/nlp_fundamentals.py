@@ -2,6 +2,7 @@
 Dataset is Kaggle intro to NLP dataset: tweets labeled as disaster/not disaster. Original source available
 at Kaggle: https://www.kaggle.com/c/nlp-getting-started
 """
+import io
 
 from helper_functions import create_tensorboard_callback, plot_loss_curves, compare_histories
 
@@ -177,6 +178,20 @@ def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
     print(results)
 
 
+def save_vocab_and_weights(vocab, weights):
+    out_v = io.open('embeddings/vectors.tsv', 'w', encoding='utf-8')
+    out_m = io.open('embeddings/metadata.tsv', 'w', encoding='utf-8')
+
+    for index, word in enumerate(vocab):
+        if index == 0:
+            continue  # skip 0, it's padding.
+        vec = weights[index]
+        out_v.write('\t'.join([str(x) for x in vec]) + "\n")
+        out_m.write(word + "\n")
+    out_v.close()
+    out_m.close()
+
+
 def fit_dense_model(X_train, y_train, X_val, y_val, X_test):
     inputs = tf.keras.layers.Input(shape=(1,), dtype=tf.string)  # 1D inputs
     text_vectorizer = tokenize_text_dataset(X_train, X_val, X_test)
@@ -212,6 +227,19 @@ def fit_dense_model(X_train, y_train, X_val, y_val, X_test):
     preds = tf.squeeze(tf.round(pred_probs))  # convert probabilities to binary labels for evaluation
     results = calculate_results(y_true=y_val, y_pred=preds)
     print(results)
+
+    words_in_vocab = text_vectorizer.get_vocabulary()
+    print(len(words_in_vocab), words_in_vocab[:10])
+    print(model.summary())
+    embed_weights = model.get_layer("embedding_1").get_weights()[0]
+    print(embed_weights.shape)
+
+    """
+    Visualize word embeddings with projector.tensorflow.org
+    More info: https://www.tensorflow.org/text/guide/word_embeddings
+    """
+    save_vocab_and_weights(words_in_vocab, embed_weights)
+
 
 def run():
     print("nlp fundies")
