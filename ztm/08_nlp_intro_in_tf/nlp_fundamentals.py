@@ -285,7 +285,36 @@ def fit_rnn(X_train, y_train, X_val, y_val, X_test):
     print(results)
 
 
+def fit_gru(X_train, y_train, X_val, y_val, X_test):
+    inputs = tf.keras.layers.Input(shape=(1,), dtype="string")
+    text_vectorizer = tokenize_text_dataset(train_sentences=X_train, val_sentences=X_val, test_sentences=X_test)
+    x = text_vectorizer(inputs)
+    embedding = create_embedding_for_text_dataset(train_sentences=X_train, val_sentences=X_val, test_sentences=X_test)
+    x = embedding(x)
+    x = tf.keras.layers.GRU(units=4, return_sequences=True)(x)
+    x = tf.keras.layers.GlobalMaxPooling1D()(x)
+    outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
+    model = tf.keras.Model(inputs, outputs, name="model_3_GRU")
 
+    model.compile(loss="binary_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+
+    history = model.fit(X_train,
+                        y_train,
+                        epochs=5,
+                        validation_data=(X_val, y_val),
+                        callbacks=[create_tensorboard_callback(SAVE_DIR, "model_3_GRU")]
+                        )
+
+    pred_probs = model.predict(X_val)
+    print(pred_probs[:10])
+
+    preds = tf.squeeze(tf.round(pred_probs))
+    print(preds[:10])
+
+    results = calculate_results(y_val, preds)
+    print(results)
 
 
 def run():
@@ -317,4 +346,5 @@ def run():
     """
     # fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
     # fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    fit_gru(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
