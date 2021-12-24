@@ -286,12 +286,25 @@ def fit_rnn(X_train, y_train, X_val, y_val, X_test):
 
 
 def fit_gru(X_train, y_train, X_val, y_val, X_test):
+    """
+    Gated Recurrent Unit
+
+    :param X_train:
+    :param y_train:
+    :param X_val:
+    :param y_val:
+    :param X_test:
+    :return:
+    """
     inputs = tf.keras.layers.Input(shape=(1,), dtype="string")
     text_vectorizer = tokenize_text_dataset(train_sentences=X_train, val_sentences=X_val, test_sentences=X_test)
     x = text_vectorizer(inputs)
     embedding = create_embedding_for_text_dataset(train_sentences=X_train, val_sentences=X_val, test_sentences=X_test)
     x = embedding(x)
-    x = tf.keras.layers.GRU(units=4, return_sequences=True)(x)
+    x = tf.keras.layers.GRU(64, return_sequences=True)(x)
+    # x = tf.keras.layers.LSTM(64, return_sequences=True)(x)
+    # x = tf.keras.layers.GRU(64)(x)
+    # x = tf.keras.layers.Dense(64, activation="relu")(x)
     x = tf.keras.layers.GlobalMaxPooling1D()(x)
     outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
     model = tf.keras.Model(inputs, outputs, name="model_3_GRU")
