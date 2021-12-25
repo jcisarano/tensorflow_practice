@@ -285,7 +285,7 @@ def fit_rnn(X_train, y_train, X_val, y_val, X_test):
     print(results)
 
 
-def fit_gru(X_train, y_train, X_val, y_val, X_test):
+def fit_gru_lstm(X_train, y_train, X_val, y_val, X_test):
     """
     Gated Recurrent Unit
 
@@ -331,6 +331,17 @@ def fit_gru(X_train, y_train, X_val, y_val, X_test):
     print(results)
 
 
+def fit_bidirectional_lstm(X_train, y_train, X_val, y_val, X_test):
+    inputs = tf.keras.layers.Input(shape=(1,), dtype="string")
+    text_vectorizer = tokenize_text_dataset(X_train, X_val, X_test)
+    x = text_vectorizer(inputs)
+    embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
+    x = embedding(x)
+    x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64))(x)
+    outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
+    model = tf.keras.Model(inputs, outputs, name="model_4_bidirectional")
+    
+
 def run():
     print("nlp fundies")
     # load the data:
@@ -361,4 +372,5 @@ def run():
     # fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
     # fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    fit_gru(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # fit_gru_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
