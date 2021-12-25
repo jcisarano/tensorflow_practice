@@ -337,9 +337,12 @@ def fit_bidirectional_lstm(X_train, y_train, X_val, y_val, X_test):
     x = text_vectorizer(inputs)
     embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
     x = embedding(x)
+    # x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64, return_sequences=True))(x)
+    # x = tf.keras.layers.Bidirectional(tf.keras.layers.GRU(64))(x)
     x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(64))(x)
     outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
     model = tf.keras.Model(inputs, outputs, name="model_4_bidirectional")
+    print(model.summary())
 
     model.compile(loss="binary_crossentropy",
                   optimizer=tf.keras.optimizers.Adam(),
@@ -352,6 +355,10 @@ def fit_bidirectional_lstm(X_train, y_train, X_val, y_val, X_test):
                         callbacks=[create_tensorboard_callback(SAVE_DIR,
                                                                experiment_name="model_4_bidirectional")])
 
+    pred_probs = model.predict(X_val)
+    preds = tf.squeeze(tf.round(pred_probs))
+    results = calculate_results(y_val, preds)
+    print(results)
 
 def run():
     print("nlp fundies")
