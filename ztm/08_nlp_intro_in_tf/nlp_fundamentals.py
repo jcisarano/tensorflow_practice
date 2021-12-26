@@ -459,6 +459,10 @@ def fit_pretrained_feature_extraction(X_train, y_train, X_val, y_val, X_test):
                         callbacks=[create_tensorboard_callback(SAVE_DIR,
                                                                experiment_name="model_6_USE")])
 
+    pred_probs = model.predict(X_val)
+    preds = tf.squeeze(tf.round(pred_probs))
+    results = calculate_results(y_val, preds)
+    print(results)
 
 
 def run():
