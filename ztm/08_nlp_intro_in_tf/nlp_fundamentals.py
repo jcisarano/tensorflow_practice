@@ -394,10 +394,9 @@ def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
     embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
     x = embedding(x)
 
-    x = tf.keras.layers.Conv1D(32, 63, activation="relu")(x)
+    x = tf.keras.layers.Conv1D(filters=32, kernel_size=5, activation="relu", padding="valid")(x)
     outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
     model = tf.keras.Model(inputs, outputs, name="model_4_conv1d")
-
 
 
 
@@ -435,5 +434,5 @@ def run():
     # fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # fit_gru_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    test_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    # fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # test_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
