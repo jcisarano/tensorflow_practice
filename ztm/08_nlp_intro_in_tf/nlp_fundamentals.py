@@ -361,9 +361,30 @@ def fit_bidirectional_lstm(X_train, y_train, X_val, y_val, X_test):
     print(results)
 
 
+def test_conv1d(X_train, y_train, X_val, y_val, X_test):
+    inputs = tf.keras.layers.Input(shape=(1,), dtype="string")
+    text_vectorizer = tokenize_text_dataset(X_train, X_val, X_test)
+    embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
+    embedding_test = embedding(text_vectorizer(["this is a test sentence"]))
+
+    conv_1d = tf.keras.layers.Conv1D(filters=32,  # num hidden units in layer feature vector
+                                     kernel_size=5,  # looks at this many tokens at a time, aka n-gram size
+                                     activation="relu",
+                                     padding="valid",  # output will likely be smaller than input shape, no padding
+                                     # padding="same"  # zero padding added if needed to maintain same size output
+                                     )
+    conv_1d_output = conv_1d(embedding_test)
+
+    max_pool = tf.keras.layers.GlobalMaxPooling1D()  # max value for each token (of 15) in feature vector
+    max_pool_output = max_pool(conv_1d_output)  # gets feature w/highest value, i.e. the most important one
+
+    print(embedding_test.shape, conv_1d_output.shape, max_pool_output.shape)
+
+
 def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
     """
-
+    Typical structure for Conv1D model for text sequences:
+        Inputs (text) -> Tokenization -> Embedding -> Conv1D layer(s) (typically Conv1D + pooling) -> Output probs
     :return:
     """
 
@@ -372,6 +393,13 @@ def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
     x = text_vectorizer(inputs)
     embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
     x = embedding(x)
+
+    x = tf.keras.layers.Conv1D(32, 63, activation="relu")(x)
+    outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
+    model = tf.keras.Model(inputs, outputs, name="model_4_conv1d")
+
+
+
 
 
 
@@ -406,4 +434,6 @@ def run():
     # fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # fit_gru_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    test_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
