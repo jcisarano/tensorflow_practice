@@ -388,29 +388,33 @@ def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
     :return:
     """
 
-    inputs = tf.keras.layers.Input(shape=(1,), dtype="string")
+    inputs = tf.keras.layers.Input(shape=(1,), dtype=tf.string)
     text_vectorizer = tokenize_text_dataset(X_train, X_val, X_test)
     x = text_vectorizer(inputs)
     embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
     x = embedding(x)
 
-    x = tf.keras.layers.Conv1D(filters=32, kernel_size=5, activation="relu", padding="valid")(x)
+    x = tf.keras.layers.Conv1D(filters=64,
+                               kernel_size=5,
+                               strides=1,
+                               activation="relu",
+                               padding="valid")(x)
+    x = tf.keras.layers.GlobalMaxPooling1D()(x)
+    # x = tf.keras.layers.Dense(64, activation="relu")(x)  # another possible layer
     outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
-    model = tf.keras.Model(inputs, outputs, name="model_4_conv_1d")
+    model = tf.keras.Model(inputs, outputs, name="model_5_conv_1d")
 
     model.compile(loss="binary_crossentropy",
                   optimizer=tf.keras.optimizers.Adam(),
                   metrics=["accuracy"])
+    print(model.summary())
 
-    import numpy as np
-    y_train = np.asarray(y_train).astype("float32").reshape((-1,1))
-    y_val = np.asarray(y_val).astype("float32").reshape((-1,1))
     history = model.fit(X_train,
                         y_train,
                         epochs=5,
                         validation_data=(X_val, y_val),
                         callbacks=[create_tensorboard_callback(SAVE_DIR,
-                                                               experiment_name="model_4_conv_1d")])
+                                                               experiment_name="model_5_conv_1d")])
 
     # pred_probs = model.predict(X_val)
     # preds = tf.squeeze(tf.round(pred_probs))
