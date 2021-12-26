@@ -396,10 +396,18 @@ def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
 
     x = tf.keras.layers.Conv1D(filters=32, kernel_size=5, activation="relu", padding="valid")(x)
     outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)
-    model = tf.keras.Model(inputs, outputs, name="model_4_conv1d")
+    model = tf.keras.Model(inputs, outputs, name="model_4_conv_1d")
 
+    model.compile(loss="binary_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
 
-
+    history = model.fit(X_train,
+                        y_train,
+                        epochs=5,
+                        validation_data=(X_val, y_val),
+                        callbacks=[create_tensorboard_callback(SAVE_DIR,
+                                                               experiment_name="model_4_conv_1d")])
 
 
 def run():
