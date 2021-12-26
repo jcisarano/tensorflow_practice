@@ -443,8 +443,10 @@ def fit_pretrained_feature_extraction(X_train, y_train, X_val, y_val, X_test):
 
     model = tf.keras.Sequential([
         sentence_encoder_layer,
-        # tf.keras.layers.Dense(64, activation="relu"),  # another possible layer
-        tf.keras.layers.Dense(1, activation="sigmoid")
+        # tf.keras.layers.Dense(256, activation="relu"),
+        # tf.keras.layers.Dense(128, activation="relu"),
+        tf.keras.layers.Dense(64, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid", name="output_layer")
     ], name="model_6_USE")
 
     model.compile(loss="binary_crossentropy",
