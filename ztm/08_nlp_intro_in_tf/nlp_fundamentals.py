@@ -360,6 +360,21 @@ def fit_bidirectional_lstm(X_train, y_train, X_val, y_val, X_test):
     results = calculate_results(y_val, preds)
     print(results)
 
+
+def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
+    """
+
+    :return:
+    """
+
+    inputs = tf.keras.layers.Input(shape=(1,), dtype="string")
+    text_vectorizer = tokenize_text_dataset(X_train, X_val, X_test)
+    x = text_vectorizer(inputs)
+    embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
+    x = embedding(x)
+
+
+
 def run():
     print("nlp fundies")
     # load the data:
