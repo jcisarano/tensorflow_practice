@@ -12,6 +12,7 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from tensorflow.keras.layers import Embedding
+import tensorflow_hub as hub
 import pandas as pd
 import random
 from sklearn.model_selection import train_test_split
@@ -423,7 +424,6 @@ def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
 
 
 def tf_hub_test():
-    import tensorflow_hub as hub
     embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
     embeddings = embed([
         "There's a flood in my street!",
@@ -434,11 +434,31 @@ def tf_hub_test():
 
 
 def fit_pretrained_feature_extraction(X_train, y_train, X_val, y_val, X_test):
-    inputs = tf.keras.layers.Input(size=(1,), dtype=tf.string)
-    text_vectorizor = tokenize_text_dataset(X_train, X_val, X_test)
-    x = text_vectorizor(inputs)
-    embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
-    x = embedding(x)
+    embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+    sentence_encoder_layer = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
+                                            input_shape=[],
+                                            dtype=tf.string,
+                                            trainable=False,
+                                            name="USE")
+
+    model = tf.keras.Sequential([
+        sentence_encoder_layer,
+        # tf.keras.layers.Dense(64, activation="relu"),  # another possible layer
+        tf.keras.layers.Dense(1, activation="sigmoid")
+    ], name="model_6_USE")
+
+    model.compile(loss="binary_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    print(model.summary())
+
+    history = model.fit(X_train,
+                        y_train,
+                        epochs=5,
+                        validation_data=(X_val, y_val),
+                        callbacks=[create_tensorboard_callback(SAVE_DIR,
+                                                               experiment_name="model_6_USE")])
+
 
 
 def run():
@@ -475,5 +495,6 @@ def run():
     # fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # test_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
-    tf_hub_test()
+    # tf_hub_test()
