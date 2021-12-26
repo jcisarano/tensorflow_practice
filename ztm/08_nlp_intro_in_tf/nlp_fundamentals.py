@@ -422,6 +422,14 @@ def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
     print(results)
 
 
+def fit_pretrained_feature_extraction(X_train, y_train, X_val, y_val, X_test):
+    inputs = tf.keras.layers.Input(size=(1,), dtype=tf.string)
+    text_vectorizor = tokenize_text_dataset(X_train, X_val, X_test)
+    x = text_vectorizor(inputs)
+    embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
+    x = embedding(x)
+    
+
 
 def run():
     print("nlp fundies")
