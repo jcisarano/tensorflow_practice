@@ -422,13 +422,23 @@ def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
     print(results)
 
 
+def tf_hub_test():
+    import tensorflow_hub as hub
+    embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
+    embeddings = embed([
+        "There's a flood in my street!",
+        "When you pass a sentence to the universal encoder, it returns a tensor full of numbers."
+    ])
+
+    print(embeddings)
+
+
 def fit_pretrained_feature_extraction(X_train, y_train, X_val, y_val, X_test):
     inputs = tf.keras.layers.Input(size=(1,), dtype=tf.string)
     text_vectorizor = tokenize_text_dataset(X_train, X_val, X_test)
     x = text_vectorizor(inputs)
     embedding = create_embedding_for_text_dataset(X_train, X_val, X_test)
     x = embedding(x)
-    
 
 
 def run():
@@ -464,4 +474,6 @@ def run():
     # fit_gru_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # test_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+
+    tf_hub_test()
