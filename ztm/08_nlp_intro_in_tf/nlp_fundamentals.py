@@ -639,6 +639,15 @@ weets dataset" --one_shot
     model_6_pretrained_pred_probs = model_6_pretrained.predict(val_sentences)
     model_6_pretrained_preds = tf.squeeze(tf.round(model_6_pretrained_pred_probs))
     # print(model_6_pretrained_preds)
-    
+
+    val_df = pd.DataFrame({"text": val_sentences,
+                           "target": val_labels,
+                           "pred": model_6_pretrained_preds,
+                           "pred_prob": tf.squeeze(model_6_pretrained_pred_probs)})
+    print(val_df)
+
+    # create a new dataframe where pred != target and sort so that the worst are at the top
+    most_wrong = val_df[val_df["target"] != val_df["pred"]].sort_values("pred_prob", ascending=False)
+    print(most_wrong)
 
 
