@@ -56,11 +56,11 @@ def load_train_data_10_percent(train_path=TRAIN_PATH, test_path=TEST_PATH):
     train_labels_10_percent = train_10_percent["target"].to_list()
 
     # see the new data count
-    print(len(train_sentences_10_percent), len(train_labels_10_percent))
+    # print(len(train_sentences_10_percent), len(train_labels_10_percent))
 
     # check the class distribution
     # it is not exactly 50/50, but is close to the original distribution
-    print(train_10_percent["target"].value_counts())
+    # print(train_10_percent["target"].value_counts())
 
     return train_sentences_10_percent, train_labels_10_percent
 
@@ -485,6 +485,37 @@ def fit_pretrained_feature_extraction(X_train, y_train, X_val, y_val, X_test):
     print(results)
 
 
+def fit_pretrained_feature_extraction_practice(X_train, y_train, X_val, y_val):
+    sentence_encoder_layer = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
+                                            input_shape=[],
+                                            dtype=tf.string,
+                                            trainable=False,
+                                            name="USE")
+
+    model = tf.keras.Sequential([
+        sentence_encoder_layer,
+        tf.keras.layers.Dense(64, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid", name="output_layer")
+    ], name="model_7_USE_10_percent")
+
+    model.compile(loss="binary_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+
+    print(model.summary())
+
+    history = model.fit(X_train,
+                        y_train,
+                        epochs=5,
+                        validation_data=(X_val, y_val),
+                        callbacks=[create_tensorboard_callback(SAVE_DIR, experiment_name="model_7_USE_10_percent")]
+                        )
+
+    pred_probs = model.predict(X_val)
+    preds = tf.squeeze(tf.round(pred_probs))
+    results = calculate_results(y_val, preds)
+    print(results)
+
 def run():
     print("nlp fundies")
     # load the data:
@@ -523,4 +554,5 @@ def run():
     # tf_hub_test()
     # fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
-    load_train_data_10_percent()
+    X_train_10_percent, y_train_10_percent = load_train_data_10_percent()
+    fit_pretrained_feature_extraction_practice(X_train_10_percent, y_train_10_percent, val_sentences, val_labels)
