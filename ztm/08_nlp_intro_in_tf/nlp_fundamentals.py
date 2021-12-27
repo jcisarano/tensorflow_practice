@@ -596,4 +596,6 @@ def run():
     print(all_model_results)
     all_model_results.plot(kind="bar", figsize=(10, 7)).legend(bbox_to_anchor=(1.0, 1.0))
     plt.show()
-    
+
+    all_model_results.sort_values("f1", ascending=False)["f1"].plot(kind="bar", figsize=(10, 7))
+    plt.show()
