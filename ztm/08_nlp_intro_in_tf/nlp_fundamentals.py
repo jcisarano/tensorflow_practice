@@ -5,6 +5,7 @@ at Kaggle: https://www.kaggle.com/c/nlp-getting-started
 import io
 
 from keras.layers import LSTM
+from matplotlib import pyplot as plt
 
 from helper_functions import create_tensorboard_callback, plot_loss_curves, compare_histories
 
@@ -200,6 +201,8 @@ def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
     results = calculate_results(y_true=val_labels, y_pred=preds)
     print(results)
 
+    return results
+
 
 def save_vocab_and_weights(vocab, weights):
     out_v = io.open('embeddings/vectors.tsv', 'w', encoding='utf-8')
@@ -263,6 +266,8 @@ def fit_dense_model(X_train, y_train, X_val, y_val, X_test):
     """
     save_vocab_and_weights(words_in_vocab, embed_weights)
 
+    return results
+
 
 def fit_rnn(X_train, y_train, X_val, y_val, X_test):
     """
@@ -304,6 +309,8 @@ def fit_rnn(X_train, y_train, X_val, y_val, X_test):
 
     results = calculate_results(y_val, preds)
     print(results)
+
+    return results
 
 
 def fit_gru_lstm(X_train, y_train, X_val, y_val, X_test):
@@ -351,6 +358,8 @@ def fit_gru_lstm(X_train, y_train, X_val, y_val, X_test):
     results = calculate_results(y_val, preds)
     print(results)
 
+    return results
+
 
 def fit_bidirectional_lstm(X_train, y_train, X_val, y_val, X_test):
     inputs = tf.keras.layers.Input(shape=(1,), dtype="string")
@@ -380,6 +389,8 @@ def fit_bidirectional_lstm(X_train, y_train, X_val, y_val, X_test):
     preds = tf.squeeze(tf.round(pred_probs))
     results = calculate_results(y_val, preds)
     print(results)
+
+    return results
 
 
 def test_conv1d(X_train, y_train, X_val, y_val, X_test):
@@ -442,6 +453,8 @@ def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
     results = calculate_results(y_val, preds)
     print(results)
 
+    return results
+
 
 def tf_hub_test():
     embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
@@ -486,6 +499,8 @@ def fit_pretrained_feature_extraction(X_train, y_train, X_val, y_val, X_test):
     results = calculate_results(y_val, preds)
     print(results)
 
+    return results
+
 
 def fit_pretrained_feature_extraction_practice(X_train, y_train, X_val, y_val):
     sentence_encoder_layer = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
@@ -518,6 +533,9 @@ def fit_pretrained_feature_extraction_practice(X_train, y_train, X_val, y_val):
     results = calculate_results(y_val, preds)
     print(results)
 
+    return results
+
+
 def run():
     print("nlp fundies")
     # load the data:
@@ -545,19 +563,37 @@ def run():
     3) Fit the model
     4) Evaluate the model
     """
-    # fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
-    # fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    # fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    # fit_gru_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    # fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    results_model_0_naive_bayes = fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
+    results_model_1_dense = fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    results_model_2_rnn = fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    results_model_3_gru = fit_gru_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    results_model_4_bidirectional = fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels,
+                                                           test_sentences)
     # test_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    # fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    results_model_5_conv1d = fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
     # tf_hub_test()
-    # fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    results_model_6_use = fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels,
+                                                            test_sentences)
 
     # X_train_10_percent, y_train_10_percent = load_train_data_10_percent()
     train_sentences_10_percent, val_sentences_10_percent, \
     test_sentences_10_percent, train_labels_10_percent, val_labels_10_percent = load_data(fraction=0.1)
-    fit_pretrained_feature_extraction_practice(train_sentences_10_percent, train_labels_10_percent,
-                                               val_sentences_10_percent, val_labels_10_percent)
+    results_model_7_use_10_percent = fit_pretrained_feature_extraction_practice(train_sentences_10_percent,
+                                                                                train_labels_10_percent,
+                                                                                val_sentences_10_percent,
+                                                                                val_labels_10_percent)
+
+    all_model_results = pd.DataFrame({"0_baseline": results_model_0_naive_bayes,
+                                      "1_simple_dense": results_model_1_dense,
+                                      "2_lstm": results_model_2_rnn,
+                                      "3_gru": results_model_3_gru,
+                                      "4_bidirectional": results_model_4_bidirectional,
+                                      "5_conv1d": results_model_5_conv1d,
+                                      "6_use_encoder": results_model_6_use,
+                                      "7_use_encoder_10_percent": results_model_7_use_10_percent}).transpose()
+    all_model_results["accuracy"] = all_model_results["accuracy"] / 100.
+    print(all_model_results)
+    all_model_results.plot(kind="bar", figsize=(10, 7)).legend(bbox_to_anchor=(1.0, 1.0))
+    plt.show()
+    
