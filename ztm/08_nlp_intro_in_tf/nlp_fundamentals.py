@@ -536,6 +536,25 @@ def fit_pretrained_feature_extraction_practice(X_train, y_train, X_val, y_val):
     return results
 
 
+def pandas_plot(results_model_0_naive_bayes, results_model_1_dense, results_model_2_rnn, results_model_3_gru,
+                results_model_4_bidirectional, results_model_5_conv1d, results_model_6_use, results_model_7_use_10_percent):
+    all_model_results = pd.DataFrame({"0_baseline": results_model_0_naive_bayes,
+                                      "1_simple_dense": results_model_1_dense,
+                                      "2_lstm": results_model_2_rnn,
+                                      "3_gru": results_model_3_gru,
+                                      "4_bidirectional": results_model_4_bidirectional,
+                                      "5_conv1d": results_model_5_conv1d,
+                                      "6_use_encoder": results_model_6_use,
+                                      "7_use_encoder_10_percent": results_model_7_use_10_percent}).transpose()
+    all_model_results["accuracy"] = all_model_results["accuracy"] / 100.
+    print(all_model_results)
+    all_model_results.plot(kind="bar", figsize=(10, 7)).legend(bbox_to_anchor=(1.0, 1.0))
+    plt.show()
+
+    all_model_results.sort_values("f1", ascending=False)["f1"].plot(kind="bar", figsize=(10, 7))
+    plt.show()
+
+
 def run():
     print("nlp fundies")
     # load the data:
@@ -563,39 +582,40 @@ def run():
     3) Fit the model
     4) Evaluate the model
     """
-    results_model_0_naive_bayes = fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
-    results_model_1_dense = fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    results_model_2_rnn = fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    results_model_3_gru = fit_gru_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    results_model_4_bidirectional = fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels,
-                                                           test_sentences)
+    # results_model_0_naive_bayes = fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
+    # results_model_1_dense = fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # results_model_2_rnn = fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # results_model_3_gru = fit_gru_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # results_model_4_bidirectional = fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels,
+    #                                                        test_sentences)
     # test_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    results_model_5_conv1d = fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # results_model_5_conv1d = fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
     # tf_hub_test()
     results_model_6_use = fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels,
                                                             test_sentences)
 
     # X_train_10_percent, y_train_10_percent = load_train_data_10_percent()
-    train_sentences_10_percent, val_sentences_10_percent, \
-    test_sentences_10_percent, train_labels_10_percent, val_labels_10_percent = load_data(fraction=0.1)
-    results_model_7_use_10_percent = fit_pretrained_feature_extraction_practice(train_sentences_10_percent,
-                                                                                train_labels_10_percent,
-                                                                                val_sentences_10_percent,
-                                                                                val_labels_10_percent)
+    # train_sentences_10_percent, val_sentences_10_percent, \
+    # test_sentences_10_percent, train_labels_10_percent, val_labels_10_percent = load_data(fraction=0.1)
+    # results_model_7_use_10_percent = fit_pretrained_feature_extraction_practice(train_sentences_10_percent,
+    #                                                                             train_labels_10_percent,
+    #                                                                             val_sentences_10_percent,
+    #                                                                             val_labels_10_percent)
 
-    all_model_results = pd.DataFrame({"0_baseline": results_model_0_naive_bayes,
-                                      "1_simple_dense": results_model_1_dense,
-                                      "2_lstm": results_model_2_rnn,
-                                      "3_gru": results_model_3_gru,
-                                      "4_bidirectional": results_model_4_bidirectional,
-                                      "5_conv1d": results_model_5_conv1d,
-                                      "6_use_encoder": results_model_6_use,
-                                      "7_use_encoder_10_percent": results_model_7_use_10_percent}).transpose()
-    all_model_results["accuracy"] = all_model_results["accuracy"] / 100.
-    print(all_model_results)
-    all_model_results.plot(kind="bar", figsize=(10, 7)).legend(bbox_to_anchor=(1.0, 1.0))
-    plt.show()
+    # pandas_plot(results_model_0_naive_bayes, results_model_1_dense, results_model_2_rnn, results_model_3_gru,
+    #                 results_model_4_bidirectional, results_model_5_conv1d, results_model_6_use,
+    #                 results_model_7_use_10_percent)
 
-    all_model_results.sort_values("f1", ascending=False)["f1"].plot(kind="bar", figsize=(10, 7))
-    plt.show()
+
+    """
+    tensorboard dev upload --logdir .\model_logs\ --name "NLP Modeling Experiments" --description "Comparing multiple models' performance on Kaggle disaster t
+weets dataset" --one_shot 
+    Uploaded experiments to tensorboard at https://tensorboard.dev/experiment/LmyqWX86TLODJrlcqU4bdw/
+    Also see https://wandb.ai/site for more visualization tools
+    """
+
+    """
+    Saving and loading a trained model.
+    There are two main formats: hdf5 and SavedModel format (which is default for TensorFlow)
+    """

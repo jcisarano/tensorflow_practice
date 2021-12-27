@@ -349,10 +349,3 @@ def compare_histories(original_history, new_history, initial_epochs=5):
 
     plt.show()
 
-    """
-    tensorboard dev upload --logdir .\model_logs\ --name "NLP Modeling Experiments" --description "Comparing multiple models' performance on Kaggle disaster t
-weets dataset" --one_shot 
-    Uploaded experiments to tensorboard at https://tensorboard.dev/experiment/LmyqWX86TLODJrlcqU4bdw/
-    Also see https://wandb.ai/site for more visualization tools
-    """
-
