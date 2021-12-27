@@ -499,7 +499,7 @@ def fit_pretrained_feature_extraction(X_train, y_train, X_val, y_val, X_test):
     results = calculate_results(y_val, preds)
     print(results)
 
-    return results
+    return model, results
 
 
 def fit_pretrained_feature_extraction_practice(X_train, y_train, X_val, y_val):
@@ -537,7 +537,8 @@ def fit_pretrained_feature_extraction_practice(X_train, y_train, X_val, y_val):
 
 
 def pandas_plot(results_model_0_naive_bayes, results_model_1_dense, results_model_2_rnn, results_model_3_gru,
-                results_model_4_bidirectional, results_model_5_conv1d, results_model_6_use, results_model_7_use_10_percent):
+                results_model_4_bidirectional, results_model_5_conv1d, results_model_6_use,
+                results_model_7_use_10_percent):
     all_model_results = pd.DataFrame({"0_baseline": results_model_0_naive_bayes,
                                       "1_simple_dense": results_model_1_dense,
                                       "2_lstm": results_model_2_rnn,
@@ -592,8 +593,9 @@ def run():
     # results_model_5_conv1d = fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
     # tf_hub_test()
-    results_model_6_use = fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels,
-                                                            test_sentences)
+    # model_6, results_model_6_use = fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences,
+    #                                                                  val_labels,
+    #                                                                  test_sentences)
 
     # X_train_10_percent, y_train_10_percent = load_train_data_10_percent()
     # train_sentences_10_percent, val_sentences_10_percent, \
@@ -607,7 +609,6 @@ def run():
     #                 results_model_4_bidirectional, results_model_5_conv1d, results_model_6_use,
     #                 results_model_7_use_10_percent)
 
-
     """
     tensorboard dev upload --logdir .\model_logs\ --name "NLP Modeling Experiments" --description "Comparing multiple models' performance on Kaggle disaster t
 weets dataset" --one_shot 
@@ -619,3 +620,13 @@ weets dataset" --one_shot
     Saving and loading a trained model.
     There are two main formats: hdf5 and SavedModel format (which is default for TensorFlow)
     """
+    # model_6.save("saved_models/model_6.h5")  # saves as hdf5
+
+    # formatting to load model with custom Hub layer (required when using hdf5 format)
+    loaded_model_6 = tf.keras.models.load_model("saved_models/model_6.h5",
+                                                custom_objects={"KerasLayer": hub.KerasLayer})
+    print(loaded_model_6.summary())
+    print(loaded_model_6.evaluate(val_sentences, val_labels))
+
+
+
