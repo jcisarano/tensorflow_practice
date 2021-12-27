@@ -349,3 +349,8 @@ def compare_histories(original_history, new_history, initial_epochs=5):
 
     plt.show()
 
+    """
+    Uploaded experiments to tensorboard at https://tensorboard.dev/experiment/LmyqWX86TLODJrlcqU4bdw/
+    Also see https://wandb.ai/site for more visualization tools
+    """
+
