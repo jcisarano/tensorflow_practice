@@ -30,11 +30,11 @@ TEST_PATH: str = "datasets/test.csv"
 SAVE_DIR: str = "model_logs"
 
 
-def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH):
+def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH, fraction=1.0):
     train_df = pd.read_csv(train_path)
     test_df = pd.read_csv(test_path)
 
-    train_df_shuffled = train_df.sample(frac=1, random_state=42)
+    train_df_shuffled = train_df.sample(frac=fraction, random_state=42)
     # visualize_train_data(train_df_shuffled)
 
     train_sentences, val_sentences, train_labels, val_labels = train_test_split(train_df_shuffled["text"].to_numpy(),
@@ -45,6 +45,24 @@ def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH):
     # print(train_sentences[:10], train_labels[:10])
 
     return train_sentences, val_sentences, test_df["text"], train_labels, val_labels
+
+
+def load_train_data_10_percent(train_path=TRAIN_PATH, test_path=TEST_PATH):
+    train_df = pd.read_csv(train_path)
+
+    train_df_shuffled = train_df.sample(frac=1, random_state=42)
+    train_10_percent = train_df_shuffled[["text", "target"]].sample(frac=0.1, random_state=42)
+    train_sentences_10_percent = train_10_percent["text"].to_list()
+    train_labels_10_percent = train_10_percent["target"].to_list()
+
+    # see the new data count
+    print(len(train_sentences_10_percent), len(train_labels_10_percent))
+
+    # check the class distribution
+    # it is not exactly 50/50, but is close to the original distribution
+    print(train_10_percent["target"].value_counts())
+
+    return train_sentences_10_percent, train_labels_10_percent
 
 
 def tokenize_text_dataset(train_sentences, val_sentences, test_sentences, max_vocab_len=10000):
@@ -501,6 +519,8 @@ def run():
     # fit_bidirectional_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # test_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
     # tf_hub_test()
+    # fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+
+    load_train_data_10_percent()
