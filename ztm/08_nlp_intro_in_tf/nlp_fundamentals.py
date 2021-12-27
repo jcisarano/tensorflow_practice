@@ -41,13 +41,15 @@ def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH, fraction=1.0):
                                                                                 train_df_shuffled["target"].to_numpy(),
                                                                                 test_size=0.1,
                                                                                 random_state=42)
-    # print(len(train_sentences), len(train_labels), len(val_sentences), len(val_labels))
+    print(len(train_sentences), len(train_labels), len(val_sentences), len(val_labels))
     # print(train_sentences[:10], train_labels[:10])
+    print(train_df_shuffled["target"].value_counts())
 
     return train_sentences, val_sentences, test_df["text"], train_labels, val_labels
 
 
 def load_train_data_10_percent(train_path=TRAIN_PATH, test_path=TEST_PATH):
+    """NOT a good way to get only 10% data, because val and test data is sampled separately"""
     train_df = pd.read_csv(train_path)
 
     train_df_shuffled = train_df.sample(frac=1, random_state=42)
@@ -554,5 +556,8 @@ def run():
     # tf_hub_test()
     # fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
-    X_train_10_percent, y_train_10_percent = load_train_data_10_percent()
-    fit_pretrained_feature_extraction_practice(X_train_10_percent, y_train_10_percent, val_sentences, val_labels)
+    # X_train_10_percent, y_train_10_percent = load_train_data_10_percent()
+    train_sentences_10_percent, val_sentences_10_percent, \
+    test_sentences_10_percent, train_labels_10_percent, val_labels_10_percent = load_data(fraction=0.1)
+    fit_pretrained_feature_extraction_practice(train_sentences_10_percent, train_labels_10_percent,
+                                               val_sentences_10_percent, val_labels_10_percent)
