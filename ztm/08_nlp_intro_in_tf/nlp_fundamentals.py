@@ -623,10 +623,12 @@ weets dataset" --one_shot
     # model_6.save("saved_models/model_6.h5")  # saves as hdf5
 
     # formatting to load model with custom Hub layer (required when using hdf5 format)
-    loaded_model_6 = tf.keras.models.load_model("saved_models/model_6.h5",
-                                                custom_objects={"KerasLayer": hub.KerasLayer})
-    print(loaded_model_6.summary())
-    print(loaded_model_6.evaluate(val_sentences, val_labels))
+    # loaded_model_6 = tf.keras.models.load_model("saved_models/model_6.h5",
+    #                                             custom_objects={"KerasLayer": hub.KerasLayer})
+    # print(loaded_model_6.summary())
+    # print(loaded_model_6.evaluate(val_sentences, val_labels))
 
-
-
+    # model_6.save("saved_models/model_6_SavedModel_format")
+    loaded_model_6_SavedModel_format = tf.keras.models.load_model("saved_models/model_6_SavedModel_format")
+    print(loaded_model_6_SavedModel_format.summary())
+    print(loaded_model_6_SavedModel_format.evaluate(val_sentences, val_labels))
