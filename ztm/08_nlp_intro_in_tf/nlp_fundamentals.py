@@ -629,6 +629,16 @@ weets dataset" --one_shot
     # print(loaded_model_6.evaluate(val_sentences, val_labels))
 
     # model_6.save("saved_models/model_6_SavedModel_format")
-    loaded_model_6_SavedModel_format = tf.keras.models.load_model("saved_models/model_6_SavedModel_format")
-    print(loaded_model_6_SavedModel_format.summary())
-    print(loaded_model_6_SavedModel_format.evaluate(val_sentences, val_labels))
+    # loaded_model_6_SavedModel_format = tf.keras.models.load_model("saved_models/model_6_SavedModel_format")
+    # print(loaded_model_6_SavedModel_format.summary())
+    # print(loaded_model_6_SavedModel_format.evaluate(val_sentences, val_labels))
+
+    # load a pretrained model for the next section, so it matches the course performance
+    model_6_pretrained = tf.keras.models.load_model("saved_models/08_model_6_USE_feature_extractor")
+    # print(model_6_pretrained.evaluate(val_sentences, val_labels))
+    model_6_pretrained_pred_probs = model_6_pretrained.predict(val_sentences)
+    model_6_pretrained_preds = tf.squeeze(tf.round(model_6_pretrained_pred_probs))
+    # print(model_6_pretrained_preds)
+    
+
+
