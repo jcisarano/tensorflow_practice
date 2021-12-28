@@ -203,7 +203,7 @@ def fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels):
     results = calculate_results(y_true=val_labels, y_pred=preds)
     print(results)
 
-    return results
+    return model, results
 
 
 def save_vocab_and_weights(vocab, weights):
@@ -601,7 +601,7 @@ def run():
     3) Fit the model
     4) Evaluate the model
     """
-    # results_model_0_naive_bayes = fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
+    model_0, results_model_0_naive_bayes = fit_naive_bayes(train_sentences, train_labels, val_sentences, val_labels)
     # results_model_1_dense = fit_dense_model(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # results_model_2_rnn = fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # results_model_3_gru = fit_gru_lstm(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
@@ -697,6 +697,7 @@ weets dataset" --one_shot
     #     print("-----\n")
 
     total_time, time_per_pred = pred_timer(model_6_pretrained, val_sentences)
-    print(f"Total time: {total_time}, Time per prediction: {time_per_pred}")
+    print(f"Model 6 total time: {total_time}, Time per prediction: {time_per_pred}")
 
-    
+    total_time, time_per_pred = pred_timer(model_0, val_sentences)
+    print(f"Baseline total time: {total_time}, Time per prediction: {time_per_pred}")
