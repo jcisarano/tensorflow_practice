@@ -538,6 +538,57 @@ def fit_pretrained_feature_extraction_practice(X_train, y_train, X_val, y_val):
     return results
 
 
+def load_and_fit_pretrained_model(X_train, X_test, X_val, y_train, y_val):
+    # load a pretrained model for the next section, so it matches the course performance
+    model = tf.keras.models.load_model("saved_models/08_model_6_USE_feature_extractor")
+    # print(model_6_pretrained.evaluate(val_sentences, val_labels))
+    pred_probs = model.predict(X_val)
+    preds = tf.squeeze(tf.round(pred_probs))
+    # print(model_6_pretrained_preds)
+
+    val_df = pd.DataFrame({"text": X_val,
+                           "target": y_val,
+                           "pred": preds,
+                           "pred_prob": tf.squeeze(pred_probs)})
+    # print(val_df)
+
+    # create a new dataframe where pred != target and sort so that the worst are at the top
+    most_wrong = val_df[val_df["target"] != val_df["pred"]].sort_values("pred_prob", ascending=False)
+    # print(most_wrong)
+    # for row in most_wrong[:10].itertuples():
+    #     _, text, target, pred, pred_prob = row
+    #     print(f"Target: {target}, Pred: {pred}, Prob: {pred_prob}")
+    #     print(f"Text:\n{text}\n")
+    #     print("----\n")
+
+    # for row in most_wrong[-10:# ].itertuples():
+    #     _, text, target, pred, pred_prob = row
+    #     print(f"Target: {target}, Pred: {pred}, Prob: {pred_prob}")
+    #     print(f"Text:\n{text}\n")
+    #     print("----\n")
+
+    # make predictions on test dataset:
+    model_6_pretrained_pred_probs_test = model.predict(X_test)
+    model_6_pretrained_preds_test = tf.squeeze(tf.round(model_6_pretrained_pred_probs_test))
+    test_df = pd.DataFrame({"text": X_test,
+                            "pred": model_6_pretrained_preds_test,
+                            "pred_prob": tf.squeeze(model_6_pretrained_pred_probs_test)})
+
+    # print(test_df[:10])
+
+    # print out 10 random predictions
+    # test_samples = random.sample(test_df["text"].to_list(), 10)
+    # for sample in test_samples:
+    #     pred_prob = tf.squeeze(model_6_pretrained.predict([sample]))
+    #     pred = tf.round(pred_prob)
+    #     print(f"Pred: {int(pred)}, Prob: {pred_prob}")
+    #     print(f"\nText: {sample}\n")
+    #     print("-----\n")
+
+    results = calculate_results(y_val, preds)
+    return model, results
+
+
 def pandas_plot(results_model_0_naive_bayes, results_model_1_dense, results_model_2_rnn, results_model_3_gru,
                 results_model_4_bidirectional, results_model_5_conv1d, results_model_6_use,
                 results_model_7_use_10_percent):
@@ -651,50 +702,11 @@ weets dataset" --one_shot
     # print(loaded_model_6_SavedModel_format.summary())
     # print(loaded_model_6_SavedModel_format.evaluate(val_sentences, val_labels))
 
-    # load a pretrained model for the next section, so it matches the course performance
-    model_6_pretrained = tf.keras.models.load_model("saved_models/08_model_6_USE_feature_extractor")
-    # print(model_6_pretrained.evaluate(val_sentences, val_labels))
-    model_6_pretrained_pred_probs = model_6_pretrained.predict(val_sentences)
-    model_6_pretrained_preds = tf.squeeze(tf.round(model_6_pretrained_pred_probs))
-    # print(model_6_pretrained_preds)
-
-    val_df = pd.DataFrame({"text": val_sentences,
-                           "target": val_labels,
-                           "pred": model_6_pretrained_preds,
-                           "pred_prob": tf.squeeze(model_6_pretrained_pred_probs)})
-    # print(val_df)
-
-    # create a new dataframe where pred != target and sort so that the worst are at the top
-    most_wrong = val_df[val_df["target"] != val_df["pred"]].sort_values("pred_prob", ascending=False)
-    # print(most_wrong)
-    # for row in most_wrong[:10].itertuples():
-    #     _, text, target, pred, pred_prob = row
-    #     print(f"Target: {target}, Pred: {pred}, Prob: {pred_prob}")
-    #     print(f"Text:\n{text}\n")
-    #     print("----\n")
-
-    # for row in most_wrong[-10:# ].itertuples():
-    #     _, text, target, pred, pred_prob = row
-    #     print(f"Target: {target}, Pred: {pred}, Prob: {pred_prob}")
-    #     print(f"Text:\n{text}\n")
-    #     print("----\n")
-
-    # make predictions on test dataset:
-    model_6_pretrained_pred_probs_test = model_6_pretrained.predict(test_sentences)
-    model_6_pretrained_preds_test = tf.squeeze(tf.round(model_6_pretrained_pred_probs_test))
-    test_df = pd.DataFrame({"text": test_sentences,
-                            "pred": model_6_pretrained_preds_test,
-                            "pred_prob": tf.squeeze(model_6_pretrained_pred_probs_test)})
-    # print(test_df[:10])
-
-    # print out 10 random predictions
-    # test_samples = random.sample(test_df["text"].to_list(), 10)
-    # for sample in test_samples:
-    #     pred_prob = tf.squeeze(model_6_pretrained.predict([sample]))
-    #     pred = tf.round(pred_prob)
-    #     print(f"Pred: {int(pred)}, Prob: {pred_prob}")
-    #     print(f"\nText: {sample}\n")
-    #     print("-----\n")
+    model_6_pretrained, model_6_pretrained_results = load_and_fit_pretrained_model(train_sentences,
+                                                                                   test_sentences,
+                                                                                   val_sentences,
+                                                                                   train_labels,
+                                                                                   val_labels)
 
     total_time, time_per_pred = pred_timer(model_6_pretrained, val_sentences)
     print(f"Model 6 total time: {total_time}, Time per prediction: {time_per_pred}")
