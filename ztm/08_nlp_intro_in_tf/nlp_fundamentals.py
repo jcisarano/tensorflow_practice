@@ -25,6 +25,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from helper_functions import create_tensorboard_callback
 
+import time
+
 TRAIN_PATH: str = "datasets/train.csv"
 TEST_PATH: str = "datasets/test.csv"
 
@@ -556,6 +558,22 @@ def pandas_plot(results_model_0_naive_bayes, results_model_1_dense, results_mode
     plt.show()
 
 
+def pred_timer(model, samples):
+    """
+    Time how long it takes the model to make a prediction.
+    :param model:
+    :param samples:
+    :return:
+    """
+    start_time = time.perf_counter()  # gets start time
+    model.predict(samples)
+    end_time = time.perf_counter()
+
+    total_time = end_time - start_time
+    time_per_pred = total_time / len(samples)
+    return total_time, time_per_pred
+
+
 def run():
     print("nlp fundies")
     # load the data:
@@ -670,10 +688,15 @@ weets dataset" --one_shot
     # print(test_df[:10])
 
     # print out 10 random predictions
-    test_samples = random.sample(test_df["text"].to_list(), 10)
-    for sample in test_samples:
-        pred_prob = tf.squeeze(model_6_pretrained.predict([sample]))
-        pred = tf.round(pred_prob)
-        print(f"Pred: {int(pred)}, Prob: {pred_prob}")
-        print(f"\nText: {sample}\n")
-        print("-----\n")
+    # test_samples = random.sample(test_df["text"].to_list(), 10)
+    # for sample in test_samples:
+    #     pred_prob = tf.squeeze(model_6_pretrained.predict([sample]))
+    #     pred = tf.round(pred_prob)
+    #     print(f"Pred: {int(pred)}, Prob: {pred_prob}")
+    #     print(f"\nText: {sample}\n")
+    #     print("-----\n")
+
+    total_time, time_per_pred = pred_timer(model_6_pretrained, val_sentences)
+    print(f"Total time: {total_time}, Time per prediction: {time_per_pred}")
+
+    
