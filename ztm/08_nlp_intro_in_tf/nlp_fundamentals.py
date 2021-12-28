@@ -667,5 +667,13 @@ weets dataset" --one_shot
     test_df = pd.DataFrame({"text": test_sentences,
                             "pred": model_6_pretrained_preds_test,
                             "pred_prob": tf.squeeze(model_6_pretrained_pred_probs_test)})
-    print(test_df[:10])
+    # print(test_df[:10])
 
+    # print out 10 random predictions
+    test_samples = random.sample(test_df["text"].to_list(), 10)
+    for sample in test_samples:
+        pred_prob = tf.squeeze(model_6_pretrained.predict([sample]))
+        pred = tf.round(pred_prob)
+        print(f"Pred: {int(pred)}, Prob: {pred_prob}")
+        print(f"\nText: {sample}\n")
+        print("-----\n")
