@@ -589,12 +589,12 @@ def load_and_fit_pretrained_model(X_train, X_test, X_val, y_train, y_val):
     return model, results
 
 
-def save_load_model_as_hdf5(model_6, X_val, y_val):
+def save_load_model_as_hdf5(model, X_val, y_val):
     """
     Saving and loading a trained model.
     There are two main formats: hdf5 and SavedModel format (which is default for TensorFlow)
     """
-    model_6.save("saved_models/model_6.h5")  # saves as hdf5
+    model.save("saved_models/model_6.h5")  # saves as hdf5
 
     # formatting to load model with custom Hub layer (required when using hdf5 format)
     loaded_model_6 = tf.keras.models.load_model("saved_models/model_6.h5",
@@ -602,7 +602,7 @@ def save_load_model_as_hdf5(model_6, X_val, y_val):
     print(loaded_model_6.summary())
     print(loaded_model_6.evaluate(X_val, y_val))
 
-    model_6.save("saved_models/model_6_SavedModel_format")
+    model.save("saved_models/model_6_SavedModel_format")
     loaded_model_6_SavedModel_format = tf.keras.models.load_model("saved_models/model_6_SavedModel_format")
     print(loaded_model_6_SavedModel_format.summary())
     print(loaded_model_6_SavedModel_format.evaluate(X_val, y_val))
@@ -710,8 +710,20 @@ weets dataset" --one_shot
                                                                                    train_labels,
                                                                                    val_labels)
 
-    total_time, time_per_pred = pred_timer(model_6_pretrained, val_sentences)
-    print(f"Model 6 total time: {total_time}, Time per prediction: {time_per_pred}")
+    model_6_total_time, model_6_time_per_pred = pred_timer(model_6_pretrained, val_sentences)
+    print(f"Model 6 total time: {model_6_total_time}, Time per prediction: {model_6_time_per_pred}")
 
-    total_time, time_per_pred = pred_timer(model_0, val_sentences)
-    print(f"Baseline total time: {total_time}, Time per prediction: {time_per_pred}")
+    baseline_total_time, baseline_time_per_pred = pred_timer(model_0, val_sentences)
+    print(f"Baseline total time: {baseline_total_time}, Time per prediction: {baseline_time_per_pred}")
+
+    # plot time to predict vs f1 score
+    # baseline is 3x faster than model 6, while model 6 is 3% more accurate
+    plt.figure(figsize=(10, 7))
+    plt.scatter(baseline_time_per_pred, results_model_0_naive_bayes["f1"], label="baseline")
+    plt.scatter(model_6_time_per_pred, model_6_pretrained_results["f1"], label="tf_hub_sentence_encoder")
+    plt.legend()
+    plt.title("F1 score versus time per prediction")
+    plt.xlabel("Time per prediction")
+    plt.ylabel("F1 score")
+    plt.show()
+
