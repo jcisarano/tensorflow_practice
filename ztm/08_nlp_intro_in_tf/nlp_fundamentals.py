@@ -589,6 +589,25 @@ def load_and_fit_pretrained_model(X_train, X_test, X_val, y_train, y_val):
     return model, results
 
 
+def save_load_model_as_hdf5(model_6, X_val, y_val):
+    """
+    Saving and loading a trained model.
+    There are two main formats: hdf5 and SavedModel format (which is default for TensorFlow)
+    """
+    model_6.save("saved_models/model_6.h5")  # saves as hdf5
+
+    # formatting to load model with custom Hub layer (required when using hdf5 format)
+    loaded_model_6 = tf.keras.models.load_model("saved_models/model_6.h5",
+                                                custom_objects={"KerasLayer": hub.KerasLayer})
+    print(loaded_model_6.summary())
+    print(loaded_model_6.evaluate(X_val, y_val))
+
+    model_6.save("saved_models/model_6_SavedModel_format")
+    loaded_model_6_SavedModel_format = tf.keras.models.load_model("saved_models/model_6_SavedModel_format")
+    print(loaded_model_6_SavedModel_format.summary())
+    print(loaded_model_6_SavedModel_format.evaluate(X_val, y_val))
+
+
 def pandas_plot(results_model_0_naive_bayes, results_model_1_dense, results_model_2_rnn, results_model_3_gru,
                 results_model_4_bidirectional, results_model_5_conv1d, results_model_6_use,
                 results_model_7_use_10_percent):
@@ -684,23 +703,6 @@ weets dataset" --one_shot
     Uploaded experiments to tensorboard at https://tensorboard.dev/experiment/LmyqWX86TLODJrlcqU4bdw/
     Also see https://wandb.ai/site for more visualization tools
     """
-
-    """
-    Saving and loading a trained model.
-    There are two main formats: hdf5 and SavedModel format (which is default for TensorFlow)
-    """
-    # model_6.save("saved_models/model_6.h5")  # saves as hdf5
-
-    # formatting to load model with custom Hub layer (required when using hdf5 format)
-    # loaded_model_6 = tf.keras.models.load_model("saved_models/model_6.h5",
-    #                                             custom_objects={"KerasLayer": hub.KerasLayer})
-    # print(loaded_model_6.summary())
-    # print(loaded_model_6.evaluate(val_sentences, val_labels))
-
-    # model_6.save("saved_models/model_6_SavedModel_format")
-    # loaded_model_6_SavedModel_format = tf.keras.models.load_model("saved_models/model_6_SavedModel_format")
-    # print(loaded_model_6_SavedModel_format.summary())
-    # print(loaded_model_6_SavedModel_format.evaluate(val_sentences, val_labels))
 
     model_6_pretrained, model_6_pretrained_results = load_and_fit_pretrained_model(train_sentences,
                                                                                    test_sentences,
