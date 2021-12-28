@@ -105,11 +105,12 @@ def create_embedding_for_text_dataset(train_sentences, val_sentences, test_sente
     `input_length` - length of sequences passed to embedding layer
     :return:
     """
-    embedding = tf.keras.layers.Embedding(input_dim=max_vocab_len,
-                                          output_dim=128,
-                                          embeddings_initializer="uniform",
-                                          input_length=len(train_sentences)
-                                          )
+    embedding = tf.keras.layers.Embedding(
+        input_dim=max_vocab_len,
+        output_dim=128,
+        embeddings_initializer="uniform",
+        input_length=len(train_sentences)
+    )
     # text_vectorizer = tokenize_text_dataset(train_sentences, val_sentences, test_sentences)
     # print(embedding)
     # random_sentence = random.choice(train_sentences)
@@ -230,7 +231,6 @@ def fit_dense_model(X_train, y_train, X_val, y_val, X_test):
     x = tf.keras.layers.GlobalMaxPooling1D()(x)  # seems to improve over avg pooling by 1%
     outputs = tf.keras.layers.Dense(1, activation="sigmoid")(x)  # binary output layer
     model = tf.keras.Model(inputs, outputs, name="model_1_dense")
-    # print(model.summary())
 
     model.compile(loss="binary_crossentropy",
                   optimizer=tf.keras.optimizers.Adam(),
@@ -254,13 +254,13 @@ def fit_dense_model(X_train, y_train, X_val, y_val, X_test):
 
     preds = tf.squeeze(tf.round(pred_probs))  # convert probabilities to binary labels for evaluation
     results = calculate_results(y_true=y_val, y_pred=preds)
-    print(results)
+    print("model_1_dense results:", results)
 
     words_in_vocab = text_vectorizer.get_vocabulary()
-    print(len(words_in_vocab), words_in_vocab[:10])
-    print(model.summary())
+    # print(len(words_in_vocab), words_in_vocab[:10])
+    # print(model.summary())
     embed_weights = model.get_layer("embedding_1").get_weights()[0]
-    print(embed_weights.shape)
+    # print(embed_weights.shape)
 
     """
     Visualize word embeddings with projector.tensorflow.org
@@ -726,4 +726,3 @@ weets dataset" --one_shot
     plt.xlabel("Time per prediction")
     plt.ylabel("F1 score")
     plt.show()
-
