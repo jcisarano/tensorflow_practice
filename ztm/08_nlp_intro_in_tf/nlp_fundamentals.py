@@ -83,7 +83,7 @@ def tokenize_text_dataset(train_sentences, val_sentences, test_sentences, max_vo
                                         pad_to_max_tokens=False,
                                         )
     text_vectorizer.adapt(train_sentences)
-    words_in_vocab = text_vectorizer.get_vocabulary()
+    # words_in_vocab = text_vectorizer.get_vocabulary()
     # print("Vocab length: ", len(words_in_vocab))
     # print("Top 5 unique words in vocabulary: ", words_in_vocab[:5])
     # print("Bottom 5 unique words in vocabulary: ", words_in_vocab[-5:])
