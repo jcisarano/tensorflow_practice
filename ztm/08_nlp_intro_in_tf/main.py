@@ -8,10 +8,13 @@ to another sequence of data (one to many, many to one, many to many, etc)
 
 import nlp_fundamentals as nlpf
 import exercises as nlp_exercises
+import best_model_for_kaggle as bmfk
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # nlpf.run()
-    nlp_exercises.run()
+    # nlp_exercises.run()
+    bmfk.run()
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

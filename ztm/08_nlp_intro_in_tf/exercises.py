@@ -7,7 +7,8 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
 from nlp_fundamentals import load_data, load_train_data_10_percent, calculate_results, SAVE_DIR, tokenize_text_dataset, \
-    fit_rnn, fit_conv1d, fit_pretrained_feature_extraction_practice, fit_pretrained_feature_extraction
+    fit_rnn, fit_conv1d, fit_pretrained_feature_extraction_practice, fit_pretrained_feature_extraction, TRAIN_PATH, \
+    TEST_PATH
 from nlp_fundamentals import fit_dense_model
 from helper_functions import create_tensorboard_callback
 
@@ -197,6 +198,7 @@ def fit_USE_trainable(X_train, y_train, X_val, y_val, X_test):
     preds = tf.squeeze(tf.round(pred_probs))
     results = calculate_results(y_val, preds)
     print("model_6_USE_trainable results:", results)
+
 
 def run():
     print("nlp exercises")
