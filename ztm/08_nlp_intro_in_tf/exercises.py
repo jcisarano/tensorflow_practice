@@ -1,10 +1,13 @@
-
 import tensorflow as tf
 import tensorflow_hub as hub
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+
 from nlp_fundamentals import load_data, load_train_data_10_percent, calculate_results, SAVE_DIR, tokenize_text_dataset, \
-    fit_rnn, fit_conv1d
+    fit_rnn, fit_conv1d, fit_pretrained_feature_extraction_practice
 from nlp_fundamentals import fit_dense_model
 from helper_functions import create_tensorboard_callback
 
@@ -153,6 +156,17 @@ def fit_conv1d_sequential(X_train, y_train, X_val, y_val, X_test, max_vocab_len=
     print("model_5_conv_1d_sequential results:", results)
 
 
+def fit_naive_bayes_ex(X_train, y_train, X_val, y_val):
+    model = Pipeline([
+        ("tfid", TfidfVectorizer()),
+        ("clf", MultinomialNB()),
+    ])
+    model.fit(X_train, y_train)
+    preds = model.predict(X_val)
+    results = calculate_results(y_val, preds)
+    print("NB 10 percent data", results)
+
+
 def run():
     print("nlp exercises")
     train_sentences, val_sentences, test_sentences, train_labels, val_labels = load_data()
@@ -165,7 +179,19 @@ def run():
     # fit_rnn_sequential(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
     # fit_rnn(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
-    fit_conv1d_sequential(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
-    fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # fit_conv1d_sequential(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    # fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
-
+    # train NB baseline on only 10% of training data and compare to USE performance on 10% of data
+    train_sentences_10_percent, val_sentences_10_percent, \
+    test_sentences_10_percent, train_labels_10_percent, val_labels_10_percent = load_data(fraction=0.1)
+    fit_naive_bayes_ex(
+        X_train=train_sentences_10_percent,
+        y_train=train_labels_10_percent,
+        X_val=val_sentences_10_percent,
+        y_val=val_labels_10_percent
+    )
+    fit_pretrained_feature_extraction_practice(train_sentences_10_percent,
+                                               train_labels_10_percent,
+                                               val_sentences_10_percent,
+                                               val_labels_10_percent)

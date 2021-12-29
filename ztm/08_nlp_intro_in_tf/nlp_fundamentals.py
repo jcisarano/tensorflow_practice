@@ -533,7 +533,7 @@ def fit_pretrained_feature_extraction_practice(X_train, y_train, X_val, y_val):
     pred_probs = model.predict(X_val)
     preds = tf.squeeze(tf.round(pred_probs))
     results = calculate_results(y_val, preds)
-    print(results)
+    print("model_7_USE_10_percent results:", results)
 
     return results
 
