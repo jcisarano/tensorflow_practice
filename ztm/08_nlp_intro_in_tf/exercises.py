@@ -7,7 +7,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
 from nlp_fundamentals import load_data, load_train_data_10_percent, calculate_results, SAVE_DIR, tokenize_text_dataset, \
-    fit_rnn, fit_conv1d, fit_pretrained_feature_extraction_practice
+    fit_rnn, fit_conv1d, fit_pretrained_feature_extraction_practice, fit_pretrained_feature_extraction
 from nlp_fundamentals import fit_dense_model
 from helper_functions import create_tensorboard_callback
 
@@ -167,6 +167,37 @@ def fit_naive_bayes_ex(X_train, y_train, X_val, y_val):
     print("NB 10 percent data", results)
 
 
+def fit_USE_trainable(X_train, y_train, X_val, y_val, X_test):
+    sentence_encoder_layer = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
+                                            input_shape=[],
+                                            dtype=tf.string,
+                                            trainable=True)
+
+    model = tf.keras.models.Sequential([
+        sentence_encoder_layer,
+        tf.keras.layers.Dense(64, activation="relu"),
+        tf.keras.layers.Dense(1, activation="sigmoid")
+    ], name="model_6_USE_trainable")
+
+    model.compile(
+        loss="binary_crossentropy",
+        optimizer=tf.keras.optimizers.Adam(),
+        metrics=["accuracy"]
+    )
+
+    model.fit(
+        x=X_train,
+        y=y_train,
+        epochs=5,
+        validation_data=(X_val, y_val),
+        callbacks=[create_tensorboard_callback(SAVE_DIR, experiment_name="model_6_USE_trainable")]
+    )
+
+    pred_probs = model.predict(X_val)
+    preds = tf.squeeze(tf.round(pred_probs))
+    results = calculate_results(y_val, preds)
+    print("model_6_USE_trainable results:", results)
+
 def run():
     print("nlp exercises")
     train_sentences, val_sentences, test_sentences, train_labels, val_labels = load_data()
@@ -183,15 +214,18 @@ def run():
     # fit_conv1d(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
 
     # train NB baseline on only 10% of training data and compare to USE performance on 10% of data
-    train_sentences_10_percent, val_sentences_10_percent, \
-    test_sentences_10_percent, train_labels_10_percent, val_labels_10_percent = load_data(fraction=0.1)
-    fit_naive_bayes_ex(
-        X_train=train_sentences_10_percent,
-        y_train=train_labels_10_percent,
-        X_val=val_sentences_10_percent,
-        y_val=val_labels_10_percent
-    )
-    fit_pretrained_feature_extraction_practice(train_sentences_10_percent,
-                                               train_labels_10_percent,
-                                               val_sentences_10_percent,
-                                               val_labels_10_percent)
+    # train_sentences_10_percent, val_sentences_10_percent, \
+    # test_sentences_10_percent, train_labels_10_percent, val_labels_10_percent = load_data(fraction=0.1)
+    # fit_naive_bayes_ex(
+    #     X_train=train_sentences_10_percent,
+    #     y_train=train_labels_10_percent,
+    #     X_val=val_sentences_10_percent,
+    #     y_val=val_labels_10_percent
+    # )
+    # fit_pretrained_feature_extraction_practice(train_sentences_10_percent,
+    #                                            train_labels_10_percent,
+    #                                            val_sentences_10_percent,
+    #                                            val_labels_10_percent)
+
+    fit_USE_trainable(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
+    fit_pretrained_feature_extraction(train_sentences, train_labels, val_sentences, val_labels, test_sentences)
