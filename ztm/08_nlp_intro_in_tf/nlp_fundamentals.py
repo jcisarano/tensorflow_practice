@@ -453,7 +453,7 @@ def fit_conv1d(X_train, y_train, X_val, y_val, X_test):
     pred_probs = model.predict(X_val)
     preds = tf.squeeze(tf.round(pred_probs))
     results = calculate_results(y_val, preds)
-    print(results)
+    print("model_5_conv_1d results:", results)
 
     return results
 
