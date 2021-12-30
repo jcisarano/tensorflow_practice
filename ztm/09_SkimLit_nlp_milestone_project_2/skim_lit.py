@@ -26,12 +26,34 @@ def get_lines(filepath):
         return f.readlines()
 
 
-def run():
-    filenames = [DATA_DIR_20K_NUM_REPL + filename for filename in os.listdir(DATA_DIR_20K_NUM_REPL)]
-    print(filenames)
+def parse_file(filepath):
+    lines = get_lines(filepath)
+    parsed_lines = []
+    for line in lines:
+        line = line.replace("\n", "")
+        if line.startswith("###"):
+            line = line.replace("###", "")
+            abstract = {"line_number": line, "total_lines": 0}
+        elif len(line) == 0:
+            parsed_lines.append(abstract)
+            continue
+        else:
+            split = line.split("\t")
+            abstract["target"] = split[0]
+            abstract["text"] = split[1]
+            abstract["total_lines"] = abstract["total_lines"] + 1
 
-    train_lines = get_lines(DATA_DIR_20K_NUM_REPL + "train.txt")
-    print(train_lines[:30])
-    print(len(train_lines))
+    print(len(parsed_lines))
+    print(parsed_lines[:5])
+
+
+def run():
+    parse_file(DATA_DIR_20K_NUM_REPL + "train.txt")
+    # filenames = [DATA_DIR_20K_NUM_REPL + filename for filename in os.listdir(DATA_DIR_20K_NUM_REPL)]
+    # print(filenames)
+
+    # train_lines = get_lines(DATA_DIR_20K_NUM_REPL + "train.txt")
+    # print(train_lines[:30])
+    # print(len(train_lines))
     # start the experiments using 20k dataset with numbers replaced by @ sign
     print("skim lit")
