@@ -22,7 +22,9 @@ def fit_USE(X_train, y_train, X_test=None, test_ids=None, num_epochs=5, X_val=No
                                             trainable=False)
     model = tf.keras.models.Sequential([
         sentence_encoder_layer,
-        tf.keras.layers.Dense(64, activation="relu"),
+        # tf.keras.layers.Dense(256, activation="selu"),
+        # tf.keras.layers.Dense(128, activation="selu"),
+        tf.keras.layers.Dense(64, activation="selu"),
         tf.keras.layers.Dense(1, activation="sigmoid")
     ], name="best_model")
 
@@ -56,7 +58,7 @@ def fit_USE(X_train, y_train, X_test=None, test_ids=None, num_epochs=5, X_val=No
         pred_probs = model.predict(X_test)
         preds = tf.squeeze(tf.round(pred_probs))
         output = np.c_[test_ids, preds]
-        np.savetxt("output/out.csv", output.astype(int), delimiter=',', fmt='%s')
+        np.savetxt("output/out.csv", output.astype(int), delimiter=',', fmt='%s', header="id,target", comments="")
 
 
 
@@ -64,4 +66,4 @@ def run():
     # train_sentences, val_sentences, test_sentences, train_labels, val_labels = load_data()
     # fit_USE(train_sentences, train_labels, num_epochs=5, X_val=val_sentences, y_val=val_labels)
     X_train, y_train, X_test, test_ids = load_train_test_data()
-    fit_USE(X_train, y_train, X_test, num_epochs=10, test_ids=test_ids)
+    fit_USE(X_train, y_train, X_test, num_epochs=5, test_ids=test_ids)
