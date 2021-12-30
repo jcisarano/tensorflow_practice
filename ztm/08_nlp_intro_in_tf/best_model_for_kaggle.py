@@ -24,7 +24,7 @@ def fit_USE(X_train, y_train, X_test=None, test_ids=None, num_epochs=5, X_val=No
         sentence_encoder_layer,
         # tf.keras.layers.Dense(256, activation="selu"),
         # tf.keras.layers.Dense(128, activation="selu"),
-        tf.keras.layers.Dense(64, activation="selu"),
+        tf.keras.layers.Dense(64, activation="relu"),
         tf.keras.layers.Dense(1, activation="sigmoid")
     ], name="best_model")
 
