@@ -48,6 +48,8 @@ def load_data(train_path=TRAIN_PATH, test_path=TEST_PATH, fraction=1.0):
     # print(train_sentences[:10], train_labels[:10])
     print(train_df_shuffled["target"].value_counts())
 
+    print(test_df.columns)
+
     return train_sentences, val_sentences, test_df["text"], train_labels, val_labels
 
 
