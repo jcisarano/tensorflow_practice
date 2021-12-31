@@ -11,6 +11,8 @@ import numpy as np
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
+from pprint import pprint
+
 from helper_functions import calculate_results
 
 
@@ -129,6 +131,15 @@ def create_text_vectorizer_layer(X_train, max_vocab_len=68000, visualize=False):
         print(f"Length:\n{len(target_sentence.split())}")
         print(f"Vectorized:\n{text_vectorizer([target_sentence])}")
 
+        # View vocab len and most/least common words
+        print(f"\nNumber of words in vocab: {len(text_vectorizer.get_vocabulary())}")
+        print(f"Most common words: {text_vectorizer.get_vocabulary()[:5]}")
+        print(f"Least common words: {text_vectorizer.get_vocabulary()[-5:]}")
+
+        # View the vectorizer configuration
+        print("\nVectorizer config:")
+        pprint(text_vectorizer.get_config())
+
     return text_vectorizer
 
 
@@ -226,4 +237,4 @@ def run():
 
     # examine_sentence_data(train_df["text"].to_numpy())
 
-    create_text_vectorizer_layer(train_df["text"].to_numpy())
+    create_text_vectorizer_layer(train_df["text"].to_numpy(), visualize=True)
