@@ -164,6 +164,24 @@ def create_embedding_layer(max_vocab_len=68000, visualize=False, X_train=False):
     return token_embed
 
 
+def format_data_for_batching(X_train, y_train_one_hot,
+                             X_val, y_val_one_hot,
+                             X_test, y_test_one_hot):
+
+    # Use tensorflow datasets to make data loads as fast as possible
+    # see https://www.tensorflow.org/guide/data
+    # and https://www.tensorflow.org/guide/data_performance
+    train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train_one_hot))
+    valid_dataset = tf.data.Dataset.from_tensor_slices((X_val, y_val_one_hot))
+    test_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test_one_hot))
+
+    train_dataset = train_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+    valid_dataset = valid_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+    test_dataset = test_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+
+    return train_dataset, valid_dataset, test_dataset
+
+
 def get_labels_one_hot(y_train, y_val, y_test):
     from sklearn.preprocessing import OneHotEncoder
     one_hot_encoder = OneHotEncoder(sparse=False)
@@ -259,4 +277,11 @@ def run():
     # examine_sentence_data(train_df["text"].to_numpy())
 
     # create_text_vectorizer_layer(train_df["text"].to_numpy())
-    create_embedding_layer(visualize=True, X_train=train_df["text"].to_numpy())
+    # create_embedding_layer()
+
+    train_dataset, val_dataset, test_dataset = format_data_for_batching(train_df["text"], train_labels_one_hot,
+                                                                        val_df["text"], val_labels_one_hot,
+                                                                        test_df["text"], test_labels_one_hot
+                                                                        )
+
+    print(train_dataset)
