@@ -1,4 +1,6 @@
 import os
+import random
+
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -10,11 +12,11 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras import layers
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
+import tensorflow_hub as hub
 
 from pprint import pprint
 
 from helper_functions import calculate_results
-
 
 DATA_DIR_20K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_20k_RCT_numbers_replaced_with_at_sign/"
 DATA_DIR_200K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_200k_RCT_numbers_replaced_with_at_sign/"
@@ -167,7 +169,6 @@ def create_embedding_layer(max_vocab_len=68000, visualize=False, X_train=False):
 def format_data_for_batching(X_train, y_train_one_hot,
                              X_val, y_val_one_hot,
                              X_test, y_test_one_hot):
-
     # Use tensorflow datasets to make data loads as fast as possible
     # see https://www.tensorflow.org/guide/data
     # and https://www.tensorflow.org/guide/data_performance
@@ -225,7 +226,7 @@ def fit_naive_bayes(X_train, y_train, X_val, y_val):
     return model, results
 
 
-def fit_conv1d(X_train, train_dataset, val_dataset, y_val, num_classes): #, y_train, X_val, y_val, num_classes):
+def fit_conv1d(X_train, train_dataset, val_dataset, y_val, num_classes):  # , y_train, X_val, y_val, num_classes):
     inputs = layers.Input(shape=(1,), dtype=tf.string)
     text_vectorizer = create_text_vectorizer_layer(X_train=X_train)
     text_vectors = text_vectorizer(inputs)
@@ -243,10 +244,10 @@ def fit_conv1d(X_train, train_dataset, val_dataset, y_val, num_classes): #, y_tr
 
     # train and validate on only 10% of data during development to speed up experimentation cycle
     history = model.fit(train_dataset,
-                        steps_per_epoch=int(0.1*len(train_dataset)),
+                        steps_per_epoch=int(0.1 * len(train_dataset)),
                         epochs=3,
                         validation_data=val_dataset,
-                        validation_steps=int(0.1*len(val_dataset)),
+                        validation_steps=int(0.1 * len(val_dataset)),
                         workers=-1
                         )
 
@@ -258,6 +259,14 @@ def fit_conv1d(X_train, train_dataset, val_dataset, y_val, num_classes): #, y_tr
     results = calculate_results(y_val, preds)
 
     return model, results
+
+
+def fit_model_with_USE(X_train):
+    tf_hub_embedding_layer = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
+                                            trainable=False,
+                                            name="universal_encoding_layer")
+
+    return None, None
 
 
 def parse_file(filepath):
@@ -304,7 +313,7 @@ def run():
         train_df["target"].to_numpy(),
         val_df["target"].to_numpy(),
         test_df["target"].to_numpy(),
-        )
+    )
 
     # model_0, model_0_results = fit_naive_bayes(train_df["text"], train_labels_encoded, val_df["text"], val_labels_encoded)
     # print(model_0_results)
@@ -316,5 +325,10 @@ def run():
                                                                         test_df["text"], test_labels_one_hot
                                                                         )
 
-    model_1, model_1_results = fit_conv1d(train_df["text"], train_dataset, val_dataset, val_labels_encoded, len(class_names))
-    print(model_1_results)
+    # model_1, model_1_results = fit_conv1d(train_df["text"], train_dataset, val_dataset, val_labels_encoded,
+    #                                       len(class_names))
+    # print(model_1_results)
+
+    model_2, model_2_results = fit_model_with_USE(train_df["text"])
+
+
