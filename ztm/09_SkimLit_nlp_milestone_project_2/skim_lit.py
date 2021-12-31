@@ -57,7 +57,7 @@ def preprocess_text_with_line_numbers(filepath):
                 line_data["target"] = target_text_split[0]
                 line_data["text"] = target_text_split[1].lower()
                 line_data["line_number"] = abstract_line_number  # what number is this line in the abstract?
-                line_data["total_lines"] = len(abstract_line_split)-1
+                line_data["total_lines"] = len(abstract_line_split) - 1
                 abstract_samples.append(line_data)
         else:
             abstract_lines += line
@@ -82,13 +82,24 @@ def visualize_data(train_df, val_df, test_df):
     print(train_sentences[:10])
 
 
-def get_labels_one_hot(y_train, y_val):
+def get_labels_one_hot(y_train, y_val, y_test):
     from sklearn.preprocessing import OneHotEncoder
     one_hot_encoder = OneHotEncoder(sparse=False)
     train_labels_one_hot = one_hot_encoder.fit_transform(y_train)
     val_labels_one_hot = one_hot_encoder.transform(y_val)
+    test_labels_one_hot = one_hot_encoder.transform(y_test)
 
-    return train_labels_one_hot, val_labels_one_hot
+    return train_labels_one_hot, val_labels_one_hot, test_labels_one_hot
+
+
+def get_labels_int_encode(y_train, y_val, y_test):
+    from sklearn.preprocessing import LabelEncoder
+    label_encoder = LabelEncoder()
+    train_labels_encoded = label_encoder.fit_transform(y_train)
+    val_labels_encoded = label_encoder.transform(y_val)
+    test_labels_encoded = label_encoder.transform(y_test)
+
+    return train_labels_encoded, val_labels_encoded, test_labels_encoded, label_encoder.classes_
 
 
 def parse_file(filepath):
@@ -123,11 +134,18 @@ def run():
     val_samples = preprocess_text_with_line_numbers(filepath=DATA_DIR_20K_NUM_REPL + "dev.txt")
     test_samples = preprocess_text_with_line_numbers(filepath=DATA_DIR_20K_NUM_REPL + "test.txt")
     train_df, val_df, test_df = convert_to_panda_df(train_samples, val_samples, test_samples)
-
-    train_labels_one_hot, val_labels_one_hot = get_labels_one_hot(train_df["target"].to_numpy().reshape(-1, 1),
-                                                                  val_df["target"].to_numpy().reshape(-1, 1))
-
-    print(train_labels_one_hot)
-    print(val_labels_one_hot)
     # visualize_data(train_df, val_df, test_df)
-    # train_samples = parse_file(DATA_DIR_20K_NUM_REPL + "train.txt")
+
+    train_labels_one_hot, val_labels_one_hot, test_labels_one_hot = get_labels_one_hot(
+        train_df["target"].to_numpy().reshape(-1, 1),
+        val_df["target"].to_numpy().reshape(-1, 1),
+        test_df["target"].to_numpy().reshape(-1, 1)
+    )
+
+    train_labels_encoded, val_labels_encoded, test_labels_encoded, class_names = get_labels_int_encode(
+        train_df["target"].to_numpy(),
+        val_df["target"].to_numpy(),
+        test_df["target"].to_numpy(),
+        )
+
+    print(class_names)
