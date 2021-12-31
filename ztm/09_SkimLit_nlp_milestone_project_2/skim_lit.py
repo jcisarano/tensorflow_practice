@@ -1,7 +1,17 @@
 import os
+import pandas as pd
+import matplotlib.pyplot as plt
 
 DATA_DIR_20K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_20k_RCT_numbers_replaced_with_at_sign/"
 DATA_DIR_200K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_200k_RCT_numbers_replaced_with_at_sign/"
+
+
+def convert_to_panda_df(train_samples, val_samples, test_samples):
+    train_df = pd.DataFrame(train_samples)
+    val_df = pd.DataFrame(val_samples)
+    test_df = pd.DataFrame(test_samples)
+
+    return train_df, val_df, test_df
 
 
 def get_lines(filepath):
@@ -55,10 +65,35 @@ def preprocess_text_with_line_numbers(filepath):
     return abstract_samples
 
 
+def visualize_data(train_df, val_df, test_df):
+    print(train_df.head(14))
+
+    # distribution of labels
+    print(train_df.target.value_counts())
+
+    # line length
+    train_df.total_lines.plot.hist()
+    plt.show()
+
+    train_sentences = train_df["text"].tolist()
+    val_sentences = val_df["text"].tolist()
+    test_sentences = test_df["text"].tolist()
+
+    print(train_sentences[:10])
+
+
+def get_labels_one_hot(y_train, y_val):
+    from sklearn.preprocessing import OneHotEncoder
+    one_hot_encoder = OneHotEncoder(sparse=False)
+    train_labels_one_hot = one_hot_encoder.fit_transform(y_train)
+    val_labels_one_hot = one_hot_encoder.transform(y_val)
+
+    return train_labels_one_hot, val_labels_one_hot
+
+
 def parse_file(filepath):
     """
-    My version of the preprocess_text_with_line_numbers() task.
-
+    My messed up version of the preprocess_text_with_line_numbers() task.
     :param filepath:
     :return:
     """
@@ -67,8 +102,7 @@ def parse_file(filepath):
     for line in lines:
         line = line.replace("\n", "")
         if line.startswith("###"):
-            line = line.replace("###", "")
-            abstract = {"line_number": line, "total_lines": 0}
+            abstract = {"line_number": 0, "total_lines": 0}
         elif len(line) == 0:
             parsed_lines.append(abstract)
             continue
@@ -88,14 +122,12 @@ def run():
     train_samples = preprocess_text_with_line_numbers(filepath=DATA_DIR_20K_NUM_REPL + "train.txt")
     val_samples = preprocess_text_with_line_numbers(filepath=DATA_DIR_20K_NUM_REPL + "dev.txt")
     test_samples = preprocess_text_with_line_numbers(filepath=DATA_DIR_20K_NUM_REPL + "test.txt")
-    print(train_samples[:10])
-    print(len(train_samples))
-    print(len(val_samples))
-    print(len(test_samples))
-    train_samples = parse_file(DATA_DIR_20K_NUM_REPL + "train.txt")
+    train_df, val_df, test_df = convert_to_panda_df(train_samples, val_samples, test_samples)
 
-    # train_lines = get_lines(DATA_DIR_20K_NUM_REPL + "train.txt")
-    # print(train_lines[:30])
-    # print(len(train_lines))
-    # start the experiments using 20k dataset with numbers replaced by @ sign
-    print("skim lit")
+    train_labels_one_hot, val_labels_one_hot = get_labels_one_hot(train_df["target"].to_numpy().reshape(-1, 1),
+                                                                  val_df["target"].to_numpy().reshape(-1, 1))
+
+    print(train_labels_one_hot)
+    print(val_labels_one_hot)
+    # visualize_data(train_df, val_df, test_df)
+    # train_samples = parse_file(DATA_DIR_20K_NUM_REPL + "train.txt")
