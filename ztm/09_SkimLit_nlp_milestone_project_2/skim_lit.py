@@ -143,6 +143,27 @@ def create_text_vectorizer_layer(X_train, max_vocab_len=68000, visualize=False):
     return text_vectorizer
 
 
+def create_embedding_layer(max_vocab_len=68000, visualize=False, X_train=False):
+    token_embed = layers.Embedding(input_dim=max_vocab_len,
+                                   output_dim=128,
+                                   mask_zero=True,
+                                   name="token_embedding"
+                                   )
+
+    if visualize:
+        import random
+        text_vectorizer = create_text_vectorizer_layer(X_train)
+        target_sentence = random.choice(X_train)
+        target_sentence_vectorized = text_vectorizer([target_sentence])
+        print(f"Text:\n{target_sentence}")
+        print(f"Vectorized:\n{target_sentence_vectorized}")
+        embedded_sentence = token_embed(target_sentence_vectorized)
+        print(f"Embedded sentence:\n{embedded_sentence}")
+        print(f"Embedded sentence shape:\n{embedded_sentence.shape}")
+
+    return token_embed
+
+
 def get_labels_one_hot(y_train, y_val, y_test):
     from sklearn.preprocessing import OneHotEncoder
     one_hot_encoder = OneHotEncoder(sparse=False)
@@ -237,4 +258,5 @@ def run():
 
     # examine_sentence_data(train_df["text"].to_numpy())
 
-    create_text_vectorizer_layer(train_df["text"].to_numpy(), visualize=True)
+    # create_text_vectorizer_layer(train_df["text"].to_numpy())
+    create_embedding_layer(visualize=True, X_train=train_df["text"].to_numpy())
