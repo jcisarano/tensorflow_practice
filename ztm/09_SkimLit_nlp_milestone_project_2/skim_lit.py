@@ -6,6 +6,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
+import tensorflow as tf
+import numpy as np
+from tensorflow.keras import layers
+
 from helper_functions import calculate_results
 
 
@@ -88,6 +92,23 @@ def visualize_data(train_df, val_df, test_df):
 
     print(train_sentences[:10])
 
+
+def examine_sentence_data(sentences):
+    sent_lens = [len(sentence.split()) for sentence in sentences]
+    avg_sent_len = np.mean(sent_lens)
+
+    print("Average sentence length:", avg_sent_len)
+
+    plt.hist(sent_lens, bins=30)
+    plt.show()
+
+    # determine 95th percentile sentence length
+    # i.e. 95% of sentences are shorter than this length
+    output_sequence_len = int(np.percentile(sent_lens, 95))
+    print("95% of sentences are below length ", output_sequence_len)
+    print("Max sentence length: ", max(sent_lens))
+    longest = sentences[np.argmax(sent_lens)]
+    print("Longest sentence:", longest)
 
 def get_labels_one_hot(y_train, y_val, y_test):
     from sklearn.preprocessing import OneHotEncoder
@@ -178,5 +199,7 @@ def run():
         test_df["target"].to_numpy(),
         )
 
-    model_0, model_0_results = fit_naive_bayes(train_df["text"], train_labels_encoded, val_df["text"], val_labels_encoded)
-    print(model_0_results)
+    # model_0, model_0_results = fit_naive_bayes(train_df["text"], train_labels_encoded, val_df["text"], val_labels_encoded)
+    # print(model_0_results)
+
+    examine_sentence_data(train_df["text"].to_numpy())
