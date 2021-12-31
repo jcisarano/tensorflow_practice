@@ -2,6 +2,11 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import Pipeline
+
 DATA_DIR_20K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_20k_RCT_numbers_replaced_with_at_sign/"
 DATA_DIR_200K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_200k_RCT_numbers_replaced_with_at_sign/"
 
@@ -102,6 +107,28 @@ def get_labels_int_encode(y_train, y_val, y_test):
     return train_labels_encoded, val_labels_encoded, test_labels_encoded, label_encoder.classes_
 
 
+def fit_naive_bayes(X_train, y_train, X_val, y_val):
+    """
+    Fit and train Naive Bayes model as baseline for comparison to all other models.
+    :param X_train:
+    :param y_train:
+    :param X_val:
+    :param y_val:
+    :return:
+    """
+
+    model = Pipeline([
+        ("tfidf", TfidfVectorizer()),
+        ("clf", MultinomialNB())
+    ])
+
+    model.fit(X_train, y_train)
+
+    score = model.score(X_val, y_val)
+    print(score)
+    preds = model.predict(X_val)
+
+    
 def parse_file(filepath):
     """
     My messed up version of the preprocess_text_with_line_numbers() task.
@@ -148,4 +175,4 @@ def run():
         test_df["target"].to_numpy(),
         )
 
-    print(class_names)
+    fit_naive_bayes(train_df["text"], train_labels_encoded, val_df["text"], val_labels_encoded)
