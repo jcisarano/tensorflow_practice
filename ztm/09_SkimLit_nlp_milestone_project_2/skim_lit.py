@@ -261,12 +261,33 @@ def fit_conv1d(X_train, train_dataset, val_dataset, y_val, num_classes):  # , y_
     return model, results
 
 
-def fit_model_with_USE(X_train):
+def fit_model_with_USE(train_dataset, valid_dataset, y_val, num_classes):
     tf_hub_embedding_layer = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
                                             trainable=False,
                                             name="universal_encoding_layer")
 
-    return None, None
+    inputs = layers.Input(shape=[], dtype=tf.string)
+    pretrained_embedding = tf_hub_embedding_layer(inputs)
+    x = layers.Dense(128, activation="relu")(pretrained_embedding)
+    output = layers.Dense(num_classes, activation="softmax")(x)
+
+    model = tf.keras.Model(inputs, output, name="model_2_USE_feature_extractor")
+
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+
+    history = model.fit(train_dataset,
+                        epochs=3,
+                        steps_per_epoch=int(0.1 * len(train_dataset)),
+                        validation_data=valid_dataset,
+                        validation_steps=int(0.1 * len(valid_dataset)))
+
+    pred_probs = model.predict(valid_dataset)
+    preds = tf.argmax(pred_probs, axis=1)
+    results = calculate_results(y_val, preds)
+
+    return model, results
 
 
 def parse_file(filepath):
@@ -329,6 +350,5 @@ def run():
     #                                       len(class_names))
     # print(model_1_results)
 
-    model_2, model_2_results = fit_model_with_USE(train_df["text"])
-
-
+    model_2, model_2_results = fit_model_with_USE(train_dataset, val_dataset, val_labels_encoded, len(class_names))
+    print(model_2_results)
