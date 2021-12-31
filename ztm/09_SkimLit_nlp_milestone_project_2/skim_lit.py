@@ -225,6 +225,41 @@ def fit_naive_bayes(X_train, y_train, X_val, y_val):
     return model, results
 
 
+def fit_conv1d(X_train, train_dataset, val_dataset, y_val, num_classes): #, y_train, X_val, y_val, num_classes):
+    inputs = layers.Input(shape=(1,), dtype=tf.string)
+    text_vectorizer = create_text_vectorizer_layer(X_train=X_train)
+    text_vectors = text_vectorizer(inputs)
+    embedding = create_embedding_layer()
+    token_embeddings = embedding(text_vectors)
+    x = layers.Conv1D(64, kernel_size=5, padding="same", activation="relu")(token_embeddings)
+    x = layers.GlobalAveragePooling1D()(x)
+    outputs = layers.Dense(num_classes, activation="softmax")(x)
+    model = tf.keras.Model(inputs, outputs)
+
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    print(model.summary())
+
+    # train and validate on only 10% of data during development to speed up experimentation cycle
+    history = model.fit(train_dataset,
+                        steps_per_epoch=int(0.1*len(train_dataset)),
+                        epochs=3,
+                        validation_data=val_dataset,
+                        validation_steps=int(0.1*len(val_dataset)),
+                        workers=-1
+                        )
+
+    # evaluate on whole validation set
+    # print(model.evaluate(val_dataset))
+
+    pred_probs = model.predict(val_dataset)
+    preds = tf.argmax(pred_probs, axis=1)
+    results = calculate_results(y_val, preds)
+
+    return model, results
+
+
 def parse_file(filepath):
     """
     My messed up version of the preprocess_text_with_line_numbers() task.
@@ -276,12 +311,10 @@ def run():
 
     # examine_sentence_data(train_df["text"].to_numpy())
 
-    # create_text_vectorizer_layer(train_df["text"].to_numpy())
-    # create_embedding_layer()
-
     train_dataset, val_dataset, test_dataset = format_data_for_batching(train_df["text"], train_labels_one_hot,
                                                                         val_df["text"], val_labels_one_hot,
                                                                         test_df["text"], test_labels_one_hot
                                                                         )
 
-    print(train_dataset)
+    model_1, model_1_results = fit_conv1d(train_df["text"], train_dataset, val_dataset, val_labels_encoded, len(class_names))
+    print(model_1_results)
