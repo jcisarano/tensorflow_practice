@@ -1,5 +1,6 @@
 import os
 import random
+import string
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -21,6 +22,8 @@ from helper_functions import calculate_results
 DATA_DIR_20K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_20k_RCT_numbers_replaced_with_at_sign/"
 DATA_DIR_200K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_200k_RCT_numbers_replaced_with_at_sign/"
 
+NUM_CHAR_TOKENS: int = len(string.ascii_lowercase + string.digits + string.punctuation) + 2
+
 
 def convert_to_panda_df(train_samples, val_samples, test_samples):
     train_df = pd.DataFrame(train_samples)
@@ -39,6 +42,10 @@ def get_lines(filepath):
     """
     with open(filepath, "r") as f:
         return f.readlines()
+
+
+def split_chars(text):
+    return " ".join(list(text))
 
 
 def preprocess_text_with_line_numbers(filepath):
@@ -116,18 +123,39 @@ def examine_sentence_data(sentences):
     print("Longest sentence:", longest)
 
 
+def examine_sentence_char_data(sentences):
+    char_lens = [len(sentence) for sentence in sentences]
+    mean_char_len = np.mean(char_lens)
+    print(mean_char_len)
+
+    plt.hist(char_lens, bins=20)
+    plt.show()
+
+    # view 95th percentile char len
+    char_len_95th = int(np.percentile(char_lens, 95))
+    print("95th percentile char len", char_len_95th)
+
+    # count all keyboard characters for max token count
+    import string
+    alphabet = string.ascii_lowercase + string.digits + string.punctuation
+    print("Alphabet count:", NUM_CHAR_TOKENS)
+
+
 def create_text_vectorizer_layer(X_train, max_vocab_len=68000, visualize=False):
     sent_lens = [len(sentence.split()) for sentence in X_train]
     ninety_five_percentile_len = int(np.percentile(sent_lens, 95))
 
     text_vectorizer = TextVectorization(max_tokens=max_vocab_len,  # how many words in final vocab, None means unlimited
                                         output_sequence_length=ninety_five_percentile_len,  # max length of sequence
+                                        standardize="lower_and_strip_punctuation"  # this is default value
                                         )
     text_vectorizer.adapt(X_train)
 
-    # Vectorize and visualize a random sentence
     if visualize:
-        import random
+        vocab = text_vectorizer.get_vocabulary()
+        print(f"Vocab length: {len(vocab)}\nVocab:\n {vocab[:50]}")
+
+        # Vectorize and visualize a random sentence
         target_sentence = random.choice(X_train)
         print(f"Text:\n{target_sentence}")
         print(f"Length:\n{len(target_sentence.split())}")
@@ -350,5 +378,14 @@ def run():
     #                                       len(class_names))
     # print(model_1_results)
 
-    model_2, model_2_results = fit_model_with_USE(train_dataset, val_dataset, val_labels_encoded, len(class_names))
-    print(model_2_results)
+    # model_2, model_2_results = fit_model_with_USE(train_dataset, val_dataset, val_labels_encoded, len(class_names))
+    # print(model_2_results)
+
+    # Split sequence-level data splits into character-level splits
+    train_chars = [split_chars(sentence) for sentence in train_df["text"].tolist()]
+    val_chars = [split_chars(sentence) for sentence in val_df["text"].tolist()]
+    test_chars = [split_chars(sentence) for sentence in test_df["text"].tolist()]
+
+    # examine_sentence_char_data(train_df["text"].tolist())
+    create_text_vectorizer_layer(train_chars, max_vocab_len=NUM_CHAR_TOKENS, visualize=True)
+
