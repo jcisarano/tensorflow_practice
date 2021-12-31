@@ -9,6 +9,7 @@ from sklearn.pipeline import Pipeline
 import tensorflow as tf
 import numpy as np
 from tensorflow.keras import layers
+from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
 from helper_functions import calculate_results
 
@@ -110,6 +111,27 @@ def examine_sentence_data(sentences):
     longest = sentences[np.argmax(sent_lens)]
     print("Longest sentence:", longest)
 
+
+def create_text_vectorizer_layer(X_train, max_vocab_len=68000, visualize=False):
+    sent_lens = [len(sentence.split()) for sentence in X_train]
+    ninety_five_percentile_len = int(np.percentile(sent_lens, 95))
+
+    text_vectorizer = TextVectorization(max_tokens=max_vocab_len,  # how many words in final vocab, None means unlimited
+                                        output_sequence_length=ninety_five_percentile_len,  # max length of sequence
+                                        )
+    text_vectorizer.adapt(X_train)
+
+    # Vectorize and visualize a random sentence
+    if visualize:
+        import random
+        target_sentence = random.choice(X_train)
+        print(f"Text:\n{target_sentence}")
+        print(f"Length:\n{len(target_sentence.split())}")
+        print(f"Vectorized:\n{text_vectorizer([target_sentence])}")
+
+    return text_vectorizer
+
+
 def get_labels_one_hot(y_train, y_val, y_test):
     from sklearn.preprocessing import OneHotEncoder
     one_hot_encoder = OneHotEncoder(sparse=False)
@@ -202,4 +224,6 @@ def run():
     # model_0, model_0_results = fit_naive_bayes(train_df["text"], train_labels_encoded, val_df["text"], val_labels_encoded)
     # print(model_0_results)
 
-    examine_sentence_data(train_df["text"].to_numpy())
+    # examine_sentence_data(train_df["text"].to_numpy())
+
+    create_text_vectorizer_layer(train_df["text"].to_numpy())
