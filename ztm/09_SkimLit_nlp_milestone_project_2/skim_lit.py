@@ -316,12 +316,13 @@ def fit_model_with_USE(train_dataset, valid_dataset, y_val, num_classes):
     return model, results
 
 
-def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val, num_classes):
+def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val_one_hot, y_val_encoded, num_classes):
     train_chars = [split_chars(sentence) for sentence in X_train]
-    train_chars_dataset = tf.data.Dataset.from_tensor_slices((train_chars, y_train)).batch(32).prefetch(tf.data.AUTOTUNE)
+    train_chars_dataset = tf.data.Dataset.from_tensor_slices((train_chars, y_train)).batch(32).prefetch(
+        tf.data.AUTOTUNE)
 
     val_chars = [split_chars(sentence) for sentence in X_val]
-    val_chars_dataset = tf.data.Dataset.from_tensor_slices((val_chars, y_val)).batch(32).prefetch(tf.data.AUTOTUNE)
+    val_chars_dataset = tf.data.Dataset.from_tensor_slices((val_chars, y_val_one_hot)).batch(32).prefetch(tf.data.AUTOTUNE)
 
     # test_chars = [split_chars(sentence) for sentence in X_test]
     # test_chars_dataset = tf.data.Dataset.from_tensor_slices((test_chars, y_test)).batch(32).prefetch(tf.data.AUTOTUNE)
@@ -355,15 +356,20 @@ def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val, num_classes):
                   metrics=["accuracy"])
     # print(model.summary())
 
-    model.fit(train_chars_dataset,
-              # steps_per_epoch=int(0.1 * len(train_chars_dataset)),
-              epochs=5,
-              validation_data=val_chars_dataset,
-              # validation_steps=int(0.1 * len(val_chars_dataset)),
-              workers=-1
-              )
+    history = model.fit(train_chars_dataset,
+                        steps_per_epoch=int(0.1 * len(train_chars_dataset)),
+                        epochs=3,
+                        validation_data=val_chars_dataset,
+                        validation_steps=int(0.1 * len(val_chars_dataset)),
+                        workers=-1
+                        )
 
-    return model, None
+    pred_probs = model.predict(val_chars_dataset)
+    preds = tf.argmax(pred_probs, axis=1)
+    print(preds)
+    results = calculate_results(y_val_encoded, preds)
+
+    return model, results
 
 
 def parse_file(filepath):
@@ -437,4 +443,5 @@ def run():
     # examine_sentence_char_data(train_df["text"].tolist())
 
     model_3, model_3_results = fit_conv1d_character_embedded(train_df["text"], train_labels_one_hot, val_df["text"],
-                                                             val_labels_one_hot, len(class_names))
+                                                             val_labels_one_hot, val_labels_encoded, len(class_names))
+    print(model_3_results)
