@@ -142,7 +142,6 @@ def examine_sentence_char_data(sentences):
 
 
 def create_text_vectorizer_layer(X_train, sequence_len, max_vocab_len=68000, visualize=False):
-
     text_vectorizer = TextVectorization(max_tokens=max_vocab_len,  # how many words in final vocab, None means unlimited
                                         output_sequence_length=sequence_len,  # max length of sequence
                                         standardize="lower_and_strip_punctuation"  # this is default value
@@ -169,7 +168,8 @@ def create_text_vectorizer_layer(X_train, sequence_len, max_vocab_len=68000, vis
     return text_vectorizer
 
 
-def create_embedding_layer(max_vocab_len=68000, visualize=False, X_train=False, output_dim=128, name="token_embedding", mask_zero=True):
+def create_embedding_layer(max_vocab_len=68000, visualize=False, X_train=False, output_dim=128, name="token_embedding",
+                           mask_zero=True):
     token_embed = layers.Embedding(input_dim=max_vocab_len,
                                    output_dim=output_dim,
                                    mask_zero=mask_zero,
@@ -316,10 +316,16 @@ def fit_model_with_USE(train_dataset, valid_dataset, y_val, num_classes):
     return model, results
 
 
-def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val):
+def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val, num_classes):
     train_chars = [split_chars(sentence) for sentence in X_train]
+    train_chars_dataset = tf.data.Dataset.from_tensor_slices((train_chars, y_train)).batch(32).prefetch(tf.data.AUTOTUNE)
+
     val_chars = [split_chars(sentence) for sentence in X_val]
+    val_chars_dataset = tf.data.Dataset.from_tensor_slices((val_chars, y_val)).batch(32).prefetch(tf.data.AUTOTUNE)
+
     # test_chars = [split_chars(sentence) for sentence in X_test]
+    # test_chars_dataset = tf.data.Dataset.from_tensor_slices((test_chars, y_test)).batch(32).prefetch(tf.data.AUTOTUNE)
+
     sent_lens = [len(sentence) for sentence in X_train]
     ninety_five_percentile_len = int(np.percentile(sent_lens, 95))
     char_vectorizer = create_text_vectorizer_layer(train_chars,
@@ -330,13 +336,35 @@ def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val):
                                             name="char_embedding",
                                             mask_zero=False)
 
-    test_sent = random.choice(train_chars)
-    print(f"Charified text:\n{test_sent}")
-    example = char_embedding(char_vectorizer([test_sent]))
-    print(f"Vectorized and embedded:\n{example}")
-    print(f"Shape: {example.shape}")
+    # test_sent = random.choice(train_chars)
+    # print(f"Charified text:\n{test_sent}")
+    # example = char_embedding(char_vectorizer([test_sent]))
+    # print(f"Vectorized and embedded:\n{example}")
+    # print(f"Shape: {example.shape}")
 
-    return None, None
+    inputs = layers.Input(shape=(1,), dtype=tf.string)
+    char_vectorized = char_vectorizer(inputs)
+    char_embedded = char_embedding(char_vectorized)
+    x = layers.Conv1D(64, kernel_size=5, padding="same", activation="relu")(char_embedded)
+    x = layers.GlobalMaxPooling1D()(x)
+    outputs = layers.Dense(num_classes, activation="softmax")(x)
+    model = tf.keras.Model(inputs, outputs, name="model_3_conv1d_char_embeddings")
+
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    # print(model.summary())
+
+    model.fit(train_chars_dataset,
+              # steps_per_epoch=int(0.1 * len(train_chars_dataset)),
+              epochs=5,
+              validation_data=val_chars_dataset,
+              # validation_steps=int(0.1 * len(val_chars_dataset)),
+              workers=-1
+              )
+
+    return model, None
+
 
 def parse_file(filepath):
     """
@@ -408,7 +436,5 @@ def run():
 
     # examine_sentence_char_data(train_df["text"].tolist())
 
-    model_3, model_3_results = fit_conv1d_character_embedded(train_df["text"],
-                                                             train_labels_encoded, val_df["text"], val_labels_encoded)
-
-
+    model_3, model_3_results = fit_conv1d_character_embedded(train_df["text"], train_labels_one_hot, val_df["text"],
+                                                             val_labels_one_hot, len(class_names))
