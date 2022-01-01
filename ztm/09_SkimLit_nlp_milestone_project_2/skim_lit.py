@@ -141,25 +141,21 @@ def examine_sentence_char_data(sentences):
     print("Alphabet count:", NUM_CHAR_TOKENS)
 
 
-def create_text_vectorizer_layer(X_train, max_vocab_len=68000, visualize=False):
-    sent_lens = [len(sentence.split()) for sentence in X_train]
-    ninety_five_percentile_len = int(np.percentile(sent_lens, 95))
+def create_text_vectorizer_layer(X_train, sequence_len, max_vocab_len=68000, visualize=False):
 
     text_vectorizer = TextVectorization(max_tokens=max_vocab_len,  # how many words in final vocab, None means unlimited
-                                        output_sequence_length=ninety_five_percentile_len,  # max length of sequence
+                                        output_sequence_length=sequence_len,  # max length of sequence
                                         standardize="lower_and_strip_punctuation"  # this is default value
                                         )
     text_vectorizer.adapt(X_train)
 
     if visualize:
-        vocab = text_vectorizer.get_vocabulary()
-        print(f"Vocab length: {len(vocab)}\nVocab:\n {vocab[:50]}")
-
         # Vectorize and visualize a random sentence
         target_sentence = random.choice(X_train)
         print(f"Text:\n{target_sentence}")
         print(f"Length:\n{len(target_sentence.split())}")
         print(f"Vectorized:\n{text_vectorizer([target_sentence])}")
+        print(f"Vectorized length:\n{len(text_vectorizer([target_sentence][0]))}")
 
         # View vocab len and most/least common words
         print(f"\nNumber of words in vocab: {len(text_vectorizer.get_vocabulary())}")
@@ -173,11 +169,11 @@ def create_text_vectorizer_layer(X_train, max_vocab_len=68000, visualize=False):
     return text_vectorizer
 
 
-def create_embedding_layer(max_vocab_len=68000, visualize=False, X_train=False):
+def create_embedding_layer(max_vocab_len=68000, visualize=False, X_train=False, output_dim=128, name="token_embedding", mask_zero=True):
     token_embed = layers.Embedding(input_dim=max_vocab_len,
-                                   output_dim=128,
-                                   mask_zero=True,
-                                   name="token_embedding"
+                                   output_dim=output_dim,
+                                   mask_zero=mask_zero,
+                                   name=name
                                    )
 
     if visualize:
@@ -255,8 +251,10 @@ def fit_naive_bayes(X_train, y_train, X_val, y_val):
 
 
 def fit_conv1d(X_train, train_dataset, val_dataset, y_val, num_classes):  # , y_train, X_val, y_val, num_classes):
+    sent_lens = [len(sentence) for sentence in X_train]
+    ninety_five_percentile_len = int(np.percentile(sent_lens, 95))
     inputs = layers.Input(shape=(1,), dtype=tf.string)
-    text_vectorizer = create_text_vectorizer_layer(X_train=X_train)
+    text_vectorizer = create_text_vectorizer_layer(X_train=X_train, sequence_len=ninety_five_percentile_len)
     text_vectors = text_vectorizer(inputs)
     embedding = create_embedding_layer()
     token_embeddings = embedding(text_vectors)
@@ -317,6 +315,28 @@ def fit_model_with_USE(train_dataset, valid_dataset, y_val, num_classes):
 
     return model, results
 
+
+def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val):
+    train_chars = [split_chars(sentence) for sentence in X_train]
+    val_chars = [split_chars(sentence) for sentence in X_val]
+    # test_chars = [split_chars(sentence) for sentence in X_test]
+    sent_lens = [len(sentence) for sentence in X_train]
+    ninety_five_percentile_len = int(np.percentile(sent_lens, 95))
+    char_vectorizer = create_text_vectorizer_layer(train_chars,
+                                                   sequence_len=ninety_five_percentile_len,
+                                                   max_vocab_len=NUM_CHAR_TOKENS)
+    char_embedding = create_embedding_layer(output_dim=25,
+                                            max_vocab_len=NUM_CHAR_TOKENS,
+                                            name="char_embedding",
+                                            mask_zero=False)
+
+    test_sent = random.choice(train_chars)
+    print(f"Charified text:\n{test_sent}")
+    example = char_embedding(char_vectorizer([test_sent]))
+    print(f"Vectorized and embedded:\n{example}")
+    print(f"Shape: {example.shape}")
+
+    return None, None
 
 def parse_file(filepath):
     """
@@ -387,5 +407,8 @@ def run():
     test_chars = [split_chars(sentence) for sentence in test_df["text"].tolist()]
 
     # examine_sentence_char_data(train_df["text"].tolist())
-    create_text_vectorizer_layer(train_chars, max_vocab_len=NUM_CHAR_TOKENS, visualize=True)
+
+    model_3, model_3_results = fit_conv1d_character_embedded(train_df["text"],
+                                                             train_labels_encoded, val_df["text"], val_labels_encoded)
+
 
