@@ -201,7 +201,10 @@ def examine_positional_embeddings(train_df):
     # however, it may be worth experimenting with different values
     train_line_numbers_one_hot = tf.one_hot(train_df["line_number"].to_numpy(), depth=15)
     print(train_line_numbers_one_hot[:15], train_line_numbers_one_hot.shape)
-
+    print(train_df["total_lines"].value_counts())
+    print("98th percentile length:", np.percentile(train_df.total_lines, 98))
+    train_df.total_lines.plot.hist()
+    plt.show()
 
 
 def format_data_for_batching(X_train, y_train_one_hot,
@@ -239,6 +242,18 @@ def get_labels_int_encode(y_train, y_val, y_test):
     test_labels_encoded = label_encoder.transform(y_test)
 
     return train_labels_encoded, val_labels_encoded, test_labels_encoded, label_encoder.classes_
+
+
+def get_positional_data_one_hot(train_df, val_df, test_df):
+    train_line_numbers_one_hot = tf.one_hot(train_df["line_number"].to_numpy(), depth=15)  # 95% are 15 or less
+    train_total_lines_one_hot = tf.one_hot(train_df["total_lines"].to_numpy(), depth=20)  # 98% are 20 or less
+    val_line_numbers_one_hot = tf.one_hot(val_df["line_number"].to_numpy(), depth=15)
+    val_total_lines_one_hot = tf.one_hot(val_df["total_lines"].to_numpy(), depth=20)
+    test_line_numbers_one_hot = tf.one_hot(test_df["line_number"].to_numpy(), depth=15)
+    test_total_lines_one_hot = tf.one_hot(test_df["total_lines"].to_numpy(), depth=20)
+
+    return train_line_numbers_one_hot, train_total_lines_one_hot, val_line_numbers_one_hot, val_total_lines_one_hot, \
+           test_line_numbers_one_hot, test_total_lines_one_hot
 
 
 def fit_naive_bayes(X_train, y_train, X_val, y_val):
@@ -482,8 +497,52 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_on
     return model, results
 
 
-def fit_pretrained_tokens_and_chars_and_position():
-    print("stub")
+def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_one_hot, y_val_encoded, num_classes):
+    """
+        1) Create token-level model
+        2) Create character-level model
+        3) Create model for line number feature
+        4) Create model for total lines feature
+        5) Combine outputs of 1 & 2 using Concatenate
+        6) Combine outputs of 3, 4 & 5 using Concatenate
+        7) Create an output layer to accept final embedding and output label probs
+        8) Combine inputs of 1, 2, 3, 4 and output (7) into tf.Keras.Model
+    :return:
+    """
+    train_chars = [split_chars(sentence) for sentence in X_train]
+    val_chars = [split_chars(sentence) for sentence in X_val]
+
+    # set up pretrained token model
+    token_input = layers.Input(shape=[], dtype=tf.string, name="token_input_layer")
+    pretrained_embedding = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
+                                          trainable=False,
+                                          name="universal_sentence_encoder")
+    token_input = pretrained_embedding(token_input)
+    token_output = layers.Dense(128, activation="relu")(token_input)
+    token_model = tf.keras.Model(inputs=token_input, outputs=token_output)
+
+    # set up character model
+    char_input = layers.Input(shape=[1, ], dtype=tf.string, name="char_input_layer")
+    sent_lens = [len(sentence) for sentence in X_train]
+    sent_len_95th_perc = int(np.percentile(sent_lens, 95))
+    char_vectorizer = create_text_vectorizer_layer(train_chars,
+                                                   sequence_len=sent_len_95th_perc,
+                                                   max_vocab_len=NUM_CHAR_TOKENS)
+    char_vectors = char_vectorizer(char_input)
+
+    char_embedder = create_embedding_layer(max_vocab_len=NUM_CHAR_TOKENS, mask_zero=False, name="char_embedding")
+    char_embeddings = char_embedder(char_vectors)
+    char_bi_lstm = layers.Bidirectional(layers.LSTM(24))(char_embeddings)
+    char_model = tf.keras.Model(inputs=char_input, outputs=char_bi_lstm)
+
+
+
+    token_char_concat = layers.Concatenate(name="token_char_concat")([token_model.output, char_model.output])
+    # tribrid_concat = layers.Concatenate(name="tribrid_concat")([token_char_concat.output, ])
+
+
+
+    return None, None
 
 def parse_file(filepath):
     """
@@ -567,7 +626,12 @@ def run():
     #                                                                       len(class_names))
     # print(model_4_results)
 
-    train_line_numbers_one_hot = tf.one_hot(train_df["line_number"].to_numpy(), depth=15)
-    val_line_numbers_one_hot = tf.one_hot(val_df["line_number"].to_numpy(), depth=15)
-    test_line_numbers_one_hot = tf.one_hot(test_df["line_number"].to_numpy(), depth=15)
-    examine_positional_embeddings(train_df)
+    train_line_numbers_one_hot, train_total_lines_one_hot, val_line_numbers_one_hot, val_total_lines_one_hot, \
+        test_line_numbers_one_hot, test_total_lines_one_hot = get_positional_data_one_hot(train_df, val_df, test_df)
+
+    # examine_positional_embeddings(train_df)
+
+    model_5, model_5_results = fit_pretrained_tokens_and_chars_and_position(train_df["text"], train_labels_one_hot,
+                                                                            val_df["text"],
+                                                                            val_labels_one_hot, val_labels_encoded,
+                                                                            len(class_names))
