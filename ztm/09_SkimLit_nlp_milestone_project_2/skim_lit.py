@@ -424,9 +424,16 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, num_classes):
     output_layer = layers.Dense(num_classes, activation="softmax")(final_dropout)
 
     # Create combined model
+    model = tf.keras.Model(inputs=[token_model.input, char_model.input],
+                           outputs=output_layer,
+                           name="model_4_token_and_char_embeddings"
+                           )
 
+    # plot the model
+    from tensorflow.keras.utils import plot_model
+    plot_model(model, show_shapes=True)
 
-    return None, None
+    return model, None
 
 
 def parse_file(filepath):
@@ -503,4 +510,6 @@ def run():
     #                                                          val_labels_one_hot, val_labels_encoded, len(class_names))
     # print(model_3_results)
 
-    model_4, model_4_results = fit_pretrained_tokens_with_char_embeddings(train_df["text"], train_labels_one_hot)
+    model_4, model_4_results = fit_pretrained_tokens_with_char_embeddings(train_df["text"],
+                                                                          train_labels_one_hot,
+                                                                          len(class_names))
