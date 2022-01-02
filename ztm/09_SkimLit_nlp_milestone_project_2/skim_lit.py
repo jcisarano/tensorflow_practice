@@ -389,7 +389,7 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_on
     train_char_token_labels = tf.data.Dataset.from_tensor_slices(y_train)
     train_char_token_dataset = tf.data.Dataset.zip((train_char_token_data, train_char_token_labels))
     train_char_token_dataset = train_char_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
-    print(train_char_token_dataset)
+    # print(train_char_token_dataset)
 
     # combine validation char and token inputs and labels into one dataset configured for batching and prefetch
     val_chars = [split_chars(sentence) for sentence in X_val]
@@ -397,7 +397,7 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_on
     val_char_token_labels = tf.data.Dataset.from_tensor_slices(y_val_one_hot)
     val_char_token_dataset = tf.data.Dataset.zip((val_char_token_data, val_char_token_labels))
     val_char_token_dataset = val_char_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
-    print(val_char_token_dataset)
+    # print(val_char_token_dataset)
 
     # set up token input model
     token_inputs = layers.Input(shape=[], dtype=tf.string, name="token_input")
@@ -450,15 +450,22 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_on
                   optimizer=tf.keras.optimizers.Adam(),  # paper uses SGD, can try that later
                   metrics=["accuracy"])
 
-    #history = model.fit(train_char_token_dataset,
-    #                    epochs=3,
-    #                    steps_per_epoch=int(0.1 * len(train_char_token_dataset)),
-    #                    validation_data=val_char_token_dataset,
-    #                    validation_steps=int(0.1 * len(val_char_token_dataset)),
-    #                    workers=-1
-    #                    )
+    history = model.fit(train_char_token_dataset,
+                        epochs=3,  # just a few epochs for fast experimentation
+                        steps_per_epoch=int(0.1 * len(train_char_token_dataset)),  # 10% of data for faster experiments
+                        validation_data=val_char_token_dataset,
+                        validation_steps=int(0.1 * len(val_char_token_dataset)),
+                        workers=-1
+                        )
 
-    return model, None
+    model.evaluate(val_char_token_dataset)
+
+    pred_probs = model.predict(val_char_token_dataset)
+    print(pred_probs[:10])
+    probs = np.argmax(pred_probs, axis=1)
+    print(probs[:10])
+    results = calculate_results(y_val_encoded, probs)
+    return model, results
 
 
 def parse_file(filepath):
@@ -512,10 +519,10 @@ def run():
 
     # examine_sentence_data(train_df["text"].to_numpy())
 
-    train_dataset, val_dataset, test_dataset = format_data_for_batching(train_df["text"], train_labels_one_hot,
-                                                                        val_df["text"], val_labels_one_hot,
-                                                                        test_df["text"], test_labels_one_hot
-                                                                        )
+    # train_dataset, val_dataset, test_dataset = format_data_for_batching(train_df["text"], train_labels_one_hot,
+    #                                                                     val_df["text"], val_labels_one_hot,
+    #                                                                     test_df["text"], test_labels_one_hot
+    #                                                                     )
 
     # model_1, model_1_results = fit_conv1d(train_df["text"], train_dataset, val_dataset, val_labels_encoded,
     #                                       len(class_names))
@@ -525,9 +532,9 @@ def run():
     # print(model_2_results)
 
     # Split sequence-level data splits into character-level splits
-    train_chars = [split_chars(sentence) for sentence in train_df["text"].tolist()]
-    val_chars = [split_chars(sentence) for sentence in val_df["text"].tolist()]
-    test_chars = [split_chars(sentence) for sentence in test_df["text"].tolist()]
+    # train_chars = [split_chars(sentence) for sentence in train_df["text"].tolist()]
+    # val_chars = [split_chars(sentence) for sentence in val_df["text"].tolist()]
+    # test_chars = [split_chars(sentence) for sentence in test_df["text"].tolist()]
 
     # examine_sentence_char_data(train_df["text"].tolist())
 
@@ -541,3 +548,4 @@ def run():
                                                                           val_labels_one_hot,
                                                                           val_labels_encoded,
                                                                           len(class_names))
+    print(model_4_results)
