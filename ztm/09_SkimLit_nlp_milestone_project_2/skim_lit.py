@@ -373,7 +373,7 @@ def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val_one_hot, y_val_
     return model, results
 
 
-def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, num_classes):
+def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_one_hot, y_val_encoded, num_classes):
     """
         1) Create a token-level embedding model (similar to model 1
         2) Create a character-level embedding model (similar to model 3)
@@ -382,9 +382,20 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, num_classes):
         5) Construct a model that takes token and char-level sequences as input and produces sequence label probs output
     :return:
     """
+
+    # combine training char and token inputs and labels into one dataset set up for batching and prefetch
     train_chars = [split_chars(sentence) for sentence in X_train]
-    train_chars_dataset = tf.data.Dataset.from_tensor_slices((train_chars, y_train)).batch(32).prefetch(
-        tf.data.AUTOTUNE)
+    train_char_token_data = tf.data.Dataset.from_tensor_slices((X_train, train_chars))
+    train_char_token_labels = tf.data.Dataset.from_tensor_slices(y_train)
+    train_char_token_dataset = tf.data.Dataset.zip((train_char_token_data, train_char_token_labels))
+    train_char_token_dataset = train_char_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+
+    # combine validation char and token inputs and labels into one dataset configured for batching and prefetch
+    val_chars = [split_chars(sentence) for sentence in X_val]
+    val_char_token_data = tf.data.Dataset.from_tensor_slices((y_train, val_chars))
+    val_char_token_labels = tf.data.Dataset.from_tensor_slices(y_val_one_hot)
+    val_char_token_dataset = tf.data.Dataset.zip((val_char_token_data, val_char_token_labels))
+    val_char_token_dataset = val_char_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
 
     # set up token input model
     token_inputs = layers.Input(shape=[], dtype=tf.string, name="token_input")
@@ -429,9 +440,21 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, num_classes):
                            name="model_4_token_and_char_embeddings"
                            )
 
-    # plot the model
-    from tensorflow.keras.utils import plot_model
-    plot_model(model, show_shapes=True)
+    # plot the model (saves to model.png)
+    # from tensorflow.keras.utils import plot_model
+    # plot_model(model, show_shapes=True)
+
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(),  # paper uses SGD, can try that later
+                  metrics=["accuracy"])
+
+    history = model.fit(train_char_token_dataset,
+                        epochs=3,
+                        steps_per_epoch=int(0.1 * len(train_char_token_dataset)),
+                        validation_data=val_char_token_dataset,
+                        validation_steps=int(0.1 * len(val_char_token_dataset)),
+                        workers=-1
+                        )
 
     return model, None
 
@@ -512,4 +535,7 @@ def run():
 
     model_4, model_4_results = fit_pretrained_tokens_with_char_embeddings(train_df["text"],
                                                                           train_labels_one_hot,
+                                                                          val_df["text"],
+                                                                          val_labels_one_hot,
+                                                                          val_labels_encoded,
                                                                           len(class_names))
