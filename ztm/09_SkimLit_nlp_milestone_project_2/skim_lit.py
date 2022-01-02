@@ -522,7 +522,7 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
     token_model = tf.keras.Model(inputs=token_input, outputs=token_output)
 
     # set up character model
-    char_input = layers.Input(shape=[1, ], dtype=tf.string, name="char_input_layer")
+    char_input = layers.Input(shape=(1,), dtype=tf.string, name="char_input_layer")
     sent_lens = [len(sentence) for sentence in X_train]
     sent_len_95th_perc = int(np.percentile(sent_lens, 95))
     char_vectorizer = create_text_vectorizer_layer(train_chars,
@@ -535,14 +535,39 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
     char_bi_lstm = layers.Bidirectional(layers.LSTM(24))(char_embeddings)
     char_model = tf.keras.Model(inputs=char_input, outputs=char_bi_lstm)
 
+    line_num_inputs = layers.Input(shape=(15,), dtype=tf.float32, name="line_num_inputs")  # shape is size of one-hot
+    x = layers.Dense(32, activation="relu")(line_num_inputs)
+    line_num_model = tf.keras.Model(inputs=line_num_inputs, outputs=x)
 
+    line_len_inputs = layers.Input(shape=(20,), dtype=tf.float32, name="line_len_inputs")  # sdhape is size of one-hot
+    x = layers.Dense(32, activation="relu")(line_len_inputs)
+    line_len_model = tf.keras.Model(inputs=line_len_inputs, outputs=x)
 
-    token_char_concat = layers.Concatenate(name="token_char_concat")([token_model.output, char_model.output])
-    # tribrid_concat = layers.Concatenate(name="tribrid_concat")([token_char_concat.output, ])
+    # concatenate embeddings
+    combined_embeddings = layers.Concatenate(name="token_char_hubrid_embedding")(
+        [token_model.output, char_model.output])
 
+    # add dropout layer
+    combined_embeddings_with_dropout = layers.Dense(256, activation="relu")(combined_embeddings)
+    combined_embeddings_with_dropout = layers.Dropout(0.5)(combined_embeddings_with_dropout)
 
+    tribrid_embeddings = layers.Concatenate(name="char_token_positional_embedding")([line_num_model.output,
+                                                                                     line_len_model.output,
+                                                                                     combined_embeddings_with_dropout])
+
+    # create output layer
+    output_layer = layers.Dense(num_classes, activation="softmax", name="softmax")(tribrid_embeddings)
+
+    # create complete model
+    model = tf.keras.Model(inputs=[
+        line_num_model.input, line_len_model.input, token_model.input, char_model.input
+    ],
+        outputs=output_layer,
+        name="model_5_token_char_positional"
+    )
 
     return None, None
+
 
 def parse_file(filepath):
     """
@@ -627,7 +652,7 @@ def run():
     # print(model_4_results)
 
     train_line_numbers_one_hot, train_total_lines_one_hot, val_line_numbers_one_hot, val_total_lines_one_hot, \
-        test_line_numbers_one_hot, test_total_lines_one_hot = get_positional_data_one_hot(train_df, val_df, test_df)
+    test_line_numbers_one_hot, test_total_lines_one_hot = get_positional_data_one_hot(train_df, val_df, test_df)
 
     # examine_positional_embeddings(train_df)
 
