@@ -373,7 +373,7 @@ def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val_one_hot, y_val_
     return model, results
 
 
-def fit_pretrained_tokens_with_char_embeddings(X_train, y_train):
+def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, num_classes):
     """
         1) Create a token-level embedding model (similar to model 1
         2) Create a character-level embedding model (similar to model 3)
@@ -409,8 +409,22 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train):
                                         name="char_embedding",
                                         mask_zero=False)
     char_embeddings = char_embed(char_vectors)
-    char_bi_lstm = layers.Bidirectional(layers.LSTM(25))(char_embeddings)  # shown in fig 1 of paper
+    char_bi_lstm = layers.Bidirectional(layers.LSTM(24))(char_embeddings)  # shown in fig 1 of paper
     char_model = tf.keras.Model(inputs=char_inputs, outputs=char_bi_lstm)
+
+    # Concatenate token and char output into input for next model
+    token_char_concat = layers.Concatenate(name="token_char_concat")([token_model.output,
+                                                                      char_model.output])
+
+    # Create output layers, adding in Dropout as in section 4.2 of paper
+    # dropout helps reduce overfitting
+    combined_droput = layers.Dropout(rate=0.5)(token_char_concat)
+    combined_dense = layers.Dense(128, activation="relu")(combined_droput)
+    final_dropout = layers.Dropout(0.5)(combined_dense)
+    output_layer = layers.Dense(num_classes, activation="softmax")(final_dropout)
+
+    # Create combined model
+
 
     return None, None
 
