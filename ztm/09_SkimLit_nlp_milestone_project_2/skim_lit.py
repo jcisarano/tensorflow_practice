@@ -517,8 +517,8 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
     pretrained_embedding = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
                                           trainable=False,
                                           name="universal_sentence_encoder")
-    token_input = pretrained_embedding(token_input)
-    token_output = layers.Dense(128, activation="relu")(token_input)
+    token_embedding = pretrained_embedding(token_input)
+    token_output = layers.Dense(128, activation="relu")(token_embedding)
     token_model = tf.keras.Model(inputs=token_input, outputs=token_output)
 
     # set up character model
@@ -530,7 +530,10 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
                                                    max_vocab_len=NUM_CHAR_TOKENS)
     char_vectors = char_vectorizer(char_input)
 
-    char_embedder = create_embedding_layer(max_vocab_len=NUM_CHAR_TOKENS, mask_zero=False, name="char_embedding")
+    char_embedder = create_embedding_layer(output_dim=25,
+                                           max_vocab_len=NUM_CHAR_TOKENS,
+                                           mask_zero=False,
+                                           name="char_embedding")
     char_embeddings = char_embedder(char_vectors)
     char_bi_lstm = layers.Bidirectional(layers.LSTM(24))(char_embeddings)
     char_model = tf.keras.Model(inputs=char_input, outputs=char_bi_lstm)
@@ -566,7 +569,9 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
         name="model_5_token_char_positional"
     )
 
-    return None, None
+    print(model.summary())
+
+    return model, None
 
 
 def parse_file(filepath):
