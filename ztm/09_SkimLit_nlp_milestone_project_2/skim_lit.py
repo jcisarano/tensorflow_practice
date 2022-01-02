@@ -190,6 +190,20 @@ def create_embedding_layer(max_vocab_len=68000, visualize=False, X_train=False, 
     return token_embed
 
 
+def examine_positional_embeddings(train_df):
+    # examine data, most abstracts have fifteen or fewer lines
+    # print(train_df["line_number"].value_counts())
+    # train_df.line_number.plot.hist()
+    # plt.show()
+
+    # one-hot encode the line numbers
+    # depth = 15 keeps each entry at 15 and most abstracts have fifteen or fewer lines
+    # however, it may be worth experimenting with different values
+    train_line_numbers_one_hot = tf.one_hot(train_df["line_number"].to_numpy(), depth=15)
+    print(train_line_numbers_one_hot[:15], train_line_numbers_one_hot.shape)
+
+
+
 def format_data_for_batching(X_train, y_train_one_hot,
                              X_val, y_val_one_hot,
                              X_test, y_test_one_hot):
@@ -401,10 +415,10 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_on
 
     # set up token input model
     token_inputs = layers.Input(shape=[], dtype=tf.string, name="token_input")
-    token_embedding_layer = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
-                                           trainable=False,
-                                           name="universal_sentence_encoder")
-    token_embedding = token_embedding_layer(token_inputs)
+    pretrained_token_embedding_layer = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
+                                                      trainable=False,
+                                                      name="universal_sentence_encoder")
+    token_embedding = pretrained_token_embedding_layer(token_inputs)
     token_output = layers.Dense(128, activation="relu")(token_embedding)  # output num based on paper, can increase
     token_model = tf.keras.Model(inputs=token_inputs, outputs=token_output)
 
@@ -461,12 +475,15 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_on
     model.evaluate(val_char_token_dataset)
 
     pred_probs = model.predict(val_char_token_dataset)
-    print(pred_probs[:10])
+    # print(pred_probs[:10])
     probs = np.argmax(pred_probs, axis=1)
-    print(probs[:10])
+    # print(probs[:10])
     results = calculate_results(y_val_encoded, probs)
     return model, results
 
+
+def fit_pretrained_tokens_and_chars_and_position():
+    print("stub")
 
 def parse_file(filepath):
     """
@@ -542,10 +559,15 @@ def run():
     #                                                          val_labels_one_hot, val_labels_encoded, len(class_names))
     # print(model_3_results)
 
-    model_4, model_4_results = fit_pretrained_tokens_with_char_embeddings(train_df["text"],
-                                                                          train_labels_one_hot,
-                                                                          val_df["text"],
-                                                                          val_labels_one_hot,
-                                                                          val_labels_encoded,
-                                                                          len(class_names))
-    print(model_4_results)
+    # model_4, model_4_results = fit_pretrained_tokens_with_char_embeddings(train_df["text"],
+    #                                                                       train_labels_one_hot,
+    #                                                                       val_df["text"],
+    #                                                                       val_labels_one_hot,
+    #                                                                       val_labels_encoded,
+    #                                                                       len(class_names))
+    # print(model_4_results)
+
+    train_line_numbers_one_hot = tf.one_hot(train_df["line_number"].to_numpy(), depth=15)
+    val_line_numbers_one_hot = tf.one_hot(val_df["line_number"].to_numpy(), depth=15)
+    test_line_numbers_one_hot = tf.one_hot(test_df["line_number"].to_numpy(), depth=15)
+    examine_positional_embeddings(train_df)
