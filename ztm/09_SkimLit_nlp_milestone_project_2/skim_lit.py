@@ -389,13 +389,15 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_on
     train_char_token_labels = tf.data.Dataset.from_tensor_slices(y_train)
     train_char_token_dataset = tf.data.Dataset.zip((train_char_token_data, train_char_token_labels))
     train_char_token_dataset = train_char_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+    print(train_char_token_dataset)
 
     # combine validation char and token inputs and labels into one dataset configured for batching and prefetch
     val_chars = [split_chars(sentence) for sentence in X_val]
-    val_char_token_data = tf.data.Dataset.from_tensor_slices((y_train, val_chars))
+    val_char_token_data = tf.data.Dataset.from_tensor_slices((X_val, val_chars))
     val_char_token_labels = tf.data.Dataset.from_tensor_slices(y_val_one_hot)
     val_char_token_dataset = tf.data.Dataset.zip((val_char_token_data, val_char_token_labels))
     val_char_token_dataset = val_char_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+    print(val_char_token_dataset)
 
     # set up token input model
     token_inputs = layers.Input(shape=[], dtype=tf.string, name="token_input")
@@ -448,13 +450,13 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_on
                   optimizer=tf.keras.optimizers.Adam(),  # paper uses SGD, can try that later
                   metrics=["accuracy"])
 
-    history = model.fit(train_char_token_dataset,
-                        epochs=3,
-                        steps_per_epoch=int(0.1 * len(train_char_token_dataset)),
-                        validation_data=val_char_token_dataset,
-                        validation_steps=int(0.1 * len(val_char_token_dataset)),
-                        workers=-1
-                        )
+    #history = model.fit(train_char_token_dataset,
+    #                    epochs=3,
+    #                    steps_per_epoch=int(0.1 * len(train_char_token_dataset)),
+    #                    validation_data=val_char_token_dataset,
+    #                    validation_steps=int(0.1 * len(val_char_token_dataset)),
+    #                    workers=-1
+    #                    )
 
     return model, None
 
