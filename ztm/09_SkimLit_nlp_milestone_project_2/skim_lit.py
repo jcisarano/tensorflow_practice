@@ -322,7 +322,8 @@ def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val_one_hot, y_val_
         tf.data.AUTOTUNE)
 
     val_chars = [split_chars(sentence) for sentence in X_val]
-    val_chars_dataset = tf.data.Dataset.from_tensor_slices((val_chars, y_val_one_hot)).batch(32).prefetch(tf.data.AUTOTUNE)
+    val_chars_dataset = tf.data.Dataset.from_tensor_slices((val_chars, y_val_one_hot)).batch(32).prefetch(
+        tf.data.AUTOTUNE)
 
     # test_chars = [split_chars(sentence) for sentence in X_test]
     # test_chars_dataset = tf.data.Dataset.from_tensor_slices((test_chars, y_test)).batch(32).prefetch(tf.data.AUTOTUNE)
@@ -370,6 +371,48 @@ def fit_conv1d_character_embedded(X_train, y_train, X_val, y_val_one_hot, y_val_
     results = calculate_results(y_val_encoded, preds)
 
     return model, results
+
+
+def fit_pretrained_tokens_with_char_embeddings(X_train, y_train):
+    """
+        1) Create a token-level embedding model (similar to model 1
+        2) Create a character-level embedding model (similar to model 3)
+        3) Combine 1 and 2 using a concatenate layer
+        4) Build a series of output layers
+        5) Construct a model that takes token and char-level sequences as input and produces sequence label probs output
+    :return:
+    """
+    train_chars = [split_chars(sentence) for sentence in X_train]
+    train_chars_dataset = tf.data.Dataset.from_tensor_slices((train_chars, y_train)).batch(32).prefetch(
+        tf.data.AUTOTUNE)
+
+    # set up token input model
+    token_inputs = layers.Input(shape=[], dtype=tf.string, name="token_input")
+    token_embedding_layer = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
+                                           trainable=False,
+                                           name="universal_sentence_encoder")
+    token_embedding = token_embedding_layer(token_inputs)
+    token_output = layers.Dense(128, activation="relu")(token_embedding)  # output num based on paper, can increase
+    token_model = tf.keras.Model(inputs=token_inputs, outputs=token_output)
+
+    # set up character input model
+    char_inputs = layers.Input(shape=[1, ], dtype=tf.string, name="char_input")
+    sent_lens = [len(sentence) for sentence in X_train]
+    ninety_five_percentile_len = int(np.percentile(sent_lens, 95))
+    char_vectorizer = create_text_vectorizer_layer(train_chars,
+                                                   sequence_len=ninety_five_percentile_len,
+                                                   max_vocab_len=NUM_CHAR_TOKENS)
+    char_vectors = char_vectorizer(char_inputs)
+
+    char_embed = create_embedding_layer(output_dim=25,
+                                        max_vocab_len=NUM_CHAR_TOKENS,
+                                        name="char_embedding",
+                                        mask_zero=False)
+    char_embeddings = char_embed(char_vectors)
+    char_bi_lstm = layers.Bidirectional(layers.LSTM(25))(char_embeddings)  # shown in fig 1 of paper
+    char_model = tf.keras.Model(inputs=char_inputs, outputs=char_bi_lstm)
+
+    return None, None
 
 
 def parse_file(filepath):
@@ -442,6 +485,8 @@ def run():
 
     # examine_sentence_char_data(train_df["text"].tolist())
 
-    model_3, model_3_results = fit_conv1d_character_embedded(train_df["text"], train_labels_one_hot, val_df["text"],
-                                                             val_labels_one_hot, val_labels_encoded, len(class_names))
-    print(model_3_results)
+    # model_3, model_3_results = fit_conv1d_character_embedded(train_df["text"], train_labels_one_hot, val_df["text"],
+    #                                                          val_labels_one_hot, val_labels_encoded, len(class_names))
+    # print(model_3_results)
+
+    model_4, model_4_results = fit_pretrained_tokens_with_char_embeddings(train_df["text"], train_labels_one_hot)
