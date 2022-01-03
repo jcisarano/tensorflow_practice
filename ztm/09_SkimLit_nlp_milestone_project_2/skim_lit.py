@@ -571,6 +571,11 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
 
     print(model.summary())
 
+    # plot the model (saves to png file)
+    from tensorflow.keras.utils import plot_model
+    plot_model(model, show_shapes=True, to_file="model_5.png")
+
+
     return model, None
 
 
