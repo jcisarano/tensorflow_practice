@@ -497,7 +497,11 @@ def fit_pretrained_tokens_with_char_embeddings(X_train, y_train, X_val, y_val_on
     return model, results
 
 
-def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_one_hot, y_val_encoded, num_classes):
+def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_one_hot, y_val_encoded,
+                                                 train_line_numbers_one_hot,
+                                                 train_total_lines_one_hot,
+                                                 val_line_numbers_one_hot,
+                                                 val_total_lines_one_hot, num_classes):
     """
         1) Create token-level model
         2) Create character-level model
@@ -510,16 +514,18 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
     :return:
     """
     train_chars = [split_chars(sentence) for sentence in X_train]
-    train_chars_token_data = tf.data.Dataset.from_tensor_slices((X_train, train_chars))
-    train_chars_token_labels = tf.data.Dataset.from_tensor_slices(y_train)
-    train_char_token_dataset = tf.data.Dataset.zip((train_chars_token_data, train_chars_token_labels))
-    train_char_token_dataset = train_char_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+    train_chars_token_pos_data = tf.data.Dataset.from_tensor_slices((train_line_numbers_one_hot,
+                                                                     train_total_lines_one_hot, X_train, train_chars))
+    train_chars_token_pos_labels = tf.data.Dataset.from_tensor_slices(y_train)
+    train_char_token_pos_dataset = tf.data.Dataset.zip((train_chars_token_pos_data, train_chars_token_pos_labels))
+    train_char_token_pos_dataset = train_char_token_pos_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
 
     val_chars = [split_chars(sentence) for sentence in X_val]
-    val_chars_token_data = tf.data.Dataset.from_tensor_slices((X_val, val_chars))
-    val_chars_token_labels = tf.data.Dataset.from_tensor_slices(y_val_one_hot)
-    val_chars_token_dataset = tf.data.Dataset.zip((val_chars_token_data, val_chars_token_labels))
-    val_chars_token_dataset = val_chars_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+    val_chars_token_pos_data = tf.data.Dataset.from_tensor_slices((val_line_numbers_one_hot,
+                                                                   val_total_lines_one_hot, X_val, val_chars))
+    val_chars_token_pos_labels = tf.data.Dataset.from_tensor_slices(y_val_one_hot)
+    val_chars_token_pos_dataset = tf.data.Dataset.zip((val_chars_token_pos_data, val_chars_token_pos_labels))
+    val_chars_token_pos_dataset = val_chars_token_pos_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
 
     # set up pretrained token model
     token_input = layers.Input(shape=[], dtype=tf.string, name="token_input_layer")
@@ -588,9 +594,6 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
     model.compile(loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.2),  # helps reduce overfitting
                   optimizer=tf.keras.optimizers.Adam(),  # paper uses SGD, worth a try
                   metrics=["accuracy"])
-
-
-
 
     return model, None
 
@@ -685,4 +688,8 @@ def run():
     model_5, model_5_results = fit_pretrained_tokens_and_chars_and_position(train_df["text"], train_labels_one_hot,
                                                                             val_df["text"],
                                                                             val_labels_one_hot, val_labels_encoded,
+                                                                            train_line_numbers_one_hot,
+                                                                            train_total_lines_one_hot,
+                                                                            val_line_numbers_one_hot,
+                                                                            val_total_lines_one_hot,
                                                                             len(class_names))
