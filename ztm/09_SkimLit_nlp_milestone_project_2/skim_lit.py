@@ -660,21 +660,21 @@ def run():
         test_df["target"].to_numpy(),
     )
 
-    model_0, model_0_results = fit_naive_bayes(train_df["text"], train_labels_encoded, val_df["text"], val_labels_encoded)
+    # model_0, model_0_results = fit_naive_bayes(train_df["text"], train_labels_encoded, val_df["text"], val_labels_encoded)
     # print(model_0_results)
 
     # examine_sentence_data(train_df["text"].to_numpy())
 
-    train_dataset, val_dataset, test_dataset = format_data_for_batching(train_df["text"], train_labels_one_hot,
-                                                                        val_df["text"], val_labels_one_hot,
-                                                                        test_df["text"], test_labels_one_hot
-                                                                        )
+    # train_dataset, val_dataset, test_dataset = format_data_for_batching(train_df["text"], train_labels_one_hot,
+    #                                                                     val_df["text"], val_labels_one_hot,
+    #                                                                     test_df["text"], test_labels_one_hot
+    #                                                                     )
 
-    model_1, model_1_results = fit_conv1d(train_df["text"], train_dataset, val_dataset, val_labels_encoded,
-                                          len(class_names))
+    # model_1, model_1_results = fit_conv1d(train_df["text"], train_dataset, val_dataset, val_labels_encoded,
+    #                                       len(class_names))
     # print(model_1_results)
 
-    model_2, model_2_results = fit_model_with_USE(train_dataset, val_dataset, val_labels_encoded, len(class_names))
+    # model_2, model_2_results = fit_model_with_USE(train_dataset, val_dataset, val_labels_encoded, len(class_names))
     # print(model_2_results)
 
     # Split sequence-level data splits into character-level splits
@@ -684,16 +684,16 @@ def run():
 
     # examine_sentence_char_data(train_df["text"].tolist())
 
-    model_3, model_3_results = fit_conv1d_character_embedded(train_df["text"], train_labels_one_hot, val_df["text"],
-                                                             val_labels_one_hot, val_labels_encoded, len(class_names))
+    # model_3, model_3_results = fit_conv1d_character_embedded(train_df["text"], train_labels_one_hot, val_df["text"],
+    #                                                          val_labels_one_hot, val_labels_encoded, len(class_names))
     # print(model_3_results)
 
-    model_4, model_4_results = fit_pretrained_tokens_with_char_embeddings(train_df["text"],
-                                                                          train_labels_one_hot,
-                                                                          val_df["text"],
-                                                                          val_labels_one_hot,
-                                                                          val_labels_encoded,
-                                                                          len(class_names))
+    # model_4, model_4_results = fit_pretrained_tokens_with_char_embeddings(train_df["text"],
+    #                                                                       train_labels_one_hot,
+    #                                                                       val_df["text"],
+    #                                                                       val_labels_one_hot,
+    #                                                                       val_labels_encoded,
+    #                                                                       len(class_names))
     # print(model_4_results)
 
     train_line_numbers_one_hot, train_total_lines_one_hot, val_line_numbers_one_hot, val_total_lines_one_hot, \
@@ -701,30 +701,49 @@ def run():
 
     # examine_positional_embeddings(train_df)
 
-    model_5, model_5_results = fit_pretrained_tokens_and_chars_and_position(train_df["text"], train_labels_one_hot,
-                                                                            val_df["text"],
-                                                                            val_labels_one_hot, val_labels_encoded,
-                                                                            train_line_numbers_one_hot,
-                                                                            train_total_lines_one_hot,
-                                                                            val_line_numbers_one_hot,
-                                                                            val_total_lines_one_hot,
-                                                                            len(class_names))
-    print(model_5_results)
+    # model_5, model_5_results = fit_pretrained_tokens_and_chars_and_position(train_df["text"], train_labels_one_hot,
+    #                                                                         val_df["text"],
+    #                                                                         val_labels_one_hot, val_labels_encoded,
+    #                                                                         train_line_numbers_one_hot,
+    #                                                                         train_total_lines_one_hot,
+    #                                                                         val_line_numbers_one_hot,
+    #                                                                         val_total_lines_one_hot,
+    #                                                                         len(class_names))
+    # print(model_5_results)
 
-    all_model_results = pd.DataFrame({"baseline": model_0_results,
-                                      "custom_token_embedding": model_1_results,
-                                      "pretrained_token_embedding": model_2_results,
-                                      "custom_char_embedding": model_3_results,
-                                      "hybrid_char_token_embedding": model_4_results,
-                                      "pos_char_token_embedding": model_5_results,
-                                      })
-    all_model_results = all_model_results.transform()
-    all_model_results["accuracy"] = all_model_results["accuracy"] / 100.
-    all_model_results.plot(kind="bar", figsize=(10, 7)).legend(bbox_to_anchor=(1.0, 1.0))
-    plt.show()
-    print(all_model_results)
+    filename = "saved_models/model_5_pos_token_char"
+    # model_5.save(filename)
+    model_5_loaded = tf.keras.models.load_model(filename)
+    print(model_5_loaded.summary())
+
+    val_chars = [split_chars(sentence) for sentence in val_df["text"]]
+    val_chars_token_pos_data = tf.data.Dataset.from_tensor_slices((val_line_numbers_one_hot,
+                                                                     val_total_lines_one_hot, val_df["text"], val_chars))
+    val_chars_token_pos_labels = tf.data.Dataset.from_tensor_slices(val_labels_one_hot)
+    val_char_token_pos_dataset = tf.data.Dataset.zip((val_chars_token_pos_data, val_chars_token_pos_labels))
+    val_char_token_pos_dataset = val_char_token_pos_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+    pred_probs = model_5_loaded.predict(val_char_token_pos_dataset)
+    probs = tf.argmax(pred_probs, axis=1)
+    print(probs[:10])
+    results = calculate_results(val_labels_encoded, probs)
+
+    print(results)
+
+
+    # all_model_results = pd.DataFrame({"baseline": model_0_results,
+    #                                   "custom_token_embedding": model_1_results,
+    #                                   "pretrained_token_embedding": model_2_results,
+    #                                   "custom_char_embedding": model_3_results,
+    #                                   "hybrid_char_token_embedding": model_4_results,
+    #                                   "pos_char_token_embedding": model_5_results
+    #                                   })
+    # all_model_results = all_model_results.transpose()
+    # all_model_results["accuracy"] = all_model_results["accuracy"] / 100.
+    # all_model_results.plot(kind="bar", figsize=(10, 7)).legend(bbox_to_anchor=(1.0, 1.0))
+    # plt.show()
+    # print(all_model_results)
 
     # plot f1 scores
-    all_model_results.sort_values("f1", ascending=True).plot(kind="bar", figsize=(10, 7))
-    plt.show()
+    # all_model_results.sort_values("f1", ascending=True).plot(kind="bar", figsize=(10, 7))
+    # plt.show()
 
