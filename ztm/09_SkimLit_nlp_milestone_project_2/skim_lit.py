@@ -510,7 +510,16 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
     :return:
     """
     train_chars = [split_chars(sentence) for sentence in X_train]
+    train_chars_token_data = tf.data.Dataset.from_tensor_slices((X_train, train_chars))
+    train_chars_token_labels = tf.data.Dataset.from_tensor_slices(y_train)
+    train_char_token_dataset = tf.data.Dataset.zip((train_chars_token_data, train_chars_token_labels))
+    train_char_token_dataset = train_char_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+
     val_chars = [split_chars(sentence) for sentence in X_val]
+    val_chars_token_data = tf.data.Dataset.from_tensor_slices((X_val, val_chars))
+    val_chars_token_labels = tf.data.Dataset.from_tensor_slices(y_val_one_hot)
+    val_chars_token_dataset = tf.data.Dataset.zip((val_chars_token_data, val_chars_token_labels))
+    val_chars_token_dataset = val_chars_token_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
 
     # set up pretrained token model
     token_input = layers.Input(shape=[], dtype=tf.string, name="token_input_layer")
@@ -572,8 +581,15 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
     print(model.summary())
 
     # plot the model (saves to png file)
-    from tensorflow.keras.utils import plot_model
-    plot_model(model, show_shapes=True, to_file="model_5.png")
+    # from tensorflow.keras.utils import plot_model
+    # plot_model(model, show_shapes=True, to_file="model_5.png")
+
+    # Compile
+    model.compile(loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.2),  # helps reduce overfitting
+                  optimizer=tf.keras.optimizers.Adam(),  # paper uses SGD, worth a try
+                  metrics=["accuracy"])
+
+
 
 
     return model, None
