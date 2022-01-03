@@ -524,8 +524,11 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
     val_chars_token_pos_data = tf.data.Dataset.from_tensor_slices((val_line_numbers_one_hot,
                                                                    val_total_lines_one_hot, X_val, val_chars))
     val_chars_token_pos_labels = tf.data.Dataset.from_tensor_slices(y_val_one_hot)
-    val_chars_token_pos_dataset = tf.data.Dataset.zip((val_chars_token_pos_data, val_chars_token_pos_labels))
-    val_chars_token_pos_dataset = val_chars_token_pos_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+    val_char_token_pos_dataset = tf.data.Dataset.zip((val_chars_token_pos_data, val_chars_token_pos_labels))
+    val_char_token_pos_dataset = val_char_token_pos_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+
+    # print(train_char_token_pos_dataset)
+    # print(val_char_token_pos_dataset)
 
     # set up pretrained token model
     token_input = layers.Input(shape=[], dtype=tf.string, name="token_input_layer")
@@ -595,7 +598,20 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
                   optimizer=tf.keras.optimizers.Adam(),  # paper uses SGD, worth a try
                   metrics=["accuracy"])
 
-    return model, None
+    history = model.fit(train_char_token_pos_dataset,
+                        epochs=3,
+                        steps_per_epoch=int(0.1*len(train_char_token_pos_dataset)),
+                        validation_data=val_char_token_pos_dataset,
+                        validation_steps=int(0.1*len(val_char_token_pos_dataset)),
+                        workers=-1)
+
+    # model.evaluate(val_char_token_pos_dataset)
+
+    pred_probs = model.predict(val_char_token_pos_dataset)
+    preds = tf.argmax(pred_probs, axis=1)
+    results = calculate_results(y_val_encoded, preds)
+
+    return model, results
 
 
 def parse_file(filepath):
@@ -693,3 +709,4 @@ def run():
                                                                             val_line_numbers_one_hot,
                                                                             val_total_lines_one_hot,
                                                                             len(class_names))
+    print(model_5_results)
