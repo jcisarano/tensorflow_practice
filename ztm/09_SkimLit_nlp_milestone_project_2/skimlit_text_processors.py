@@ -51,9 +51,17 @@ def preprocess_text_with_line_numbers(filepath):
     return abstract_samples
 
 
-def get_labels_one_hot(sentences):
+def get_labels_one_hot(labels):
     from sklearn.preprocessing import OneHotEncoder
     one_hot_encoder = OneHotEncoder(sparse=False)
-    one_hot = one_hot_encoder.fit_transform(sentences)
+    one_hot = one_hot_encoder.fit_transform(labels)
 
-    return sentences
+    return one_hot
+
+
+def get_labels_int_encoded(labels):
+    from sklearn.preprocessing import LabelEncoder
+    label_encoder = LabelEncoder()
+    labels_encoded = label_encoder.fit_transform(labels)
+
+    return labels_encoded, label_encoder.classes_

@@ -11,7 +11,7 @@ Note: Pretrained model stored in Google drive for course if desired:
 import tensorflow as tf
 import pandas as pd
 
-from skimlit_text_processors import preprocess_text_with_line_numbers
+from skimlit_text_processors import preprocess_text_with_line_numbers, get_labels_one_hot, get_labels_int_encoded
 
 MODEL_PATH: str = "saved_models/model_5_pos_token_char"
 DATA_DIR_20K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_20k_RCT_numbers_replaced_with_at_sign/"
@@ -28,5 +28,7 @@ def run():
 
     test_samples = preprocess_text_with_line_numbers(filepath=DATA_DIR_20K_NUM_REPL + "test.txt")
     test_df = pd.DataFrame(test_samples)
+    test_labels_one_hot = get_labels_one_hot(test_df["target"].to_numpy().reshape(-1, 1))
+    test_labels_encoded, classes = get_labels_int_encoded(test_df["target"].to_numpy().reshape(-1, 1))
 
     print("challenges")
