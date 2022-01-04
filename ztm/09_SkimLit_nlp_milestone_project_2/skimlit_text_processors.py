@@ -1,4 +1,4 @@
-
+import tensorflow as tf
 
 def get_lines(filepath):
     """
@@ -65,3 +65,15 @@ def get_labels_int_encoded(labels):
     labels_encoded = label_encoder.fit_transform(labels)
 
     return labels_encoded, label_encoder.classes_
+
+
+def split_chars(text):
+    return " ".join(list(text))
+
+
+def get_positional_data_one_hot(line_numbers, total_lines, line_num_depth=15, total_line_depth=20):
+    line_numbers_one_hot = tf.one_hot(line_numbers, depth=15)  # 95% are 15 or less
+    total_lines_one_hot = tf.one_hot(total_lines, depth=20)  # 98% are 20 or less
+
+    return line_numbers_one_hot, total_lines_one_hot
+

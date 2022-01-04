@@ -11,7 +11,8 @@ Note: Pretrained model stored in Google drive for course if desired:
 import tensorflow as tf
 import pandas as pd
 
-from skimlit_text_processors import preprocess_text_with_line_numbers, get_labels_one_hot, get_labels_int_encoded
+from skimlit_text_processors import preprocess_text_with_line_numbers, get_labels_one_hot, get_labels_int_encoded, \
+    split_chars, get_positional_data_one_hot
 
 MODEL_PATH: str = "saved_models/model_5_pos_token_char"
 DATA_DIR_20K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_20k_RCT_numbers_replaced_with_at_sign/"
@@ -29,6 +30,16 @@ def run():
     test_samples = preprocess_text_with_line_numbers(filepath=DATA_DIR_20K_NUM_REPL + "test.txt")
     test_df = pd.DataFrame(test_samples)
     test_labels_one_hot = get_labels_one_hot(test_df["target"].to_numpy().reshape(-1, 1))
-    test_labels_encoded, classes = get_labels_int_encoded(test_df["target"].to_numpy().reshape(-1, 1))
+    test_labels_encoded, classes = get_labels_int_encoded(test_df["target"].to_numpy())
 
-    print("challenges")
+    test_line_numbers_one_hot, test_total_len_one_hot = get_positional_data_one_hot(test_df["line_number"],
+                                                                                    test_df["total_lines"])
+
+    test_chars = [split_chars(sentence) for sentence in test_df["text"]]
+    test_chars_tokens_pos_data = tf.data.Dataset.from_tensor_slices((test_line_numbers_one_hot,
+                                                                     test_total_len_one_hot,
+                                                                     test_df["text"], test_chars))
+    test_chars_tokens_pos_labels = tf.data.Dataset.from_tensor_slices(test_labels_one_hot)
+    test_chars_tokens_pos_dataset = tf.data.Dataset.zip((test_chars_tokens_pos_data, test_chars_tokens_pos_labels))
+    test_chars_tokens_pos_dataset = test_chars_tokens_pos_dataset.batch(32).prefetch(tf.data.AUTOTUNE)
+
