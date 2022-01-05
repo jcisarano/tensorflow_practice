@@ -59,7 +59,15 @@ def run():
     test_df["pred_prob"] = tf.reduce_max(pred_probs, axis=1).numpy()
     test_df["correct"] = test_df["prediction"] == test_df["target"]
 
-    print(test_df.head(20))
+    most_wrong = test_df[test_df["correct"] == False].sort_values("pred_prob", ascending=False)[:100]
+    print(most_wrong)
+
+    for row in most_wrong[0:10].itertuples():
+        _, target, text, line_num, total_lines, pred, pred_prob, _ = row
+        print(f"Target: {target}, Pred:{pred}, Prob: {pred_prob}, Line number: {line_num}, Total_lines: {total_lines}\n")
+        print(f"Text:\n{text}")
+        print("-----\n")
+
 
 
 
