@@ -24,6 +24,22 @@ def load_model(filepath):
     return tf.keras.models.load_model(filepath)
 
 
+def find_most_wrong(test_df, preds, pred_probs, classes):
+    # find most wrong predictions
+    pred_classes = [classes[pred] for pred in preds]
+    test_df["prediction"] = pred_classes
+    test_df["pred_prob"] = tf.reduce_max(pred_probs, axis=1).numpy()
+    test_df["correct"] = test_df["prediction"] == test_df["target"]
+
+    most_wrong = test_df[test_df["correct"] == False].sort_values("pred_prob", ascending=False)[:100]
+    print(most_wrong)
+
+    for row in most_wrong[0:10].itertuples():
+        _, target, text, line_num, total_lines, pred, pred_prob, _ = row
+        print(f"Target: {target}, Pred:{pred}, Prob: {pred_prob}, Line number: {line_num}, Total_lines: {total_lines}\n")
+        print(f"Text:\n{text}")
+        print("-----\n")
+
 def run():
     # model = load_model(MODEL_PATH)
     # print(model.summary())
@@ -53,20 +69,8 @@ def run():
 
     print(results)
 
-    # find most wrong predictions
-    pred_classes = [classes[pred] for pred in preds]
-    test_df["prediction"] = pred_classes
-    test_df["pred_prob"] = tf.reduce_max(pred_probs, axis=1).numpy()
-    test_df["correct"] = test_df["prediction"] == test_df["target"]
+    find_most_wrong(test_df, preds, pred_probs, classes)
 
-    most_wrong = test_df[test_df["correct"] == False].sort_values("pred_prob", ascending=False)[:100]
-    print(most_wrong)
-
-    for row in most_wrong[0:10].itertuples():
-        _, target, text, line_num, total_lines, pred, pred_prob, _ = row
-        print(f"Target: {target}, Pred:{pred}, Prob: {pred_prob}, Line number: {line_num}, Total_lines: {total_lines}\n")
-        print(f"Text:\n{text}")
-        print("-----\n")
 
 
 
