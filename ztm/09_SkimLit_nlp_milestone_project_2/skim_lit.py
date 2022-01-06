@@ -565,7 +565,7 @@ def fit_pretrained_tokens_and_chars_and_position(X_train, y_train, X_val, y_val_
     line_len_model = tf.keras.Model(inputs=line_len_inputs, outputs=x)
 
     # concatenate embeddings
-    combined_embeddings = layers.Concatenate(name="token_char_hubrid_embedding")(
+    combined_embeddings = layers.Concatenate(name="token_char_hybrid_embedding")(
         [token_model.output, char_model.output])
 
     # add dropout layer
