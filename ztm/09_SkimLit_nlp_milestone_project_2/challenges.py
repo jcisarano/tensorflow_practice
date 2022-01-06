@@ -25,6 +25,8 @@ MODEL_PATH: str = "saved_models/model_5_pos_token_char"
 DATA_DIR_20K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_20k_RCT_numbers_replaced_with_at_sign/"
 DATA_DIR_200K_NUM_REPL: str = "dataset/pubmed-rct-master/PubMed_200k_RCT_numbers_replaced_with_at_sign/"
 
+CHECKPOINT_PATH: str = "model_checkpoints/cp.ckpt"
+
 
 def load_model(filepath):
     return tf.keras.models.load_model(filepath)
@@ -48,7 +50,8 @@ def find_most_wrong(test_df, preds, pred_probs, classes):
         print("-----\n")
 
 
-def create_model_with_callbacks():
+def create_model_with_callbacks(X_train, train_chars, train_char_token_pos_dataset, val_char_token_pos_dataset,
+                                num_classes):
     # token model
     token_input = layers.Input(shape=[], dtype=tf.string, name="token_input_layer")
     pretrained_embedding = hub.KerasLayer("https://tfhub.dev/google/universal-sentence-encoder/4",
@@ -59,8 +62,6 @@ def create_model_with_callbacks():
     token_model = tf.keras.Model(inputs=token_input, outputs=token_output)
 
     # char model
-    MAX_TOKENS = 68000
-
     NUM_CHAR_TOKENS: int = len(string.ascii_lowercase + string.digits + string.punctuation) + 2
     sent_len = [len(sentence) for sentence in X_train]
     seq_len = int(np.percentile(sent_len, 95))
@@ -87,12 +88,50 @@ def create_model_with_callbacks():
 
     line_len_inputs = layers.Input(shape=(20,), dtype=tf.float32, name="line_len_inputs")
     x = layers.Dense(32, activation="relu")(line_len_inputs)
-    line_len_inputs = tf.keras.Model(inputs=line_len_inputs, outputs=x)
+    line_len_model = tf.keras.Model(inputs=line_len_inputs, outputs=x)
 
-    combined_embeddings = layers.Concatenate(name="token_char_hybrid_embedding")([token_model.outputs,
-                                                                                  char_model.outputs])
+    combined_embeddings = layers.Concatenate(name="token_char_hybrid_embedding")([token_model.output,
+                                                                                  char_model.output])
 
+    combined_embeddings_with_dropout = layers.Dense(256, activation="relu")(combined_embeddings)
+    combined_embeddings_with_dropout = layers.Dropout(0.5)(combined_embeddings_with_dropout)
 
+    tribrid_embedding = layers.Concatenate(name="char_token_positional_embedding")([line_num_model.output,
+                                                                                    line_len_model.output,
+                                                                                    combined_embeddings_with_dropout])
+
+    output = layers.Dense(num_classes, activation="softmax", name="softmax_output")(tribrid_embedding)
+    model = tf.keras.Model(inputs=[line_num_model.input, line_len_model.input, token_model.input, char_model.input],
+                           outputs=output,
+                           name="model_5_with_checkpoint_and_early_stop")
+
+    model.compile(loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.2),
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+
+    early_stopping = tf.keras.callbacks.EarlyStopping(
+        monitor="val_loss",
+        patience=3,
+        verbose=1,
+        restore_best_weights=True
+    )
+
+    model_checkpoint = tf.keras.callbacks.ModelCheckpoint(CHECKPOINT_PATH,
+                                                          monitor="val_accuracy",
+                                                          save_best_only=True,
+                                                          save_weights_only=True,
+                                                          verbose=0)
+
+    model.fit(train_char_token_pos_dataset,
+              epochs=3,
+              steps_per_epoch=int(0.1*len(train_char_token_pos_dataset)),
+              validation_data=val_char_token_pos_dataset,
+              validation_steps=int(0.1*val_char_token_pos_dataset),
+              callbacks=[early_stopping, model_checkpoint],
+              workers=-1
+              )
+
+    return model
 
 def run():
     # model = load_model(MODEL_PATH)
@@ -124,3 +163,8 @@ def run():
     # print(results)
 
     # find_most_wrong(test_df, preds, pred_probs, classes)
+
+    model = create_model_with_callbacks(test_df["text"], test_chars, len(classes))
+    print(model.summary())
+
+
