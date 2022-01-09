@@ -1,3 +1,4 @@
+import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 import matplotlib.pyplot as plt
@@ -28,6 +29,21 @@ def visualize_data(X_train, y_train, X_valid, y_valid, X_test, y_test, class_nam
     plt.show()
 
 
+def visualize_model_details(model):
+    print(model.layers)
+    print(model.summary())
+
+    keras.utils.plot_model(model, "mnist_fashion_model.png", show_shapes=True, show_dtype=True)
+    hidden1 = model.layers[1]
+    print(hidden1.name)
+    print(model.get_layer(hidden1.name) is hidden1)
+    weights, biases = hidden1.get_weights()
+    print(weights)
+    print(weights.shape)
+    print(biases)
+    print(biases.shape)
+
+
 def run():
     print("TF version:", tf.__version__)
     print("Keras version:", keras.__version__)
@@ -49,5 +65,29 @@ def run():
     class_names = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
                    "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
 
-    visualize_data(X_train, y_train, X_valid, y_valid, X_test, y_test, class_names)
+    # visualize_data(X_train, y_train, X_valid, y_valid, X_test, y_test, class_names)
+
+    # one way to build a Sequential model#
+    # model = keras.models.Sequential()
+    # model.add(keras.layers.Flatten(input_shape=[28, 28]))
+    # model.add(keras.layers.Dense(300, activation="relu"))
+    # model.add(keras.layers.Dense(100, activation="relu"))
+    # model.add(keras.layers.Dense(10, activation="softmax"))
+    # print(model.layers)
+    # print(model.summary())
+
+    keras.backend.clear_session()
+    np.random.seed(42)
+    tf.random.set_seed(432)
+
+    model = keras.models.Sequential([
+        keras.layers.Flatten(input_shape=[28, 28]),
+        keras.layers.Dense(300, activation="relu"),
+        keras.layers.Dense(100, activation="relu"),
+        keras.layers.Dense(10, activation="softmax"),
+    ])
+
+    visualize_model_details(model)
+
+
 
