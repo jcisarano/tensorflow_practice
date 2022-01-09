@@ -87,7 +87,54 @@ def run():
         keras.layers.Dense(10, activation="softmax"),
     ])
 
-    visualize_model_details(model)
+    # visualize_model_details(model)
+
+    # two equivalent ways to compile the model
+    # model.compile(loss="sparse_categorical_crossentropy",
+    #               optimizer="sgd",
+    #               metrics=["accuracy"])
+    model.compile(loss=keras.losses.sparse_categorical_crossentropy,
+                  optimizer=keras.optimizers.SGD(),
+                  metrics=[keras.metrics.sparse_categorical_accuracy])
+
+    history = model.fit(X_train,
+                        y_train,
+                        epochs=30,
+                        validation_data=(X_valid, y_valid),
+                        workers=-1)
+    print(history.params)
+    print(history.epoch)
+    print(history.history.keys())
+
+    # plot loss curves
+    import pandas as pd
+    pd.DataFrame(history.history).plot(figsize=(8, 5))
+    plt.grid(True)
+    plt.gca().set_ylim(0, 1)
+    plt.show()
+
+    model.evaluate(X_test, y_test)
+    X_new = X_test[:3]
+    y_prob = model.predict(X_new)
+    print(y_prob.round(2))
+
+    y_pred = np.argmax(model.predict(X_new), axis=-1)
+    print(y_pred)
+    print(np.array(class_names)[y_pred])
+
+    y_new = y_test[:3]
+    print(y_new)
+
+    # visualize image predictions
+    plt.figure(figsize=(7.2, 2.4))
+    for index, image in enumerate(X_new):
+        plt.subplot(1, 3, index+1)
+        plt.imshow(image, cmap="binary", interpolation="nearest")
+        plt.axis("off")
+        plt.title(class_names[y_test[index]], fontsize=12)
+    plt.subplots_adjust(wspace=0.2, hspace=0.5)
+    plt.show()`
+
 
 
 
