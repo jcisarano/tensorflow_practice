@@ -133,7 +133,7 @@ def run():
         plt.axis("off")
         plt.title(class_names[y_test[index]], fontsize=12)
     plt.subplots_adjust(wspace=0.2, hspace=0.5)
-    plt.show()`
+    plt.show()
 
 
 
