@@ -5,6 +5,7 @@ import image_classifier as ic
 import regression_mlp as rmlp
 import functional_api as fa
 import subclassing_api as sub
+import saving_and_restoring as sar
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -13,6 +14,7 @@ if __name__ == '__main__':
     # ic.run()
     # rmlp.run()
     # fa.run()
-    sub.run()
+    # sub.run()
+    sar.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
