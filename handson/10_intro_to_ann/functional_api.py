@@ -90,3 +90,12 @@ def run():
 
     history = model.fit([X_train_A, X_train_B], [y_train, y_train], epochs=20,
                         validation_data=([X_valid_A, X_valid_B], [y_valid, y_valid]))
+
+    total_loss, main_loss, aux_loss = model.evaluate(
+        [X_test_A, X_test_B], [y_test, y_test])
+    y_pred_main, y_pred_aux = model.predict([X_new_A, X_new_B])
+    print("total loss separate output model:", total_loss)
+    print("main loss separate output model:", main_loss)
+    print("aux loss separate output model:", aux_loss)
+
+
