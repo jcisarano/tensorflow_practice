@@ -45,5 +45,18 @@ def run():
                         callbacks=[checkpoint_cb],
                         workers=-1)
 
-    print("mwc")
+    # load previously saved model
+    model = tf.keras.models.load_model(SAVE_PATH)
+    mse_test = model.evaluate(X_test, y_test)
+    print("Loaded model MSE:", mse_test)
+
+    model.compile(loss="mse", optimizer=tf.keras.optimizers.SGD(learning_rate=1e-3))
+    early_stopping_cb = tf.keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True)
+    history = model.fit(X_train, y_train, epochs=100,
+                        validation_data=[X_valid, y_valid],
+                        callbacks=[checkpoint_cb, early_stopping_cb],
+                        workers=-1)
+    mse_test = model.evaluate(X_test, y_test)
+    print("Loaded model:\n", model.summary())
+    print("Early stopping MSE:", mse_test)
 
