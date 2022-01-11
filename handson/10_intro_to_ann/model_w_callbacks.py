@@ -16,6 +16,11 @@ CALLBACK_PATH: str = os.path.join(CALLBACK_DIR, FILENAME)
 SAVE_PATH: str = os.path.join(SAVE_DIR, FILENAME)
 
 
+class PrintValTrainRatioCallback(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs):
+        print("\nval/train: {:.2f}".format(logs["val_loss"] / logs["loss"]))
+
+
 def run():
     keras.backend.clear_session()
     np.random.seed(42)
@@ -59,4 +64,10 @@ def run():
     mse_test = model.evaluate(X_test, y_test)
     print("Loaded model:\n", model.summary())
     print("Early stopping MSE:", mse_test)
+
+    # custom callback that prints val/train ratio on epoch end:
+    val_train_ratio_cb = PrintValTrainRatioCallback()
+    history = model.fit(X_train, y_train, epochs=1,
+                        validation_data=(X_valid, y_valid),
+                        callbacks=[val_train_ratio_cb])
 
