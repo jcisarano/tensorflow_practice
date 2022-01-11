@@ -7,6 +7,7 @@ import functional_api as fa
 import subclassing_api as sub
 import saving_and_restoring as sar
 import model_w_callbacks as mwc
+import tensorboard_callback as tbe
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -17,6 +18,7 @@ if __name__ == '__main__':
     # fa.run()
     # sub.run()
     # sar.run()
-    mwc.run()
+    # mwc.run()
+    tbe.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
