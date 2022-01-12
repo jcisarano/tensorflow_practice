@@ -53,4 +53,23 @@ def run():
                         callbacks=[checkpoint_cb, tensorboard_cb],
                         workers=-1)
 
-    print("tensorboard")
+    # another model for tb
+    run_logdir2 = get_run_logdir()
+    print("run log dir 2", run_logdir2)
+
+    keras.backend.clear_session()
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    model = keras.models.Sequential([
+        layers.Dense(30, activation="relu", input_shape=[8]),
+        layers.Dense(30, activation="relu"),
+        layers.Dense(1)
+    ])
+    model.compile(loss="mse", optimizer=tf.keras.optimizers.SGD(learning_rate=1e-3))
+
+    tensorboard_cb = tf.keras.callbacks.TensorBoard(run_logdir2)
+    history = model.fit(X_train, y_train, epochs=30,
+                        validation_data=(X_valid, y_valid),
+                        callbacks=[checkpoint_cb, tensorboard_cb],
+                        workers=-1)
