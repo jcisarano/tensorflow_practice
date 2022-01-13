@@ -43,5 +43,27 @@ def run():
     y_pred = keras_reg.predict(X_new)
     print(y_pred)
 
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    from scipy.stats import reciprocal
+    from sklearn.model_selection import RandomizedSearchCV
+
+    param_distribs = {
+        "n_hidden": [0, 1, 2, 3],
+        "n_neurons": np.arange(1, 100),
+        "learning_rate": reciprocal(3e-4, 3e-2)
+    }
+
+    rnd_search_cv = RandomizedSearchCV(keras_reg, param_distribs, n_iter=10, cv=3, verbose=2)
+    rnd_search_cv.fit(X_train, y_train, epochs=100,
+                      validation_data=(X_valid, y_valid),
+                      callbacks=[tf.keras.callbacks.EarlyStopping(patience=10)])
+    print(rnd_search_cv.best_params_)
+    print(rnd_search_cv.best_score_)
+    print(rnd_search_cv.best_estimator_)
+    print(rnd_search_cv.score(X_test, y_test))
+    model = rnd_search_cv.best_estimator_.model
+    model.evaluate(X_test, y_test)
     print("yperparameter tuning")
 
