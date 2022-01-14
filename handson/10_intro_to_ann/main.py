@@ -8,7 +8,8 @@ import subclassing_api as sub
 import saving_and_restoring as sar
 import model_w_callbacks as mwc
 import tensorboard_callback as tbe
-import  hyperparameter_tuning as ht
+import hyperparameter_tuning as ht
+import mnist_ex as me
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -21,6 +22,7 @@ if __name__ == '__main__':
     # sar.run()
     # mwc.run()
     # tbe.run()
-    ht.run()
+    # ht.run()
+    me.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
