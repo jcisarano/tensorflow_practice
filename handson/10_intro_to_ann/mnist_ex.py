@@ -1,3 +1,6 @@
+import os
+
+import keras.backend
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -74,6 +77,32 @@ def run():
     plt.xlabel("Learning rate")
     plt.ylabel("Loss")
     plt.show()
+
+    keras.backend.clear_session()
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    model = keras.models.Sequential([
+        tf.keras.layers.Flatten(input_shape=[28, 28]),
+        tf.keras.layers.Dense(300, activation="relu"),
+        tf.keras.layers.Dense(100, activation="relu"),
+        tf.keras.layers.Dense(10, activation="softmax"),
+    ])
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.SGD(learning_rate=3e-1),
+                  metrics=["accuracy"])
+    run_index = 1
+    run_logdir = os.path.join("saved_logs", "run_{:03d}".format(run_index))
+
+    early_stopping_cb = tf.keras.callbacks.EarlyStopping(patience=20)
+    checkpoint_cb = tf.keras.callbacks.ModelCheckpoint("saved_callbacks/my_mnist_model.h5", save_best_only=True)
+    tensorboard_cb = tf.keras.callbacks.TensorBoard(run_logdir)
+
+    history = model.fit(X_train, y_train, epochs=100,
+                        validation_data=(X_valid, y_valid),
+                        callbacks=[early_stopping_cb, checkpoint_cb, tensorboard_cb],
+                        workers=-1)
+
 
 
     # print("mnist")
