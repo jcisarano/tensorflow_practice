@@ -58,8 +58,14 @@ def plot_leaky_relu():
     plt.show()
 
 
+def list_keras_activations():
+    print([m for m in dir(keras.activations) if not m.startswith("_")])
+    print([m for m in dir(keras.layers) if "relu" in m.lower()])
+
+
 def run():
     # plot_sigmoid_function()
     # explore_keras_initializers()
-    plot_leaky_relu()
+    # plot_leaky_relu()
+    list_keras_activations()
 
