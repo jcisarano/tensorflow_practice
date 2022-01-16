@@ -1,6 +1,7 @@
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.special import erfc
 
 from tensorflow import keras
 
@@ -99,6 +100,28 @@ def elu(z, alpha=1):
     return np.where(z < 0, alpha*(np.exp(z)-1), z)
 
 
+alpha_0_1 = -np.sqrt(2 / np.pi) / (erfc(1/np.sqrt(2)) * np.exp(1/2) - 1)
+scale_0_1 = (1 - erfc(1 / np.sqrt(2)) * np.sqrt(np.e)) * np.sqrt(2 * np.pi) * (2 * erfc(np.sqrt(2))*np.e**2 + np.pi*erfc(1/np.sqrt(2))**2*np.e - 2*(2+np.pi)*erfc(1/np.sqrt(2))*np.sqrt(np.e)+np.pi+2)**(-1/2)
+
+
+def selu(z, scale=scale_0_1, alpha=alpha_0_1):
+    return scale * elu(z, alpha)
+
+
+def plot_selu():
+    z = np.linspace(-5, 5, 200)
+
+    plt.plot([-5, 5], [0, 0], "k-")
+    plt.plot([0, 0], [-5, 5], "k-")
+    plt.plot([-5, 5], [-1.758, -1.758], "k--")
+    plt.plot(z, selu(z), "b-", linewidth=2)
+
+    plt.grid(True)
+    plt.title("SELU activation function")
+    plt.axis([-5, 5, -2.2, 3.2])
+    plt.show()
+
+
 def plot_elu():
     z = np.linspace(-5, 5, 200)
 
@@ -144,5 +167,6 @@ def run():
     # list_keras_activations()
     # train_fashion_mnist_relu()
     # train_fashion_mnist_prelu()
-    plot_elu()
+    # plot_elu()
+    plot_selu()
 
