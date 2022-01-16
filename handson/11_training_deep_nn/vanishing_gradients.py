@@ -160,8 +160,8 @@ def train_fashion_mnist_selu():
     X_valid_scaled = (X_valid - pixel_means) / pixel_stds
     X_test_scaled = (X_test - pixel_means) / pixel_stds
 
-    model.fit(X_train_scaled, y_train, epochs=10,
-              validation_data=[X_valid_scaled, y_valid])
+    model.fit(X_train_scaled, y_train, epochs=5,
+              validation_data=(X_valid_scaled, y_valid))
 
 
 def train_fashion_mnist_relu_scaled():
@@ -187,7 +187,7 @@ def train_fashion_mnist_relu_scaled():
     X_test_scaled = (X_test - pixel_means) / pixel_stds
 
     model.fit(X_train_scaled, y_train, epochs=5,
-              validation_data=(X_valid_scaled, y_valid))    
+              validation_data=(X_valid_scaled, y_valid))
 
 
 def plot_elu():
@@ -238,5 +238,6 @@ def run():
     # plot_elu()
     # plot_selu()
     # show_selu_hyperparams()
-    train_fashion_mnist_selu()
+    # train_fashion_mnist_selu()
+    train_fashion_mnist_relu()
 
