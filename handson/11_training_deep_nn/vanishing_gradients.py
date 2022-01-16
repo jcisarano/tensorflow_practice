@@ -63,9 +63,31 @@ def list_keras_activations():
     print([m for m in dir(keras.layers) if "relu" in m.lower()])
 
 
+def train_fashion_mnist():
+    # load data into training, validation and test sets, normalize to 0-1 range
+    (X_train_full, y_train_full), (X_test, y_test) = keras.datasets.fashion_mnist.load_data()
+    X_train, X_valid = X_train_full[:55000]/255., X_train_full[55000:]/255.
+    X_test = X_test / 255.
+    y_train, y_valid = y_train_full[:55000], y_train_full[55000:]
+    # print(X_train.shape, X_valid.shape, X_test.shape)
+    # print(X_train[0])
+
+    model = keras.models.Sequential([
+        keras.layers.Flatten(input_shape=[28, 28], name="input_layer"),
+        keras.layers.Dense(30, activation="relu"),
+        keras.layers.Dense(10, activation="softmax")
+    ])
+
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.SGD(learning_rate=1e-3),
+                  metrics=["accuracy"])
+
+
+
 def run():
     # plot_sigmoid_function()
     # explore_keras_initializers()
     # plot_leaky_relu()
-    list_keras_activations()
+    # list_keras_activations()
+    train_fashion_mnist()
 
