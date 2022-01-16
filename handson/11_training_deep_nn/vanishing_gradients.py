@@ -122,6 +122,18 @@ def plot_selu():
     plt.show()
 
 
+def show_selu_hyperparams():
+    np.random.seed(42)
+    Z = np.random.normal(size=(500, 100))
+    for layer in range(1000):
+        W = np.random.normal(size=(100, 100), scale=np.sqrt(1/100))  # LeCun initialization
+        Z = selu(np.dot(Z, W))
+        means = np.mean(Z, axis=0).mean()
+        stds = np.std(Z, axis=0).mean()
+        if layer % 100 == 0:
+            print("Layer {}: mean {:.2f}, std deviation {:.2f}".format(layer, means, stds))
+
+
 def plot_elu():
     z = np.linspace(-5, 5, 200)
 
@@ -168,5 +180,6 @@ def run():
     # train_fashion_mnist_relu()
     # train_fashion_mnist_prelu()
     # plot_elu()
-    plot_selu()
+    # plot_selu()
+    show_selu_hyperparams()
 
