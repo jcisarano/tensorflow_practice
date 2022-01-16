@@ -72,13 +72,20 @@ def train_fashion_mnist():
     # print(X_train.shape, X_valid.shape, X_test.shape)
     # print(X_train[0])
 
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    # Uses Keras LeakyReLU built-in layers
     model = keras.models.Sequential([
         keras.layers.Flatten(input_shape=[28, 28], name="input_layer"),
-        keras.layers.Dense(30, activation="relu"),
+        keras.layers.Dense(300, kernel_initializer="he_normal"),
+        keras.layers.LeakyReLU(),
+        keras.layers.Dense(100, kernel_initializer="he_normal"),
+        keras.layers.LeakyReLU(),
         keras.layers.Dense(10, activation="softmax")
     ])
 
-    model.compile(loss="categorical_crossentropy",
+    model.compile(loss="sparse_categorical_crossentropy",
                   optimizer=tf.keras.optimizers.SGD(learning_rate=1e-3),
                   metrics=["accuracy"])
 
