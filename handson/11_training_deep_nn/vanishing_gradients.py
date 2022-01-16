@@ -134,6 +134,30 @@ def show_selu_hyperparams():
             print("Layer {}: mean {:.2f}, std deviation {:.2f}".format(layer, means, stds))
 
 
+def train_fashion_mnist_selu():
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_data()
+
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    model = keras.models.Sequential()
+    model.add(keras.layers.Flatten(input_shape=[28, 28]))
+    model.add(keras.layers.Dense(300, activation="selu",
+                                 kernel_initializer="lecun_normal"))
+    for layer in range(99):
+        model.add(keras.layers.Dense(100,
+                                     activation="selu",
+                                     kernel_initializer="lecun_normal"))
+    model.add(keras.layers.Dense(10, activation="softmax"))
+
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.SGD(learning_rate=1e-3),
+                  metrics=["accuracy"])
+
+    # model.fit(X_train, y_train, epochs=10,
+    #           validation_data=[X_valid, y_valid])
+
+
 def plot_elu():
     z = np.linspace(-5, 5, 200)
 
@@ -181,5 +205,6 @@ def run():
     # train_fashion_mnist_prelu()
     # plot_elu()
     # plot_selu()
-    show_selu_hyperparams()
+    # show_selu_hyperparams()
+    train_fashion_mnist_selu()
 
