@@ -95,6 +95,24 @@ def train_fashion_mnist_prelu():
               validation_data=[X_valid, y_valid])
 
 
+def elu(z, alpha=1):
+    return np.where(z < 0, alpha*(np.exp(z)-1), z)
+
+
+def plot_elu():
+    z = np.linspace(-5, 5, 200)
+
+    plt.plot([-5, 5], [0, 0], "k-")
+    plt.plot([-5, 5], [-1, -1], "k--")
+    plt.plot([0, 0], [-5, 5], "k-")
+    plt.plot(z, elu(z), "b-", linewidth=2)
+
+    plt.grid(True)
+    plt.title(r"ELU activation function($\alpha=1$)")
+    plt.axis([-5, 5, -2.2, 3.2])
+    plt.show()
+
+
 def train_fashion_mnist_relu():
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_data()
 
@@ -125,5 +143,6 @@ def run():
     # plot_leaky_relu()
     # list_keras_activations()
     # train_fashion_mnist_relu()
-    train_fashion_mnist_prelu()
+    # train_fashion_mnist_prelu()
+    plot_elu()
 
