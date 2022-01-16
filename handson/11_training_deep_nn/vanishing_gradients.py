@@ -63,7 +63,7 @@ def list_keras_activations():
     print([m for m in dir(keras.layers) if "relu" in m.lower()])
 
 
-def train_fashion_mnist():
+def train_fashion_mnist_relu():
     # load data into training, validation and test sets, normalize to 0-1 range
     (X_train_full, y_train_full), (X_test, y_test) = keras.datasets.fashion_mnist.load_data()
     X_train, X_valid = X_train_full[:55000]/255., X_train_full[55000:]/255.
@@ -89,6 +89,8 @@ def train_fashion_mnist():
                   optimizer=tf.keras.optimizers.SGD(learning_rate=1e-3),
                   metrics=["accuracy"])
 
+    model.fit(X_train, y_train, epochs=10,
+              validation_data=(X_valid, y_valid))
 
 
 def run():
@@ -96,5 +98,5 @@ def run():
     # explore_keras_initializers()
     # plot_leaky_relu()
     # list_keras_activations()
-    train_fashion_mnist()
+    train_fashion_mnist_relu()
 
