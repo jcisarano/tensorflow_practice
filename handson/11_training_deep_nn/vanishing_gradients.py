@@ -154,8 +154,14 @@ def train_fashion_mnist_selu():
                   optimizer=tf.keras.optimizers.SGD(learning_rate=1e-3),
                   metrics=["accuracy"])
 
-    # model.fit(X_train, y_train, epochs=10,
-    #           validation_data=[X_valid, y_valid])
+    pixel_means = X_train.mean(axis=0, keepdims=True)
+    pixel_stds = X_train.std(axis=0, keepdims=True)
+    X_train_scaled = (X_train - pixel_means) / pixel_stds
+    X_valid_scaled = (X_valid - pixel_means) / pixel_stds
+    X_test_scaled = (X_test - pixel_means) / pixel_stds
+
+    model.fit(X_train_scaled, y_train, epochs=10,
+              validation_data=[X_valid_scaled, y_valid])
 
 
 def plot_elu():
