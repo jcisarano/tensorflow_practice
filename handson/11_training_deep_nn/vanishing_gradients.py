@@ -63,14 +63,18 @@ def list_keras_activations():
     print([m for m in dir(keras.layers) if "relu" in m.lower()])
 
 
-def train_fashion_mnist_relu():
+def load_data():
     # load data into training, validation and test sets, normalize to 0-1 range
     (X_train_full, y_train_full), (X_test, y_test) = keras.datasets.fashion_mnist.load_data()
     X_train, X_valid = X_train_full[:55000]/255., X_train_full[55000:]/255.
     X_test = X_test / 255.
     y_train, y_valid = y_train_full[:55000], y_train_full[55000:]
-    # print(X_train.shape, X_valid.shape, X_test.shape)
-    # print(X_train[0])
+
+    return X_train, X_valid, X_test, y_train, y_valid, y_test
+
+
+def train_fashion_mnist_relu():
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_data()
 
     np.random.seed(42)
     tf.random.set_seed(42)
