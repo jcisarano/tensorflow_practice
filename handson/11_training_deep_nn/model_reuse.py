@@ -22,6 +22,7 @@ def split_data(X, y):
     return ((X[~y_5_or_6], y_A),
             (X[y_5_or_6], y_B))
 
+
 def load_split_data():
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_data()
     (X_train_A, y_train_A), (X_train_B, y_train_B) = split_data(X_train, y_train)
@@ -45,5 +46,18 @@ def run():
 
     np.random.seed(42)
     tf.random.set_seed(42)
+
+    model_A = keras.models.Sequential()
+    model_A.add(keras.layers.Flatten(input_shape=[28, 28]))
+    for n_hidden in (300, 100, 50, 50, 50):
+        model_A.add(keras.layers.Dense(n_hidden, activation="selu"))
+    model_A.add(keras.layers.Dense(8, activation="softmax"))
+
+    model_A.compile(loss="sparse_categorical_crossentropy",
+                    optimizer=keras.optimizers.SGD(learning_rate=1e-3),
+                    metrics=["accuracy"])
+    model_A.fit(X_train_A, y_train_A, epochs=10,
+                validation_data=(X_valid_A, y_valid_A),
+                workers=-1)
 
     print("reuse keras model")
