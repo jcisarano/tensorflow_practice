@@ -177,7 +177,7 @@ def train_fashion_mnist_relu_scaled():
     model.add(keras.layers.Dense(10, activation="softmax"))
 
     model.compile(loss="sparse_categorical_crossentropy",
-                  optimizer=tf.keras.optimizer.SGD(learning_rate=1e-3),
+                  optimizer=tf.keras.optimizers.SGD(learning_rate=1e-3),
                   metrics=["accuracy"])
 
     pixel_means = X_train.mean(axis=0, keepdims=True)
@@ -239,5 +239,5 @@ def run():
     # plot_selu()
     # show_selu_hyperparams()
     # train_fashion_mnist_selu()
-    train_fashion_mnist_relu()
+    train_fashion_mnist_relu_scaled()
 
