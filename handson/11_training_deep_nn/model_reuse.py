@@ -5,7 +5,7 @@ from tensorflow import keras
 from helper_functions import load_data
 
 
-def split_data_(X, y):
+def split_data(X, y):
     y_5_or_6 = (y == 5) | (y == 6)
     y_A = y[~y_5_or_6]
     y_A[y_A > 6] -= 2  # reduce indices above 6 by 2
@@ -14,11 +14,11 @@ def split_data_(X, y):
             (X[y_5_or_6], y_B))
 
 
-def split_data(X, y):
+def _split_data(X, y):
     y_5_or_6 = (y == 5) | (y == 6) # sandals or shirts
     y_A = y[~y_5_or_6]
-    y_A[y_A > 6] -= 2 # class indices 7, 8, 9 should be moved to 5, 6, 7
-    y_B = (y[y_5_or_6] == 6).astype(np.float32) # binary classification task: is it a shirt (class 6)?
+    y_A[y_A > 6] -= 2  # class indices 7, 8, 9 should be moved to 5, 6, 7
+    y_B = (y[y_5_or_6] == 6).astype(np.float32)  # binary classification task: is it a shirt (class 6)?
     return ((X[~y_5_or_6], y_A),
             (X[y_5_or_6], y_B))
 
@@ -34,14 +34,15 @@ def load_split_data():
     return X_train_A, X_valid_A, X_test_A, X_train_B, X_valid_B, X_test_B, y_train_A, y_valid_A, y_test_A, y_train_B, y_valid_B, y_test_B
 
 
-def create_model():
+def create_model(n_output=8, output_activation="softmax"):
     model = keras.models.Sequential()
     model.add(keras.layers.Flatten(input_shape=[28, 28]))
     for n_hidden in (300, 100, 50, 50, 50):
         model.add(keras.layers.Dense(n_hidden, activation="selu"))
-    model.add(keras.layers.Dense(8, activation="softmax"))
+    model.add(keras.layers.Dense(n_output, activation=output_activation))
 
     return model
+
 
 def run():
     np.random.seed(42)
@@ -50,15 +51,15 @@ def run():
     X_train_A, X_valid_A, X_test_A, X_train_B, X_valid_B, X_test_B, y_train_A, y_valid_A, y_test_A, y_train_B, \
     y_valid_B, y_test_B = load_split_data()
 
-    # print(X_train_A.shape)
-    # print(X_train_B.shape)
-    # print(y_train_A[:30])
-    # print(y_train_B[:30])
+    print(X_train_A.shape)
+    print(X_train_B.shape)
+    print(y_train_A[:30])
+    print(y_train_B[:30])
 
     np.random.seed(42)
     tf.random.set_seed(42)
 
-    if True:
+    if False:
         model_A = create_model()
         model_A.compile(loss="sparse_categorical_crossentropy",
                         optimizer=keras.optimizers.SGD(learning_rate=1e-3),
@@ -68,5 +69,12 @@ def run():
                     workers=-1)
         model_A.save("saved_models/model_a.h5")
 
+    model_B = create_model(n_output=1, output_activation="sigmoid")
+    model_B.compile(loss="binary_crossentropy",
+                    optimizer=keras.optimizers.SGD(learning_rate=1e-3),
+                    metrics=["accuracy"])
+    model_B.fit(X_train_B, y_train_B, epochs=20,
+                validation_data=(X_valid_B, y_valid_B),
+                workers=-1)
 
     print("reuse keras model")
