@@ -4,6 +4,9 @@ from tensorflow import keras
 
 from helper_functions import load_data
 
+MODEL_A_PATH: str = "saved_models/model_a.h5"
+MODEL_B_PATH: str = "saved_models/model_b.h5"
+
 
 def split_data(X, y):
     y_5_or_6 = (y == 5) | (y == 6)
@@ -67,14 +70,21 @@ def run():
         model_A.fit(X_train_A, y_train_A, epochs=20,
                     validation_data=(X_valid_A, y_valid_A),
                     workers=-1)
-        model_A.save("saved_models/model_a.h5")
+        model_A.save(MODEL_A_PATH)
 
-    model_B = create_model(n_output=1, output_activation="sigmoid")
-    model_B.compile(loss="binary_crossentropy",
-                    optimizer=keras.optimizers.SGD(learning_rate=1e-3),
-                    metrics=["accuracy"])
-    model_B.fit(X_train_B, y_train_B, epochs=20,
-                validation_data=(X_valid_B, y_valid_B),
-                workers=-1)
+    if False:
+        model_B = create_model(n_output=1, output_activation="sigmoid")
+        model_B.compile(loss="binary_crossentropy",
+                        optimizer=keras.optimizers.SGD(learning_rate=1e-3),
+                        metrics=["accuracy"])
+        model_B.fit(X_train_B, y_train_B, epochs=20,
+                    validation_data=(X_valid_B, y_valid_B),
+                    workers=-1)
+        model_B.save(MODEL_B_PATH)
+
+    model_A = keras.models.load_model(MODEL_A_PATH)
+    # print(model_A.summary())
+    model_B = keras.models.load_model(MODEL_B_PATH)
+    # print(model_B.summary())
 
     print("reuse keras model")
