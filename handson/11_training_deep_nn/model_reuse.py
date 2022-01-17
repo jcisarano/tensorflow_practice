@@ -38,11 +38,13 @@ def run():
     np.random.seed(42)
     tf.random.set_seed(42)
 
-    X_train_A, X_valid_A, X_test_A, X_train_B, X_valid_B, X_test_B, y_train_A, y_valid_A, y_test_A, y_train_B, y_valid_B, y_test_B = load_split_data()
-    print(X_train_A.shape)
-    print(X_train_B.shape)
-    print(y_train_A[:30])
-    print(y_train_B[:30])
+    X_train_A, X_valid_A, X_test_A, X_train_B, X_valid_B, X_test_B, y_train_A, y_valid_A, y_test_A, y_train_B, \
+    y_valid_B, y_test_B = load_split_data()
+
+    # print(X_train_A.shape)
+    # print(X_train_B.shape)
+    # print(y_train_A[:30])
+    # print(y_train_B[:30])
 
     np.random.seed(42)
     tf.random.set_seed(42)
@@ -56,8 +58,10 @@ def run():
     model_A.compile(loss="sparse_categorical_crossentropy",
                     optimizer=keras.optimizers.SGD(learning_rate=1e-3),
                     metrics=["accuracy"])
-    model_A.fit(X_train_A, y_train_A, epochs=10,
+    model_A.fit(X_train_A, y_train_A, epochs=20,
                 validation_data=(X_valid_A, y_valid_A),
                 workers=-1)
+    model_A.save("saved_models/model_a.h5")
+
 
     print("reuse keras model")
