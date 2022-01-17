@@ -34,6 +34,15 @@ def load_split_data():
     return X_train_A, X_valid_A, X_test_A, X_train_B, X_valid_B, X_test_B, y_train_A, y_valid_A, y_test_A, y_train_B, y_valid_B, y_test_B
 
 
+def create_model():
+    model = keras.models.Sequential()
+    model.add(keras.layers.Flatten(input_shape=[28, 28]))
+    for n_hidden in (300, 100, 50, 50, 50):
+        model.add(keras.layers.Dense(n_hidden, activation="selu"))
+    model.add(keras.layers.Dense(8, activation="softmax"))
+
+    return model
+
 def run():
     np.random.seed(42)
     tf.random.set_seed(42)
@@ -49,19 +58,15 @@ def run():
     np.random.seed(42)
     tf.random.set_seed(42)
 
-    model_A = keras.models.Sequential()
-    model_A.add(keras.layers.Flatten(input_shape=[28, 28]))
-    for n_hidden in (300, 100, 50, 50, 50):
-        model_A.add(keras.layers.Dense(n_hidden, activation="selu"))
-    model_A.add(keras.layers.Dense(8, activation="softmax"))
-
-    model_A.compile(loss="sparse_categorical_crossentropy",
-                    optimizer=keras.optimizers.SGD(learning_rate=1e-3),
-                    metrics=["accuracy"])
-    model_A.fit(X_train_A, y_train_A, epochs=20,
-                validation_data=(X_valid_A, y_valid_A),
-                workers=-1)
-    model_A.save("saved_models/model_a.h5")
+    if True:
+        model_A = create_model()
+        model_A.compile(loss="sparse_categorical_crossentropy",
+                        optimizer=keras.optimizers.SGD(learning_rate=1e-3),
+                        metrics=["accuracy"])
+        model_A.fit(X_train_A, y_train_A, epochs=20,
+                    validation_data=(X_valid_A, y_valid_A),
+                    workers=-1)
+        model_A.save("saved_models/model_a.h5")
 
 
     print("reuse keras model")
