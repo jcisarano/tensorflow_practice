@@ -6,13 +6,7 @@ from tensorflow import keras
 from helper_functions import load_data
 
 
-def run():
-    X_train, X_valid, X_test, y_train, y_valid, y_test = load_data()
-    pixel_means = X_train.mean(axis=0, keepdims=True)
-    pixel_stds = X_train.std(axis=0, keepdims=True)
-    X_train_scaled = (X_train - pixel_means) / pixel_stds
-    X_valid_scaled = (X_valid - pixel_means) / pixel_stds
-    X_test_scaled = (X_test - pixel_means) / pixel_stds
+def lr_power_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test):
 
     # SGD optimizer with decay:
     optimizer = keras.optimizers.SGD(learning_rate=0.01, decay=1e-4)
@@ -47,6 +41,18 @@ def run():
     plt.grid(True)
 
     plt.show()
+
+
+def run():
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_data()
+    pixel_means = X_train.mean(axis=0, keepdims=True)
+    pixel_stds = X_train.std(axis=0, keepdims=True)
+    X_train_scaled = (X_train - pixel_means) / pixel_stds
+    X_valid_scaled = (X_valid - pixel_means) / pixel_stds
+    X_test_scaled = (X_test - pixel_means) / pixel_stds
+
+    lr_power_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
+
 
 
     print("lr scheduling")
