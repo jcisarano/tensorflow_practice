@@ -29,7 +29,7 @@ def lr_power_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, 
     learning_rate = 0.01
     decay = 1e-4
     batch_size = 32
-    n_steps_per_epoch = math.ceil(len(X_train) / batch_size)
+    n_steps_per_epoch = math.ceil(len(X_train_scaled) / batch_size)
     epochs = np.arange(n_epochs)
     lrs = learning_rate / (1 + decay*epochs*n_steps_per_epoch)
 
@@ -41,6 +41,12 @@ def lr_power_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, 
     plt.grid(True)
 
     plt.show()
+
+
+def exponential_decay_fn(epoch):
+    return 0.01 * 0.01**(epoch/5)
+
+
 
 
 def run():
