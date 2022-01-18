@@ -17,15 +17,6 @@ def split_data(X, y):
             (X[y_5_or_6], y_B))
 
 
-def _split_data(X, y):
-    y_5_or_6 = (y == 5) | (y == 6) # sandals or shirts
-    y_A = y[~y_5_or_6]
-    y_A[y_A > 6] -= 2  # class indices 7, 8, 9 should be moved to 5, 6, 7
-    y_B = (y[y_5_or_6] == 6).astype(np.float32)  # binary classification task: is it a shirt (class 6)?
-    return ((X[~y_5_or_6], y_A),
-            (X[y_5_or_6], y_B))
-
-
 def load_split_data():
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_data()
     (X_train_A, y_train_A), (X_train_B, y_train_B) = split_data(X_train, y_train)
@@ -90,13 +81,14 @@ def run():
     # copy a model into another, and add a different activation layer
     model_B_on_A = keras.models.Sequential(model_A.layers[:-1])
     model_B_on_A.add(keras.layers.Dense(1, activation="sigmoid", name="activation"))
+    # print(model_B_on_A.get_weights())
 
     # clone the model before copying--this makes sure training one does not affect the other
     model_A_clone = keras.models.clone_model(model_A)
     model_A_clone.set_weights(model_A.get_weights())
     model_B_on_A = keras.models.Sequential(model_A_clone.layers[:-1])
     model_B_on_A.add(keras.layers.Dense(1, activation="sigmoid", name="activation"))
-    # print(model_B_on_A.summary())
+    # print(model_B_on_A.get_weights())
 
     for layer in model_B_on_A.layers[:-1]:
         layer.trainable = False
@@ -117,7 +109,11 @@ def run():
     history = model_B_on_A.fit(X_train_B, y_train_B, epochs=16,
                                validation_data=(X_valid_B, y_valid_B),
                                workers=-1)
-    
+
+    print("Evaluate model B:")
+    model_B.evaluate(X_test_B, y_test_B)
+    print("Evaluate model B on A:")
+    model_B_on_A.evaluate(X_test_B, y_test_B)
 
 
 
