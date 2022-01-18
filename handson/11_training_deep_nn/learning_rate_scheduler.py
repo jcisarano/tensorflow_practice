@@ -47,6 +47,28 @@ def exponential_decay_fn(epoch):
     return 0.01 * 0.01**(epoch/5)
 
 
+def exponential_decay(lr0, s):
+    def exponential_decay_fn(epoch):
+        return lr0 * 0.1**(epoch/s)
+    return exponential_decay_fn
+
+
+def lr_exponential_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test):
+    exponential_decay_fn = exponential_decay(lr0=0.01, s=20)
+    model = keras.models.Sequential([
+        keras.layers.Flatten(input_shape=[28, 28]),
+        keras.layers.Dense(300, activation="selu", kernel_initializer="lecun_normal"),
+        keras.layers.Dense(100, activation="selu", kernel_initializer="lecun_normal"),
+        keras.layers.Dense(10, activation="softmax")
+    ])
+    model.compile(loss="sparse_categorical_crossentropy", optimizer="nadam", metrics=["accuracy"])
+
+    n_epochs = 25
+    lr_scheduler = keras.callbacks.LearningRateScheduler(exponential_decay_fn)
+    history = model.fit(X_train_scaled, y_train, epochs=n_epochs,
+                        validation_data=(X_valid_scaled, y_valid),
+                        callbacks=[lr_scheduler])
+
 
 
 def run():
@@ -57,7 +79,8 @@ def run():
     X_valid_scaled = (X_valid - pixel_means) / pixel_stds
     X_test_scaled = (X_test - pixel_means) / pixel_stds
 
-    lr_power_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
+    # lr_power_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
+    lr_exponential_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
 
 
 
