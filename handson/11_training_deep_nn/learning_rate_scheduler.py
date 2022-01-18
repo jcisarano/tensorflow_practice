@@ -69,6 +69,13 @@ def lr_exponential_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_t
                         validation_data=(X_valid_scaled, y_valid),
                         callbacks=[lr_scheduler])
 
+    plt.plot(history.epoch, history.history["lr"], "o-")
+    plt.axis([0, n_epochs-1, 0, 0.011])
+    plt.xlabel("Epoch")
+    plt.ylabel("Learning Rate")
+    plt.title("Exponential Scheduling", fontsize=14)
+    plt.grid(True)
+    plt.show()
 
 
 def run():
