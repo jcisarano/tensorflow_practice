@@ -87,4 +87,14 @@ def run():
     model_B = keras.models.load_model(MODEL_B_PATH)
     # print(model_B.summary())
 
+    # copy a model into another, and add a different activation layer
+    model_B_on_A = keras.models.Sequential(model_A.layers[:-1])
+    model_B_on_A.add(keras.layers.Dense(1, activation="sigmoid"))
+
+    # clone the model before copying--this makes sure training one does not affect the other
+    model_A_clone = keras.models.clone(model_A)
+    model_A_clone.set_weights(model_A.get_weights())
+    model_B_on_A = keras.models.Sequential(model_A_clone.layers[:-1])
+    model_B_on_A.add(keras.layers.Dense(1, activation="sigmoid"))
+
     print("reuse keras model")
