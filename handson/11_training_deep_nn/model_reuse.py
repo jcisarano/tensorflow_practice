@@ -54,10 +54,10 @@ def run():
     X_train_A, X_valid_A, X_test_A, X_train_B, X_valid_B, X_test_B, y_train_A, y_valid_A, y_test_A, y_train_B, \
     y_valid_B, y_test_B = load_split_data()
 
-    print(X_train_A.shape)
-    print(X_train_B.shape)
-    print(y_train_A[:30])
-    print(y_train_B[:30])
+    # print(X_train_A.shape)
+    # print(X_train_B.shape)
+    # print(y_train_A[:30])
+    # print(y_train_B[:30])
 
     np.random.seed(42)
     tf.random.set_seed(42)
@@ -96,7 +96,17 @@ def run():
     model_A_clone.set_weights(model_A.get_weights())
     model_B_on_A = keras.models.Sequential(model_A_clone.layers[:-1])
     model_B_on_A.add(keras.layers.Dense(1, activation="sigmoid", name="activation"))
-    print(model_B_on_A.summary())
+    # print(model_B_on_A.summary())
+
+    for layer in model_B_on_A.layers[:-1]:
+        layer.trainable = False
+
+    model_B_on_A.compile(loss="binary_crossentropy",
+                         optimizer=keras.optimizers.SGD(learning_rate=1e-3),
+                         metrics=["accuracy"])
+    history = model_B_on_A.fit(X_train_B, y_train_B, epochs=4,
+                               validation_data=(X_valid_B, y_valid_B),
+                               workers=-1)
 
 
 
