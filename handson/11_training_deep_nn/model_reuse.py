@@ -108,6 +108,17 @@ def run():
                                validation_data=(X_valid_B, y_valid_B),
                                workers=-1)
 
+    for layer in model_B_on_A.layers[:-1]:
+        layer.trainable = True
+
+    model_B_on_A.compile(loss="binary_crossentropy",
+                         optimizer=keras.optimizers.SGD(learning_rate=1e-3),
+                         metrics=["accuracy"])
+    history = model_B_on_A.fit(X_train_B, y_train_B, epochs=16,
+                               validation_data=(X_valid_B, y_valid_B),
+                               workers=-1)
+    
+
 
 
     print("reuse keras model")
