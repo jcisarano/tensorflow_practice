@@ -37,4 +37,19 @@ def run():
                         callbacks=[lr_scheduler],
                         workers=-1)
 
+    plt.plot(history.epoch, history.history["lr"], "bo-")
+    plt.xlabel("Epoch")
+    plt.ylabel("Learning Rate")
+    plt.tick_params('y', colors='b')
+    plt.gca().set_xlim(0, n_epochs-1)
+    plt.grid(True)
+
+    ax2 = plt.gca().twinx()
+    ax2.plot(history.epoch, history.history["val_loss"], "r^-")
+    ax2.set_ylabel("Validation Loss", color="r")
+    ax2.tick_params("y", colors="r")
+
+    plt.title("Reduce LR on Plateau", fontsize=14)
+    plt.show()
+
     print("perform sched")
