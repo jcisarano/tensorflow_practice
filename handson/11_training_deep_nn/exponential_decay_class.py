@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 from tensorflow import keras
+import matplotlib.pyplot as plt
+
 import keras.callbacks
 
 from helper_functions import load_data
@@ -56,5 +58,17 @@ def run():
                         validation_data=(X_valid_scaled, y_valid),
                         callbacks=[exp_decay],
                         workers=-1)
+
+    n_steps = n_epochs * len(X_train) // 32
+    steps = np.arange(n_steps)
+    lrs = lr0 * 0.1**(steps/s)
+
+    plt.plot(steps, lrs, "-", linewidth=2)
+    plt.title("Exponential Scheduling (per batch)")
+    plt.xlabel("Batch")
+    plt.ylabel("Learning Rate")
+    plt.grid(True)
+    plt.axis([0, n_steps-1, 0, lr0*1.1])
+    plt.show()
 
     print("ed class")
