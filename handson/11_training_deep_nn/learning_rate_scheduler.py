@@ -43,8 +43,12 @@ def lr_power_scheduling(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, 
     plt.show()
 
 
-def exponential_decay_fn(epoch):
-    return 0.01 * 0.01**(epoch/5)
+# def exponential_decay_fn(epoch):
+#     return 0.01 * 0.01**(epoch/20)
+
+
+# def exponential_decay_fn(epoch, lr):
+#     return lr * 0.1**(1/20)
 
 
 def exponential_decay(lr0, s):
