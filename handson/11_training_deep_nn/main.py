@@ -5,6 +5,7 @@ import model_reuse as mr
 import learning_rate_scheduler as lrs
 import exponential_decay_class as edc
 import piecewise_constant_scheduling as pcs
+import performance_scheduling as ps
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -13,5 +14,6 @@ if __name__ == '__main__':
     # mr.run()
     # lrs.run()
     # edc.run()
-    pcs.run()
+    # pcs.run()
+    ps.run()
 
