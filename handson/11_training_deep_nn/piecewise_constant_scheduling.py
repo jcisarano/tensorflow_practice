@@ -19,8 +19,10 @@ def piecewise_constant_fn(epoch):
 def piecewise_constant(boundaries, values):
     boundaries = np.array([0] + boundaries)
     values = np.array(values)
+
     def piecewise_constant_fn(epoch):
         return values[np.argmax(boundaries > epoch) - 1]
+
     return piecewise_constant_fn
 
 
@@ -47,9 +49,17 @@ def run():
                   optimizer="nadam",
                   metrics=["accuracy"])
     n_epochs = 25
-    model.fit(X_train_scaled, y_train, epochs=n_epochs,
-              validation_data=[X_valid_scaled, y_valid],
-              callbacks=[lr_scheduler],
-              workers=-1)
+    history = model.fit(X_train_scaled, y_train, epochs=n_epochs,
+                        validation_data=[X_valid_scaled, y_valid],
+                        callbacks=[lr_scheduler],
+                        workers=-1)
+
+    plt.plot(history.epoch, [piecewise_constant_fn(epoch) for epoch in history.epoch], "o-")
+    plt.axis([0, n_epochs - 1, 0, 0.011])
+    plt.grid(True)
+    plt.title("Piecewise Constant Scheduling")
+    plt.xlabel("Epoch")
+    plt.ylabel("Learning Rate")
+    plt.show()
 
     print("pcs")
