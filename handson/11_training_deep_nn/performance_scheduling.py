@@ -44,6 +44,27 @@ def lr_sched_callback(X_train, X_valid, X_test, X_train_scaled, X_valid_scaled,
     plt.show()
 
 
+def lr_scheduler(X_train, X_valid, X_test, X_train_scaled, X_valid_scaled,
+                      X_test_scaled, y_train, y_valid, y_test):
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    model = keras.models.Sequential([
+        keras.layers.Flatten(input_shape=[28, 28]),
+        keras.layers.Dense(300, activation="selu", kernel_initializer="lecun_normal"),
+        keras.layers.Dense(100, activation="selu", kernel_initializer="lecun_normal"),
+        keras.layers.Dense(10, activation="softmax"),
+    ])
+    s = 20 * len(X_train) // 32  # number of steps in 20 epochs where batch size is 32
+    learning_rate = keras.optimizers.schedules.ExponentialDecay(0.01, s, 0.1)
+    optimizer = keras.optimizers.SGD(learning_rate)
+    model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
+    n_epochs = 25
+    history = model.fit(X_train_scaled, y_train, epochs=n_epochs,
+                        validation_data=[X_valid_scaled, y_valid],
+                        workers=-1)
+
+
 def run():
     np.random.seed(42)
     tf.random.set_seed(42)
@@ -55,6 +76,7 @@ def run():
     X_valid_scaled = (X_valid - pixel_means) / pixel_stds
     X_test_scaled = (X_test - pixel_means) / pixel_stds
 
-    lr_sched_callback(X_train, X_valid, X_test, X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
+    # lr_sched_callback(X_train, X_valid, X_test, X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
+    lr_scheduler(X_train, X_valid, X_test, X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
 
     print("perform sched")
