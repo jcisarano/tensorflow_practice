@@ -6,6 +6,7 @@ import learning_rate_scheduler as lrs
 import exponential_decay_class as edc
 import piecewise_constant_scheduling as pcs
 import performance_scheduling as ps
+import onecycle_scheduling as ocs
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -15,5 +16,6 @@ if __name__ == '__main__':
     # lrs.run()
     # edc.run()
     # pcs.run()
-    ps.run()
+    # ps.run()
+    ocs.run()
 
