@@ -1,5 +1,6 @@
 import math
 
+import keras.models
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -59,6 +60,7 @@ def plot_lr_vs_loss(rates, losses):
     plt.axis([min(rates), max(rates), min(losses), (losses[0] + min(losses)) / 2])
     plt.xlabel("Learning rate")
     plt.ylabel("Loss")
+    plt.show()
 
 
 def run():
@@ -71,5 +73,19 @@ def run():
     X_train_scaled = (X_train - pixel_means) / pixel_stds
     X_valid_scaled = (X_valid - pixel_means) / pixel_stds
     X_test_scaled = (X_test - pixel_means) / pixel_stds
+
+    model = keras.models.Sequential([
+        keras.layers.Flatten(input_shape=[28, 28]),
+        keras.layers.Dense(300, activation="selu", kernel_initializer="lecun_normal"),
+        keras.layers.Dense(100, activation="selu", kernel_initializer="lecun_normal"),
+        keras.layers.Dense(10, activation="softmax"),
+    ])
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.SGD(learning_rate=1e-3),
+                  metrics=["accuracy"])
+    batch_size = 128
+    rates, losses = find_learning_rate(model, X_train_scaled, y_train, epochs=1, batch_size=batch_size)
+    plot_lr_vs_loss(rates, losses)
+
     print("onecycle")
 
