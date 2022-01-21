@@ -42,7 +42,7 @@ class OneCycleScheduler(keras.callbacks.Callback):
         elif self.iteration < 2*self.half_iteration:
             rate = self._interpolate(self.half_iteration, 2*self.half_iteration, self.max_rate, self.start_rate)
         else:
-            rate = self._interpolate((2*self.half_iteration, self.iterations, self.start_rate, self.last_rate))
+            rate = self._interpolate(2*self.half_iteration, self.iterations, self.start_rate, self.last_rate)
         self.iteration += 1
         K.set_value(self.model.optimizer.learning_rate, rate)
 
@@ -111,6 +111,12 @@ def run():
     batch_size = 128
     rates, losses = find_learning_rate(model, X_train_scaled, y_train, epochs=1, batch_size=batch_size)
     plot_lr_vs_loss(rates, losses)
+
+    n_epochs = 25
+    onecycle = OneCycleScheduler(math.ceil(len(X_train) / batch_size) * n_epochs, max_rate=0.05)
+    history = model.fit(X_train_scaled, y_train, epochs=n_epochs, batch_size=batch_size,
+                        validation_data=(X_valid_scaled, y_valid), callbacks=[onecycle],
+                        workers=-1)
 
     print("onecycle")
 
