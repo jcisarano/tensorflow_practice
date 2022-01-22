@@ -7,7 +7,6 @@ from helper_functions import load_data
 
 
 def fit_simple_model(X_train_scaled, y_train, X_valid_scaled, y_valid):
-
     model = tf.keras.models.Sequential([
         keras.layers.Flatten(input_shape=[28, 28]),
         keras.layers.Dense(300, activation="elu",
@@ -21,6 +20,26 @@ def fit_simple_model(X_train_scaled, y_train, X_valid_scaled, y_valid):
     model.compile(loss="sparse_categorical_crossentropy", optimizer="nadam", metrics=["accuracy"])
     n_epochs = 2
     history = model.fit(X_train_scaled, y_train, epochs=n_epochs, validation_data=(X_valid_scaled, y_valid), workers=-1)
+
+
+def fit_example_w_partial(X_train_scaled, y_train, X_valid_scaled, y_valid):
+    from functools import partial
+    RegularizedDense = partial(keras.layers.Dense,
+                               activation="elu",
+                               kernel_initializer="he_normal",
+                               kernel_regularizer=keras.regularizers.l2(0.01))
+    model = keras.models.Sequential([
+        keras.layers.Flatten(input_shape=[28, 28]),
+        RegularizedDense(300),
+        RegularizedDense(100),
+        RegularizedDense(10, activation="softmax"),
+    ])
+    model.compile(loss="sparse_categorical_crossentropy", optimizer="nadam", metrics=["accuracy"])
+    n_epochs = 2
+    history = model.fit(X_train_scaled, y_train, epochs=n_epochs,
+                        validation_data=(X_valid_scaled, y_valid),
+                        workers=-1)
+
 
 def run():
     np.random.seed(42)
@@ -40,6 +59,7 @@ def run():
     # or, for l1 use keras.regularizers.l1(0.1)
     # or, for l1 AND l2, use keras.regularizers.l1_l2(0.1, 0.01)
 
-    fit_simple_model(X_train_scaled, y_train, X_valid_scaled, y_valid)
+    # fit_simple_model(X_train_scaled, y_train, X_valid_scaled, y_valid)
+    fit_example_w_partial(X_train_scaled, y_train, X_valid_scaled, y_valid)
 
     print("regularization")
