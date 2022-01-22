@@ -8,6 +8,7 @@ import piecewise_constant_scheduling as pcs
 import performance_scheduling as ps
 import onecycle_scheduling as ocs
 import regularization as r
+import dropout as d
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -19,5 +20,6 @@ if __name__ == '__main__':
     # pcs.run()
     # ps.run()
     # ocs.run()
-    r.run()
+    # r.run()
+    d.run()
 
