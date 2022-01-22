@@ -40,10 +40,23 @@ def load_and_scale_cfir10():
     X_test_scaled = (X_test - pixel_means) / pixel_stds
 
     return X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test
-    
+
+
+def visualize_cfir10_samples(X, y):
+    plt.figure(figsize=(7.2, 2.4))
+    for index, image in enumerate(X):
+        plt.subplot(5, 10, index+1)
+        plt.imshow(image)
+        plt.axis(False)
+        # plt.title(y[index])
+    # plt.subplots_adjust(wspace=0.2, hspace=0.5)
+    plt.show()
+
 
 def run():
-    X_train, X_valid, X_test, y_train, y_valid, y_test = load_and_scale_cfir10()
+    X_train, X_valid, X_test, y_train, y_valid, y_test = load_cfir10()
     print(X_train.shape, X_valid.shape, X_test.shape)
+
+    visualize_cfir10_samples(X_train[:50], y_train)
 
     print("example")
