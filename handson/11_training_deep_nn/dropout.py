@@ -60,7 +60,7 @@ def fit_alpha_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_s
     return model
 
 
-def fit_mc_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test):
+def show_dropout_examples(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test):
     tf.random.set_seed(42)
     np.random.seed(42)
 
@@ -80,6 +80,22 @@ def fit_mc_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scal
     print(accuracy)
 
 
+def fit_mc_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test):
+    tf.random.set_seed(42)
+    np.random.seed(42)
+
+    model = fit_alpha_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
+
+    mc_model = keras.models.Sequential([
+        MCAlphaDropout(layer.rate) if isinstance(layer, keras.layers.AlphaDropout) else layer
+        for layer in model.layers
+    ])
+    optimizer = tf.keras.optimizers.SGD(learning_rate=0.01, momentum=0.9, nesterov=True)
+    mc_model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
+    mc_model.set_weights(model.get_weights())
+    print(np.round(np.mean([mc_model.predict(X_test_scaled[:1]) for sample in range(100)], axis=0), 2))
+
+
 def run():
     np.random.seed(42)
     tf.random.set_seed(42)
@@ -93,6 +109,7 @@ def run():
 
     # fit_dropout_model(X_train_scaled, y_train, X_valid_scaled, y_valid)
     # fit_alpha_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
+    # show_dropout_examples(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
     fit_mc_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
 
     print("dropout")
