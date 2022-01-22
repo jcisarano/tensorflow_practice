@@ -1,3 +1,5 @@
+from functools import partial
+
 import keras.models
 import tensorflow as tf
 import numpy as np
@@ -95,6 +97,27 @@ def fit_mc_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scal
     mc_model.set_weights(model.get_weights())
     print(np.round(np.mean([mc_model.predict(X_test_scaled[:1]) for sample in range(100)], axis=0), 2))
 
+    print(mc_model.summary())
+
+
+def max_norm(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test):
+    layer = keras.layers.Dense(100, activation="selu", kernel_initializer="lecun_normal",
+                               kernel_constraint=keras.constraints.max_norm(1.))
+    MaxNormDense = partial(keras.layers.Dense,
+                           activation="selu", kernel_initializer="lecun_normal",
+                           kernel_constraint=keras.constraints.max_norm(1.))
+    model = keras.models.Sequential([
+        keras.layers.Flatten(input_shape=[28, 28]),
+        MaxNormDense(300),
+        MaxNormDense(100),
+        MaxNormDense(10, activation="softmax"),
+    ])
+    model.compile(loss="sparse_categorical_crossentropy", optimizer="nadam", metrics=["accuracy"])
+    n_epochs = 2
+    history = model.fit(X_train_scaled, y_train, epochs=n_epochs,
+                        validation_data=(X_valid_scaled, y_valid),
+                        workers=-1)
+
 
 def run():
     np.random.seed(42)
@@ -110,7 +133,8 @@ def run():
     # fit_dropout_model(X_train_scaled, y_train, X_valid_scaled, y_valid)
     # fit_alpha_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
     # show_dropout_examples(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
-    fit_mc_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
+    # fit_mc_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
+    max_norm(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
 
     print("dropout")
 
