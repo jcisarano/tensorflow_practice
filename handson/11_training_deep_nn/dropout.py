@@ -6,6 +6,16 @@ import matplotlib.pyplot as plt
 from helper_functions import load_data
 
 
+class MCDropout(keras.layers.Dropout):
+    def call(self, inputs):
+        return super().call(inputs, training=True)
+
+
+class MCAlphaDropout(keras.layers.AlphaDropout):
+    def call(self, inputs):
+        return super().call(inputs, training=True)
+
+
 def fit_dropout_model(X_train_scaled, y_train, X_valid_scaled, y_valid):
     model = keras.models.Sequential([
         keras.layers.Flatten(input_shape=[28, 28]),
@@ -47,6 +57,28 @@ def fit_alpha_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_s
     model.evaluate(X_train_scaled, y_train)
     history = model.fit(X_train_scaled, y_train)
 
+    return model
+
+
+def fit_mc_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test):
+    tf.random.set_seed(42)
+    np.random.seed(42)
+
+    model = fit_alpha_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
+
+    y_probas = np.stack([model(X_test_scaled, training=True) for sample in range(100)])
+    y_proba = y_probas.mean(axis=0)
+    y_std = y_probas.std(axis=0)
+
+    print(np.round(model.predict(X_test_scaled[:1]), 2))
+    print(np.round(y_probas[:, :1], 2))
+    print(np.round(y_proba[:1], 2))
+    y_std = y_probas.std(axis=0)
+    print(np.round(y_std[:1], 2))
+    y_pred = np.argmax(y_proba, axis=1)
+    accuracy = np.sum(y_pred == y_test) / len(y_test)
+    print(accuracy)
+
 
 def run():
     np.random.seed(42)
@@ -59,8 +91,9 @@ def run():
     X_valid_scaled = (X_valid - pixel_means) / pixel_stds
     X_test_scaled = (X_test - pixel_means) / pixel_stds
 
-    #fit_dropout_model(X_train_scaled, y_train, X_valid_scaled, y_valid)
-    fit_alpha_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
+    # fit_dropout_model(X_train_scaled, y_train, X_valid_scaled, y_valid)
+    # fit_alpha_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
+    fit_mc_dropout(X_train_scaled, y_train, X_valid_scaled, y_valid, X_test_scaled, y_test)
 
     print("dropout")
 
