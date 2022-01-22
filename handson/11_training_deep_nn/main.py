@@ -9,6 +9,7 @@ import performance_scheduling as ps
 import onecycle_scheduling as ocs
 import regularization as r
 import dropout as d
+import cifar10_exercise as cf10_ex
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -21,5 +22,7 @@ if __name__ == '__main__':
     # ps.run()
     # ocs.run()
     # r.run()
-    d.run()
+    # d.run()
+    cf10_ex.run()
+
 
