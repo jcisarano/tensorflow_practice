@@ -23,8 +23,8 @@ import matplotlib.pyplot as plt
 
 def load_cfir10():
     (X_train_full, y_train_full), (X_test, y_test) = tf.keras.datasets.cifar10.load_data()
-    X_train_full = X_train_full / 255.
-    X_test = X_test / 255.
+    # X_train_full = X_train_full / 255.
+    # X_test = X_test / 255.
     X_valid, X_train = X_train_full[:5000], X_train_full[5000:]
     y_valid, y_train = y_train_full[:5000], y_train_full[5000:]
 
@@ -48,7 +48,7 @@ def get_class_names():
 
 def create_model(n_classes, n_layers=20, n_neurons=100):
     model = keras.models.Sequential()
-    model.add(keras.layers.Flatten(input_shape=[32, 32]))
+    model.add(keras.layers.Flatten(input_shape=[32, 32, 3]))
     for _ in range(n_layers):
         model.add(keras.layers.Dense(n_neurons, activation="elu", kernel_initializer="he_normal"))
     model.add(tf.keras.layers.Dense(n_classes, activation="softmax"))
@@ -68,6 +68,9 @@ def visualize_cfir10_samples(X, y):
 
 
 def run():
+    tf.random.set_seed(42)
+    np.random.seed(42)
+
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_cfir10()
     class_names = get_class_names()
     print(X_train.shape, X_valid.shape, X_test.shape)
@@ -75,5 +78,14 @@ def run():
     # visualize_cfir10_samples(X_train[:50], y_train)
 
     model = create_model(n_classes=len(class_names))
+    lr0 = 0.01
+    optimizer = tf.keras.optimizers.Nadam(learning_rate=lr0)
+    model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
+
+    n_epochs = 10
+    model.fit(X_train, y_train, epochs=n_epochs,
+              validation_data=(X_valid, y_valid),
+              callbacks=[tf.keras.callbacks.EarlyStopping(patience=10)],
+              workers=-1)
 
     print("example")
