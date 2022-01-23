@@ -15,7 +15,7 @@ Practice training a deep neural network on the CIFAR10 image dataset.
         accuracy using MC Dropout.
     f) Retrain your model using 1cycle scheduling and see if it improves training speed and model accuracy.
 """
-
+import keras.models
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -42,6 +42,20 @@ def load_and_scale_cfir10():
     return X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test
 
 
+def get_class_names():
+    return ["airplane", "automobile", "bird", "cat", "deer", "dog", "frog", "horse", "ship", "truck"]
+
+
+def create_model(n_classes, n_layers=20, n_neurons=100):
+    model = keras.models.Sequential()
+    model.add(keras.layers.Flatten(input_shape=[32, 32]))
+    for _ in range(n_layers):
+        model.add(keras.layers.Dense(n_neurons, activation="elu", kernel_initializer="he_normal"))
+    model.add(tf.keras.layers.Dense(n_classes, activation="softmax"))
+
+    return model
+
+
 def visualize_cfir10_samples(X, y):
     plt.figure(figsize=(7.2, 2.4))
     for index, image in enumerate(X):
@@ -55,8 +69,11 @@ def visualize_cfir10_samples(X, y):
 
 def run():
     X_train, X_valid, X_test, y_train, y_valid, y_test = load_cfir10()
+    class_names = get_class_names()
     print(X_train.shape, X_valid.shape, X_test.shape)
 
-    visualize_cfir10_samples(X_train[:50], y_train)
+    # visualize_cfir10_samples(X_train[:50], y_train)
+
+    model = create_model(n_classes=len(class_names))
 
     print("example")
