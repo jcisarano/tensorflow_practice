@@ -68,6 +68,7 @@ def visualize_cfir10_samples(X, y):
 
 
 def run():
+    tf.keras.backend.clear_session()
     tf.random.set_seed(42)
     np.random.seed(42)
 
@@ -78,11 +79,11 @@ def run():
     # visualize_cfir10_samples(X_train[:50], y_train)
 
     model = create_model(n_classes=len(class_names))
-    lr0 = 0.01
+    lr0 = 5e-5
     optimizer = tf.keras.optimizers.Nadam(learning_rate=lr0)
     model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
 
-    n_epochs = 10
+    n_epochs = 100
     model.fit(X_train, y_train, epochs=n_epochs,
               validation_data=(X_valid, y_valid),
               callbacks=[tf.keras.callbacks.EarlyStopping(patience=10)],
