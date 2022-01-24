@@ -20,6 +20,9 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
+BASE_MODEL_PATH: str = "saved_models/cifar10/base_model.h5"
+BATCH_NORM_MODEL_PATH: str = "saved_models/cifar10/batch_norm_model.h5"
+
 
 def load_cfir10():
     (X_train_full, y_train_full), (X_test, y_test) = tf.keras.datasets.cifar10.load_data()
@@ -59,12 +62,27 @@ def create_model(n_classes, n_layers=20, n_neurons=100):
 def visualize_cfir10_samples(X, y):
     plt.figure(figsize=(7.2, 2.4))
     for index, image in enumerate(X):
-        plt.subplot(5, 10, index+1)
+        plt.subplot(5, 10, index + 1)
         plt.imshow(image)
         plt.axis(False)
         # plt.title(y[index])
     # plt.subplots_adjust(wspace=0.2, hspace=0.5)
     plt.show()
+
+
+def create_train_save_base_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
+    model = create_model(n_classes=len(class_names))
+    lr0 = 5e-5
+    optimizer = tf.keras.optimizers.Nadam(learning_rate=lr0)
+    model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
+
+    n_epochs = 100
+    history = model.fit(X_train, y_train, epochs=n_epochs,
+                        validation_data=(X_valid, y_valid),
+                        callbacks=[tf.keras.callbacks.EarlyStopping(patience=10)],
+                        workers=-1)
+
+    model.save(BASE_MODEL_PATH)
 
 
 def run():
@@ -78,15 +96,6 @@ def run():
 
     # visualize_cfir10_samples(X_train[:50], y_train)
 
-    model = create_model(n_classes=len(class_names))
-    lr0 = 5e-5
-    optimizer = tf.keras.optimizers.Nadam(learning_rate=lr0)
-    model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
-
-    n_epochs = 100
-    model.fit(X_train, y_train, epochs=n_epochs,
-              validation_data=(X_valid, y_valid),
-              callbacks=[tf.keras.callbacks.EarlyStopping(patience=10)],
-              workers=-1)
+    create_train_save_base_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names)
 
     print("example")
