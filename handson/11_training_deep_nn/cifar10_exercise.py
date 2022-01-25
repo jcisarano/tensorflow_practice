@@ -85,35 +85,27 @@ def visualize_cfir10_samples(X, y):
 
 def create_train_save_base_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
     model = create_model(n_classes=len(class_names))
-    train_save_model(model, BASE_MODEL_PATH, X_train, X_valid, X_test, y_train, y_valid, y_test, class_names)
-
-    """lr0 = 5e-5
-    optimizer = tf.keras.optimizers.Nadam(learning_rate=lr0)
-    model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
-
-    n_epochs = 100
-    history = model.fit(X_train, y_train, epochs=n_epochs,
-                        validation_data=(X_valid, y_valid),
-                        callbacks=[tf.keras.callbacks.EarlyStopping(patience=20)],
-                        workers=-1)
-
-    model.save(BASE_MODEL_PATH)"""
-
-
-def create_train_save_bn_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
-    model = create_model_with_batch_normalization(n_classes=len(class_names))
-    history, model = train_save_model(model, BATCH_NORM_MODEL_PATH,
+    lr0 = 5e-5
+    history, model = train_save_model(model, BASE_MODEL_PATH, lr0,
                                       X_train, X_valid, X_test,
                                       y_train, y_valid, y_test, class_names)
 
 
-def train_save_model(model, save_path, X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
-    lr0 = 5e-5
+def create_train_save_bn_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
+    model = create_model_with_batch_normalization(n_classes=len(class_names))
+    lr0 = 5e-4
+    history, model = train_save_model(model, BATCH_NORM_MODEL_PATH, lr0,
+                                      X_train, X_valid, X_test,
+                                      y_train, y_valid, y_test, class_names)
+
+
+def train_save_model(model, save_path, learning_rate, X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
+    lr0 = learning_rate
     optimizer = tf.keras.optimizers.Nadam(learning_rate=lr0)
     model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
 
     n_epochs = 100
-    early_stopping = tf.keras.callbacks.EarlyStopping(patience=20)
+    early_stopping = tf.keras.callbacks.EarlyStopping(patience=10)
     checkpoints = tf.keras.callbacks.ModelCheckpoint(save_path, save_best_only=True)
     history = model.fit(X_train, y_train, epochs=n_epochs,
                         validation_data=(X_valid, y_valid),
@@ -134,6 +126,10 @@ def run():
     # visualize_cfir10_samples(X_train[:50], y_train)
 
     # create_train_save_base_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names)
+
+    tf.keras.backend.clear_session()
+    tf.random.set_seed(42)
+    np.random.seed(42)
     create_train_save_bn_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names)
 
     print("example")
