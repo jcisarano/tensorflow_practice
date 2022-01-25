@@ -61,7 +61,7 @@ def create_model(n_classes, n_layers=20, n_neurons=100):
 
 def create_model_with_batch_normalization(n_classes, n_layers=20, n_neurons=100):
     model = keras.models.Sequential()
-    model.add(keras.layers.Flatten([32, 32, 3]))
+    model.add(keras.layers.Flatten(input_shape=[32, 32, 3]))
     model.add(keras.layers.BatchNormalization())
     for _ in range(n_layers):
         model.add(keras.layers.Dense(n_neurons, use_bias=False, kernel_initializer="he_normal"))
@@ -85,7 +85,9 @@ def visualize_cfir10_samples(X, y):
 
 def create_train_save_base_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
     model = create_model(n_classes=len(class_names))
-    lr0 = 5e-5
+    train_save_model(model, BASE_MODEL_PATH, X_train, X_valid, X_test, y_train, y_valid, y_test, class_names)
+
+    """lr0 = 5e-5
     optimizer = tf.keras.optimizers.Nadam(learning_rate=lr0)
     model.compile(loss="sparse_categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
 
@@ -95,7 +97,14 @@ def create_train_save_base_model(X_train, X_valid, X_test, y_train, y_valid, y_t
                         callbacks=[tf.keras.callbacks.EarlyStopping(patience=20)],
                         workers=-1)
 
-    model.save(BASE_MODEL_PATH)
+    model.save(BASE_MODEL_PATH)"""
+
+
+def create_train_save_bn_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
+    model = create_model_with_batch_normalization(n_classes=len(class_names))
+    history, model = train_save_model(model, BATCH_NORM_MODEL_PATH,
+                                      X_train, X_valid, X_test,
+                                      y_train, y_valid, y_test, class_names)
 
 
 def train_save_model(model, save_path, X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
@@ -124,6 +133,7 @@ def run():
 
     # visualize_cfir10_samples(X_train[:50], y_train)
 
-    create_train_save_base_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names)
+    # create_train_save_base_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names)
+    create_train_save_bn_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names)
 
     print("example")
