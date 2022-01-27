@@ -24,6 +24,7 @@ BASE_MODEL_PATH: str = "saved_models/cifar10/base_model.h5"
 BATCH_NORM_MODEL_PATH: str = "saved_models/cifar10/batch_norm_model.h5"
 SELU_MODEL_PATH: str = "saved_models/cifar10/selu_model.h5"
 ALPHA_DROP_MODEL_PATH: str = "saved_models/cifar10/alpha_dropout_model.h5"
+MC_DROP_MODEL_PATH: str = "saved_models/cifar10/mc_dropout_model.h5"
 
 
 def load_cfir10():
@@ -118,6 +119,18 @@ def create_alpha_dropout_model_1(n_classes, n_layers=20, n_neurons=100):
     return model
 
 
+class MCAlphaDropout(keras.layers.AlphaDropout):
+    def call(self, inputs):
+        return super().call(inputs, training=True)
+
+
+def create_mc_dropout_from_alpha_model(model):
+    mc_model = keras.models.Sequential([
+        MCAlphaDropout(layer.rate) if isinstance(layer, keras.layers.AlphaDropout)
+        else layer for layer in model.layers
+    ])
+    return mc_model
+
 def visualize_cfir10_samples(X, y):
     plt.figure(figsize=(7.2, 2.4))
     for index, image in enumerate(X):
@@ -162,6 +175,14 @@ def create_train_alpha_dropout_model(X_train, X_valid, X_test, y_train, y_valid,
                                       y_train, y_valid, y_test, class_names)
 
 
+def create_train_mc_dropout_model(alpha_model, X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
+    model = create_mc_dropout_from_alpha_model(alpha_model)
+    lr0 = 5e-4
+    history, model = train_save_model(model, MC_DROP_MODEL_PATH, lr0,
+                                      X_train, X_valid, X_test,
+                                      y_train, y_valid, y_test, class_names)
+
+
 def train_save_model(model, save_path, learning_rate, X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
     lr0 = learning_rate
     optimizer = tf.keras.optimizers.Nadam(learning_rate=lr0)
@@ -200,6 +221,11 @@ def run():
     np.random.seed(42)
     X_train_scaled, X_valid_scaled, X_test_scaled = scale_data(X_train, X_valid, X_test)
     # create_train_selu_model(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, class_names)
-    create_train_alpha_dropout_model(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, class_names)
+    create_train_alpha_dropout_model(X_train_scaled, X_valid_scaled, X_test_scaled,
+                                     y_train, y_valid, y_test, class_names)
+
+    # alpha_model = keras.models.load_model(ALPHA_DROP_MODEL_PATH)
+    # create_train_mc_dropout_model(alpha_model, X_train_scaled, X_valid_scaled, X_test_scaled,
+    #                               y_train, y_valid, y_test, class_names)
 
     print("example")
