@@ -23,6 +23,7 @@ import matplotlib.pyplot as plt
 BASE_MODEL_PATH: str = "saved_models/cifar10/base_model.h5"
 BATCH_NORM_MODEL_PATH: str = "saved_models/cifar10/batch_norm_model.h5"
 SELU_MODEL_PATH: str = "saved_models/cifar10/selu_model.h5"
+ALPHA_DROP_MODEL_PATH: str = "saved_models/cifar10/alpha_dropout_model.h5"
 
 
 def load_cfir10():
@@ -93,6 +94,30 @@ def create_model_with_batch_normalization(n_classes, n_layers=20, n_neurons=100)
     return model
 
 
+def create_alpha_dropout_model(n_classes, n_layers=20, n_neurons=100):
+    model = keras.models.Sequential()
+
+    model.add(keras.layers.Flatten(input_shape=[32, 32, 3]))
+    for _ in range(n_layers):
+        model.add(keras.layers.AlphaDropout(rate=0.1))
+        model.add(keras.layers.Dense(n_neurons, activation="selu", kernel_initializer="lecun_normal"))
+    model.add(keras.layers.Dense(n_classes, activation="softmax"))
+
+    return model
+
+
+def create_alpha_dropout_model_1(n_classes, n_layers=20, n_neurons=100):
+    model = keras.models.Sequential()
+
+    model.add(keras.layers.Flatten(input_shape=[32,32, 3]))
+    for _ in range(n_layers):
+        model.add(keras.layers.Dense(n_neurons, activation="selu", kernel_initializer="lecun_normal"))
+    model.add(keras.layers.AlphaDropout(rate=0.1))
+    model.add(keras.layers.Dense(n_classes, activation="softmax"))
+
+    return model
+
+
 def visualize_cfir10_samples(X, y):
     plt.figure(figsize=(7.2, 2.4))
     for index, image in enumerate(X):
@@ -122,8 +147,17 @@ def create_train_save_bn_model(X_train, X_valid, X_test, y_train, y_valid, y_tes
 
 def create_train_selu_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
     model = create_selu_model(n_classes=len(class_names))
-    lr0 = 5e-5
+    lr0 = 7e-4
     history, model = train_save_model(model, SELU_MODEL_PATH, lr0,
+                                      X_train, X_valid, X_test,
+                                      y_train, y_valid, y_test, class_names)
+
+
+def create_train_alpha_dropout_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
+    # model = create_alpha_dropout_model(n_classes=len(class_names))
+    model = create_alpha_dropout_model_1(n_classes=len(class_names))
+    lr0 = 5e-4
+    history, model = train_save_model(model, ALPHA_DROP_MODEL_PATH, lr0,
                                       X_train, X_valid, X_test,
                                       y_train, y_valid, y_test, class_names)
 
@@ -165,6 +199,7 @@ def run():
     tf.random.set_seed(42)
     np.random.seed(42)
     X_train_scaled, X_valid_scaled, X_test_scaled = scale_data(X_train, X_valid, X_test)
-    create_train_selu_model(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, class_names)
+    # create_train_selu_model(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, class_names)
+    create_train_alpha_dropout_model(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, class_names)
 
     print("example")
