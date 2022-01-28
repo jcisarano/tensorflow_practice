@@ -15,10 +15,14 @@ Practice training a deep neural network on the CIFAR10 image dataset.
         accuracy using MC Dropout.
     f) Retrain your model using 1cycle scheduling and see if it improves training speed and model accuracy.
 """
+import math
+
 import keras.models
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+
+from onecycle_scheduling import OneCycleScheduler
 
 BASE_MODEL_PATH: str = "saved_models/cifar10/base_model.h5"
 BATCH_NORM_MODEL_PATH: str = "saved_models/cifar10/batch_norm_model.h5"
@@ -110,7 +114,7 @@ def create_alpha_dropout_model(n_classes, n_layers=20, n_neurons=100):
 def create_alpha_dropout_model_1(n_classes, n_layers=20, n_neurons=100):
     model = keras.models.Sequential()
 
-    model.add(keras.layers.Flatten(input_shape=[32,32, 3]))
+    model.add(keras.layers.Flatten(input_shape=[32, 32, 3]))
     for _ in range(n_layers):
         model.add(keras.layers.Dense(n_neurons, activation="selu", kernel_initializer="lecun_normal"))
     model.add(keras.layers.AlphaDropout(rate=0.1))
@@ -130,6 +134,7 @@ def create_mc_dropout_from_alpha_model(model):
         else layer for layer in model.layers
     ])
     return mc_model
+
 
 def visualize_cfir10_samples(X, y):
     plt.figure(figsize=(7.2, 2.4))
@@ -183,6 +188,19 @@ def create_train_mc_dropout_model(alpha_model, X_train, X_valid, X_test, y_train
                                       y_train, y_valid, y_test, class_names)
 
 
+def create_train_onecycle_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
+    model = create_alpha_dropout_model_1(len(class_names))
+    model.compile(loss="sparse_categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.SGD(learning_rate=1e-2),
+                  metrics=["accuracy"])
+    batch_size = 128
+    n_epochs = 15
+    onecycle = OneCycleScheduler(math.ceil(len(X_train) / batch_size) * n_epochs, max_rate=0.05)
+    history = model.fit(X_train, y_train, epochs=n_epochs, batch_size=batch_size,
+                        validation_data=(X_valid, y_valid),
+                        callbacks=[onecycle], workers=-1)
+
+
 def train_save_model(model, save_path, learning_rate, X_train, X_valid, X_test, y_train, y_valid, y_test, class_names):
     lr0 = learning_rate
     optimizer = tf.keras.optimizers.Nadam(learning_rate=lr0)
@@ -224,8 +242,11 @@ def run():
     # create_train_alpha_dropout_model(X_train_scaled, X_valid_scaled, X_test_scaled,
     #                                  y_train, y_valid, y_test, class_names)
 
-    alpha_model = keras.models.load_model(ALPHA_DROP_MODEL_PATH)
-    create_train_mc_dropout_model(alpha_model, X_train_scaled, X_valid_scaled, X_test_scaled,
-                                  y_train, y_valid, y_test, class_names)
+    # alpha_model = keras.models.load_model(ALPHA_DROP_MODEL_PATH)
+    # create_train_mc_dropout_model(alpha_model, X_train_scaled, X_valid_scaled, X_test_scaled,
+    #                               y_train, y_valid, y_test, class_names)
+
+    create_train_onecycle_model(X_train_scaled, X_valid_scaled, X_test_scaled,
+                                y_train, y_valid, y_test, class_names)
 
     print("example")
