@@ -16,11 +16,21 @@ def load_csv():
         next(csv_reader)
         data = list(csv_reader)
     for item in data:
-        timesteps.append(item[1])
-        btc_price.append(item[2])
-    print(btc_price)
-    data_array = np.concatenate([timesteps, btc_price])
-    return data_array
+        timesteps.append(datetime.strptime(item[1], "%Y-%m-%d"))
+        btc_price.append(float(item[2]))
+
+    plt.figure(figsize=[10, 7])
+    plt.plot(timesteps, btc_price)
+    plt.title(label="Price of Bitcoin from 1 Oct 2013 to 18 May 2021", fontsize=16)
+    plt.ylabel("BTC Price", fontsize=12)
+    plt.xlabel("Date", fontsize=12)
+    plt.legend(fontsize=14)
+    axes = plt.gca().axes
+    axes.yaxis.grid()
+    axes.tick_params(axis="x", labelsize=10)
+    axes.tick_params(axis="y", labelsize=10)
+    plt.show()
+
 
 
 def load_csv_1():
@@ -32,8 +42,6 @@ def load_csv_1():
         for line in csv_reader:
             timesteps.append(datetime.strptime(line[1], "%Y-%m-%d"))  # date as datetime object
             btc_price.append(float(line[2]))  # price as float
-    print(timesteps[:10])
-    print(btc_price[:10])
 
     plt.figure(figsize=[10, 7])
     plt.plot(timesteps, btc_price)
@@ -75,7 +83,7 @@ def run():
 
     # bitcoin_prices = pd.DataFrame(df["Closing Price (USD)"]).rename(columns={"Closing Price (USD)": "Price"})
     # visualize(bitcoin_prices)
-    #prices = load_csv()
+    load_csv()
     #print(prices)
     load_csv_1()
 
