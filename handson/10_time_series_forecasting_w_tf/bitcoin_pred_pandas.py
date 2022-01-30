@@ -19,8 +19,12 @@ def load_csv():
         timesteps.append(datetime.strptime(item[1], "%Y-%m-%d"))
         btc_price.append(float(item[2]))
 
+    plot_from_x_y(timesteps, btc_price)
+
+
+def plot_from_x_y(x, y):
     plt.figure(figsize=[10, 7])
-    plt.plot(timesteps, btc_price, label="Price", color="#EDA800")
+    plt.plot(x, y, label="Price", color="#EDA800")
     plt.title(label="Price of Bitcoin from 1 Oct 2013 to 18 May 2021", fontsize=16)
     plt.ylabel("BTC Price", fontsize=12)
     plt.xlabel("Date", fontsize=12)
@@ -30,7 +34,6 @@ def load_csv():
     axes.tick_params(axis="x", labelsize=10)
     axes.tick_params(axis="y", labelsize=10)
     plt.show()
-
 
 
 def load_csv_1():
@@ -43,17 +46,7 @@ def load_csv_1():
             timesteps.append(datetime.strptime(line[1], "%Y-%m-%d"))  # date as datetime object
             btc_price.append(float(line[2]))  # price as float
 
-    plt.figure(figsize=[10, 7])
-    plt.plot(timesteps, btc_price, label="Price", color="#EDA800")
-    plt.title(label="Price of Bitcoin from 1 Oct 2013 to 18 May 2021", fontsize=16)
-    plt.ylabel("BTC Price", fontsize=12)
-    plt.xlabel("Date", fontsize=12)
-    plt.legend(fontsize=14)
-    axes = plt.gca().axes
-    axes.yaxis.grid()
-    axes.tick_params(axis="x", labelsize=10)
-    axes.tick_params(axis="y", labelsize=10)
-    plt.show()
+    plot_from_x_y(timesteps, btc_price)
 
 
 def visualize(df):
