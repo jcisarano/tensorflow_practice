@@ -234,9 +234,6 @@ def run():
     # np.random.seed(42)
     # create_train_save_bn_model(X_train, X_valid, X_test, y_train, y_valid, y_test, class_names)
 
-    tf.keras.backend.clear_session()
-    tf.random.set_seed(42)
-    np.random.seed(42)
     X_train_scaled, X_valid_scaled, X_test_scaled = scale_data(X_train, X_valid, X_test)
     # create_train_selu_model(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, class_names)
     # create_train_alpha_dropout_model(X_train_scaled, X_valid_scaled, X_test_scaled,
