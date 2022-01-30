@@ -20,7 +20,7 @@ def load_csv():
         btc_price.append(float(item[2]))
 
     plt.figure(figsize=[10, 7])
-    plt.plot(timesteps, btc_price)
+    plt.plot(timesteps, btc_price, label="Price", color="#EDA800")
     plt.title(label="Price of Bitcoin from 1 Oct 2013 to 18 May 2021", fontsize=16)
     plt.ylabel("BTC Price", fontsize=12)
     plt.xlabel("Date", fontsize=12)
@@ -44,7 +44,7 @@ def load_csv_1():
             btc_price.append(float(line[2]))  # price as float
 
     plt.figure(figsize=[10, 7])
-    plt.plot(timesteps, btc_price)
+    plt.plot(timesteps, btc_price, label="Price", color="#EDA800")
     plt.title(label="Price of Bitcoin from 1 Oct 2013 to 18 May 2021", fontsize=16)
     plt.ylabel("BTC Price", fontsize=12)
     plt.xlabel("Date", fontsize=12)
