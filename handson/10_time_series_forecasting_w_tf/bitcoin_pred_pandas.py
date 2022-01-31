@@ -95,9 +95,17 @@ def run():
     timesteps = bitcoin_prices.index.to_numpy()
     prices = bitcoin_prices["Price"].to_numpy()
 
-    # wrong way to split train-test data
-    X_train, X_test, y_train, y_test = train_test_split(timesteps, prices, test_size=0.2, random_state=42)
-    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+    # wrong way to split train-test data for time series, because the test data is randomly mixed in with the train data
+    # X_train, X_test, y_train, y_test = train_test_split(timesteps, prices, test_size=0.2, random_state=42)
+    # print("Wrong way:", X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+    # scatterplot(X_train, y_train, X_test, y_test)
+
+    # right way to split train-test data for time series:
+    # data stays in chronological order, and last bit is used as test data to represent future (pseudo future data)
+    split_size = int(0.8 * len(prices))  # create 80/20 split
+    X_train, y_train = timesteps[:split_size], prices[:split_size]
+    X_test, y_test = timesteps[split_size:], prices[split_size:]
+    print("Right way:", X_train.shape, X_test.shape, y_train.shape, y_test.shape)
     scatterplot(X_train, y_train, X_test, y_test)
 
     # visualize(bitcoin_prices)
