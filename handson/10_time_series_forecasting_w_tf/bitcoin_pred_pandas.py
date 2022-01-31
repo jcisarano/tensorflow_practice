@@ -39,6 +39,25 @@ def scatterplot(x0, y0, x1, y1):
     plt.show()
 
 
+def plot_time_series(timesteps, values, format=".", start=0, end=None, label=None):
+    """
+    Plots series of points in times against values
+    :param timesteps: array of timestep values
+    :param values: array of values across time
+    :param format: style of plot, default = .
+    :param start: where to start the plot, value is used as index of timesteps
+    :param end: where to end the plot, index for timesteps
+    :param label: label to give to plot values
+    :return:
+    """
+    plt.plot(timesteps[start:end], values[start:end], format, label=label)
+    plt.xlabel("Time")
+    plt.ylabel("BTC price")
+    if label:
+        plt.legend(fontsize=14)
+    plt.grid(True)
+
+
 def load_csv():
     timesteps = []
     btc_price = []
@@ -112,5 +131,10 @@ def run():
     # load_csv()
     #print(prices)
     # load_csv_1()
+
+    plt.figure(figsize=(10, 7))
+    plot_time_series(timesteps=X_train, values=y_train, label="Train data")
+    plot_time_series(timesteps=X_test, values=y_test, label="Test data")
+    plt.show()
 
     print("bitcoin predict pandas")
