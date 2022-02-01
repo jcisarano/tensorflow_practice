@@ -7,7 +7,7 @@ import csv
 
 from sklearn.model_selection import train_test_split
 
-DATA_PATH: str = "data/BTC_USD_2013-10-01_2021-05-18-CoinDesk.csv"
+from utils import plot_time_series, load_data, DATA_PATH, my_train_test_split
 
 
 def plot_from_x_y(x, y):
@@ -37,25 +37,6 @@ def scatterplot(x0, y0, x1, y1):
     axes.tick_params(axis="x", labelsize=10)
     axes.tick_params(axis="y", labelsize=10)
     plt.show()
-
-
-def plot_time_series(timesteps, values, format=".", start=0, end=None, label=None):
-    """
-    Plots series of points in times against values
-    :param timesteps: array of timestep values
-    :param values: array of values across time
-    :param format: style of plot, default = .
-    :param start: where to start the plot, value is used as index of timesteps
-    :param end: where to end the plot, index for timesteps
-    :param label: label to give to plot values
-    :return:
-    """
-    plt.plot(timesteps[start:end], values[start:end], format, label=label)
-    plt.xlabel("Time")
-    plt.ylabel("BTC price")
-    if label:
-        plt.legend(fontsize=14)
-    plt.grid(True)
 
 
 def load_csv():
@@ -106,13 +87,7 @@ def visualize(df):
 
 
 def run():
-    df = pd.read_csv(DATA_PATH,
-                     parse_dates=["Date"],  # parses the date column to pandas.datetime
-                     index_col=["Date"])  # makes the date column the index, useful because this is sequential data
-
-    bitcoin_prices = pd.DataFrame(df["Closing Price (USD)"]).rename(columns={"Closing Price (USD)": "Price"})
-    timesteps = bitcoin_prices.index.to_numpy()
-    prices = bitcoin_prices["Price"].to_numpy()
+    timesteps, prices = load_data()
 
     # wrong way to split train-test data for time series, because the test data is randomly mixed in with the train data
     # X_train, X_test, y_train, y_test = train_test_split(timesteps, prices, test_size=0.2, random_state=42)
@@ -121,15 +96,17 @@ def run():
 
     # right way to split train-test data for time series:
     # data stays in chronological order, and last bit is used as test data to represent future (pseudo future data)
-    split_size = int(0.8 * len(prices))  # create 80/20 split
-    X_train, y_train = timesteps[:split_size], prices[:split_size]
-    X_test, y_test = timesteps[split_size:], prices[split_size:]
+    # split_size = int(0.8 * len(prices))  # create 80/20 split
+    # X_train, y_train = timesteps[:split_size], prices[:split_size]
+    # X_test, y_test = timesteps[split_size:], prices[split_size:]
+
+    X_train, X_test, y_train, y_test = my_train_test_split(timesteps, prices)
     print("Right way:", X_train.shape, X_test.shape, y_train.shape, y_test.shape)
     scatterplot(X_train, y_train, X_test, y_test)
 
     # visualize(bitcoin_prices)
     # load_csv()
-    #print(prices)
+    # print(prices)
     # load_csv_1()
 
     plt.figure(figsize=(10, 7))
