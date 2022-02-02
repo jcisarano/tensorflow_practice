@@ -6,7 +6,7 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-from utils import plot_time_series, load_data, my_train_test_split, mean_absolute_scaled_error
+from utils import plot_time_series, load_data, my_train_test_split, mean_absolute_scaled_error, evaluate_preds
 
 
 def naive_forecast(y):
@@ -25,4 +25,7 @@ def run():
     plt.show()
 
     # Check MASE implementation. This output should be very close to one:
-    print("MASE", mean_absolute_scaled_error(y_true=y_test[1:], y_pred=n_forecast))
+    # print("MASE", mean_absolute_scaled_error(y_true=y_test[1:], y_pred=n_forecast))
+
+    results = evaluate_preds(y_true=y_test[1:], y_pred=n_forecast)
+    print(results)
