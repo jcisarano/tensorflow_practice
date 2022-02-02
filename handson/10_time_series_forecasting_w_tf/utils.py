@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import pandas as pd
+import tensorflow as tf
 
 DATA_PATH: str = "data/BTC_USD_2013-10-01_2021-05-18-CoinDesk.csv"
 
@@ -40,3 +41,17 @@ def load_data(data_path=DATA_PATH):
     prices = bitcoin_prices["Price"].to_numpy()
 
     return timesteps, prices
+
+
+def mean_absolute_scaled_error(y_true, y_pred):
+    """
+    Implement MASE assuming no seasonality of the data
+    :param y_true:
+    :param y_pred:
+    :return:
+    """
+    mae = tf.reduce_mean(tf.abs(y_true-y_pred))
+    mae_naive_no_season = tf.reduce_mean(tf.abs(y_true[1:] - y_true[:-1]))  # shift left 1 for seasonality of one day
+
+    return  mae / mae_naive_no_season
+

@@ -4,8 +4,9 @@
 # for horizon of one
 
 import matplotlib.pyplot as plt
+import tensorflow as tf
 
-from utils import plot_time_series, load_data, my_train_test_split
+from utils import plot_time_series, load_data, my_train_test_split, mean_absolute_scaled_error
 
 
 def naive_forecast(y):
@@ -22,3 +23,6 @@ def run():
     plot_time_series(timesteps=X_test, values=y_test, start=350, format="-", label="Test data")
     plot_time_series(timesteps=X_test[1:], values=n_forecast, start=350, format="-", label="Naive forecast data")
     plt.show()
+
+    # Check MASE implementation. This output should be very close to one:
+    print("MASE", mean_absolute_scaled_error(y_true=y_test[1:], y_pred=n_forecast))
