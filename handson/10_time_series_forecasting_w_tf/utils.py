@@ -72,3 +72,17 @@ def evaluate_preds(y_true, y_pred):
             "rmse": rmse.numpy(),
             "mape": mape.numpy(),
             "mase": mase.numpy()}
+
+
+# function to label windowed data
+def get_labelled_window(x, horizon):
+    """
+    Creates labels for windowed dataset
+    e.g. if horizon = 1,
+    Input: [0, 1, 2, 3, 4, 5, 6, 7] -> Output: ([0, 1, 2, 3, 4, 5, 6], [7])
+    :param x:
+    :param horizon:
+    :return:
+    """
+
+    return x[:, :-horizon], x[:, -horizon]

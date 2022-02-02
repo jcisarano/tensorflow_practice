@@ -6,7 +6,11 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-from utils import plot_time_series, load_data, my_train_test_split, mean_absolute_scaled_error, evaluate_preds
+from utils import plot_time_series, load_data, my_train_test_split, mean_absolute_scaled_error, evaluate_preds, \
+    get_labelled_window
+
+HORIZON = 1
+WINDOW_SIZE = 7
 
 
 def naive_forecast(y):
@@ -29,3 +33,7 @@ def run():
 
     results = evaluate_preds(y_true=y_test[1:], y_pred=n_forecast)
     print(results)
+
+    # test window label function
+    test_window, test_label = get_labelled_window(tf.expand_dims(tf.range(8), axis=0), horizon=HORIZON)
+    print(f"Window: {tf.squeeze(test_window).numpy()} -> Label: {tf.squeeze(test_label).numpy()}")
