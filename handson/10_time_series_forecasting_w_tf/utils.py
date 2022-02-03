@@ -92,6 +92,7 @@ def get_labelled_window(x, horizon):
 def make_windows(x, window_size, horizon):
     """
     Turns 1d array into 2d array of sequential labelled windows of window_size with horizon sized labels
+    Should be the same result as keras function tf.keras.utils.timeseries_dataset_from_array
     :param x:
     :param window_size:
     :param horizon:
@@ -101,7 +102,8 @@ def make_windows(x, window_size, horizon):
     # create the window, len win_size + horizon (includes the data and label at this point)
     window_step = np.expand_dims(np.arange(window_size+horizon), axis=0)
     # creates 2d array of indices of size (data length, window_step length)
-    window_indexes = window_step + np.expand_dims(np.arange(len(x)-(window_size+horizon-1)), axis=0).T
+    # window_indexes = window_step + np.expand_dims(np.arange(len(x)-(window_size+horizon-1)), axis=0).T
+    window_indexes = window_step + np.expand_dims(np.arange(len(x)-(window_size+horizon-1)), axis=1)
     print(window_indexes.shape)
     # convert array of indices to temp array of actual data
     windowed_array = x[window_indexes]

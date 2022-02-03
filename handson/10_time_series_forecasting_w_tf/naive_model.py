@@ -40,4 +40,11 @@ def run():
 
     # test full window label function
     full_windows, full_labels = make_windows(prices, window_size=WINDOW_SIZE, horizon=HORIZON)
-    print(len(full_windows), len(full_labels))
+    # print(len(full_windows), len(full_labels))
+
+    for i in range(3):
+        print(f"Window: {full_windows[i]} -> Label: {full_labels[i]}")
+
+    for i in range(3):
+        print(f"Window: {full_windows[i-3]} -> Label: {full_labels[i-3]}")
+
