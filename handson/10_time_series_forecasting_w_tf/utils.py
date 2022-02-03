@@ -1,3 +1,4 @@
+import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 import tensorflow as tf
@@ -86,3 +87,25 @@ def get_labelled_window(x, horizon):
     """
 
     return x[:, :-horizon], x[:, -horizon]
+
+
+def make_windows(x, window_size, horizon):
+    """
+    Turns 1d array into 2d array of sequential labelled windows of window_size with horizon sized labels
+    :param x:
+    :param window_size:
+    :param horizon:
+    :return:
+    """
+
+    # create the window, len win_size + horizon (includes the data and label at this point)
+    window_step = np.expand_dims(np.arange(window_size+horizon), axis=0)
+    # creates 2d array of indices of size (data length, window_step length)
+    window_indexes = window_step + np.expand_dims(np.arange(len(x)-(window_size+horizon-1)), axis=0).T
+    print(window_indexes.shape)
+    # convert array of indices to temp array of actual data
+    windowed_array = x[window_indexes]
+    # split temp windows into windows array and labels array
+    windows, labels = get_labelled_window(windowed_array, horizon=horizon)
+
+    return windows, labels

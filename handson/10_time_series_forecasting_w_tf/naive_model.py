@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 from utils import plot_time_series, load_data, my_train_test_split, mean_absolute_scaled_error, evaluate_preds, \
-    get_labelled_window
+    get_labelled_window, make_windows
 
 HORIZON = 1
 WINDOW_SIZE = 7
@@ -37,3 +37,7 @@ def run():
     # test window label function
     test_window, test_label = get_labelled_window(tf.expand_dims(tf.range(8), axis=0), horizon=HORIZON)
     print(f"Window: {tf.squeeze(test_window).numpy()} -> Label: {tf.squeeze(test_label).numpy()}")
+
+    # test full window label function
+    full_windows, full_labels = make_windows(prices, window_size=WINDOW_SIZE, horizon=HORIZON)
+    print(len(full_windows), len(full_labels))
