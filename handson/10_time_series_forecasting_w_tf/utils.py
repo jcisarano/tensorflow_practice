@@ -131,3 +131,15 @@ def create_model_checkpoint(model_name, save_path=CHECKPOINT_SAVE_PATH):
     return tf.keras.callbacks.ModelCheckpoint(filepath=os.path.join(save_path, model_name),
                                               verbose=0,
                                               save_best_only=True)
+
+
+def make_preds(model, input_data):
+    """
+    Uses model to make predictions on input data
+    :param model:
+    :param input_data: Should be windowed as when training model
+    :return:
+    """
+    forecast = model.predict(input_data)
+    return tf.squeeze(forecast)  # squeeze to return 1d array of preds
+
