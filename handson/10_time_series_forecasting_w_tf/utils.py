@@ -2,8 +2,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 import tensorflow as tf
+import os
 
 DATA_PATH: str = "data/BTC_USD_2013-10-01_2021-05-18-CoinDesk.csv"
+CHECKPOINT_SAVE_PATH: str = "model_experiments"
 
 
 def plot_time_series(timesteps, values, format=".", start=0, end=None, label=None):
@@ -121,3 +123,9 @@ def make_windows(x, window_size, horizon):
     windows, labels = get_labelled_window(windowed_array, horizon=horizon)
 
     return windows, labels
+
+
+def create_model_checkpoint(model_name, save_path=CHECKPOINT_SAVE_PATH):
+    return tf.keras.callbacks.ModelCheckpoint(filepath=os.path.join(save_path, model_name),
+                                              verbose=0,
+                                              save_best_only=True)
