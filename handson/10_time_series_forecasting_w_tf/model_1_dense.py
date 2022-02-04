@@ -9,6 +9,7 @@ First experiment is a simple dense model:
 import os
 
 import tensorflow as tf
+from matplotlib import pyplot as plt
 from tensorflow.keras import layers
 
 import utils
@@ -56,5 +57,16 @@ def run():
     preds = utils.make_preds(model, test_windows)
     results = utils.evaluate_preds(y_true=test_labels, y_pred=preds)
     print(results)
+
+    offset = 300
+    plt.figure(figsize=(10, 7))
+    # account for the test_window offset and index into test_labels to ensure correct plot
+    utils.plot_time_series(timesteps=X_test[-len(test_windows):],
+                           values=test_labels, start=offset, label="Test Data")
+    utils.plot_time_series(timesteps=X_test[-len(test_windows):],
+                           values=preds,
+                           start=offset, format="-",
+                           label="Predictions")
+    plt.show()
 
     print("dense model")
