@@ -4,6 +4,7 @@
 # for horizon of one
 
 import matplotlib.pyplot as plt
+import numpy as np
 import tensorflow as tf
 
 from utils import plot_time_series, load_data, my_train_test_split, mean_absolute_scaled_error, evaluate_preds, \
@@ -51,3 +52,6 @@ def run():
     # test create train and test windows
     train_windows, test_windows, train_labels, test_labels = make_train_test_splits(full_windows, full_labels)
     print(len(train_windows), len(test_windows))
+
+    # verify that the labels are the same before and after the split
+    print(np.array_equal(np.squeeze(train_labels[:-HORIZON-1]), y_train[WINDOW_SIZE:]))
