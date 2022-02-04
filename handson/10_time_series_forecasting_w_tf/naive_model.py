@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 from utils import plot_time_series, load_data, my_train_test_split, mean_absolute_scaled_error, evaluate_preds, \
-    get_labelled_window, make_windows
+    get_labelled_window, make_windows, make_train_test_splits
 
 HORIZON = 1
 WINDOW_SIZE = 7
@@ -46,5 +46,8 @@ def run():
         print(f"Window: {full_windows[i]} -> Label: {full_labels[i]}")
 
     for i in range(3):
-        print(f"Window: {full_windows[i-3]} -> Label: {full_labels[i-3]}")
+        print(f"Window: {full_windows[i - 3]} -> Label: {full_labels[i - 3]}")
 
+    # test create train and test windows
+    train_windows, test_windows, train_labels, test_labels = make_train_test_splits(full_windows, full_labels)
+    print(len(train_windows), len(test_windows))

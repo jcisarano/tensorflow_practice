@@ -32,6 +32,16 @@ def my_train_test_split(X, y, split=0.8):
     return X_train, X_test, y_train, y_test
 
 
+def make_train_test_splits(windows, labels, test_split=0.2):
+    split_size = int(len(windows) * (1-test_split))
+    train_windows = windows[:split_size]
+    train_labels = labels[:split_size]
+    test_windows = windows[split_size:]
+    test_labels = labels[split_size:]
+
+    return train_windows, test_windows, train_labels, test_labels
+
+
 def load_data(data_path=DATA_PATH):
     df = pd.read_csv(data_path,
                      parse_dates=["Date"],  # parses the date column to pandas.datetime
