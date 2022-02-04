@@ -20,10 +20,12 @@
 
 import bitcoin_pred_pandas as bpp
 import naive_model as nm
+import model_1_dense as m1
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # bpp.run()
-    nm.run()
+    # nm.run()
+    m1.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -6,9 +6,12 @@ First experiment is a simple dense model:
     * Batch size 128 (larger because data rows are smaller, only 7 items per row)
     * 100 epochs
 """
+import os
+
 import tensorflow as tf
 from tensorflow.keras import layers
 
+import utils
 from utils import load_data, my_train_test_split, make_windows, make_train_test_splits, HORIZON, WINDOW_SIZE, \
     create_model_checkpoint
 
@@ -37,6 +40,15 @@ def run():
               validation_data=(test_windows, test_labels),
               callbacks=[create_model_checkpoint(model_name=model.name)],
               workers=-1
-    )
+              )
+
+    print("Evaluate trained model:")
+    model.evaluate(test_windows, test_labels)
+
+    # load best performing model and evaluate
+    model = tf.keras.models.load_model(os.path.join(utils.CHECKPOINT_SAVE_PATH, model.name))
+
+    print("Evaluate best saved model:")
+    model.evaluate(test_windows, test_labels)
 
     print("dense model")
