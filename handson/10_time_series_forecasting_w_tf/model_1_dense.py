@@ -58,23 +58,24 @@ def run():
     # load best performing model and evaluate
     model = tf.keras.models.load_model(os.path.join(utils.CHECKPOINT_SAVE_PATH, model_name))
 
-    print("Evaluate best saved model:")
+    print("Evaluate best saved model 1:")
     model.evaluate(test_windows, test_labels)
 
     # Simulate forecast using test dataset
     preds = utils.make_preds(model, test_windows)
     results = utils.evaluate_preds(y_true=test_labels, y_pred=preds)
-    print(results)
+    print("Model 1:", results)
 
-    offset = 300
-    plt.figure(figsize=(10, 7))
+    # offset = 300
+    # plt.figure(figsize=(10, 7))
     # account for the test_window offset and index into test_labels to ensure correct plot
-    utils.plot_time_series(timesteps=X_test[-len(test_windows):],
-                           values=test_labels, start=offset, label="Test Data")
-    utils.plot_time_series(timesteps=X_test[-len(test_windows):],
-                           values=preds,
-                           start=offset, format="-",
-                           label="Predictions")
-    plt.show()
+    # utils.plot_time_series(timesteps=X_test[-len(test_windows):],
+    #                        values=test_labels, start=offset, label="Test Data")
+    # utils.plot_time_series(timesteps=X_test[-len(test_windows):],
+    #                        values=preds,
+    #                        start=offset, format="-",
+    #                        label="Predictions")
+    # plt.show()
 
+    return results
     print("model 1 dense")

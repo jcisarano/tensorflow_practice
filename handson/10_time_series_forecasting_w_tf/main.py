@@ -16,7 +16,8 @@
 # Terms / tunable hyperparameters
 # horizon: number of timesteps into the future to predict
 # window size: number of timesteps to use to predict horizon
-
+import pandas as pd
+from matplotlib import pyplot as plt
 
 import bitcoin_pred_pandas as bpp
 import naive_model as nm
@@ -27,9 +28,17 @@ import model_3_dense as m3
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # bpp.run()
-    # nm.run()
-    # m1.run()
-    # m2.run()
-    m3.run()
+    naive_results = nm.run()
+    m1_results = m1.run()
+    m2_results = m2.run()
+    m3_results = m3.run()
+
+    pd.DataFrame({"naive": naive_results["mae"],
+                  "horizon_1_window_7": m1_results["mae"],
+                  "horizon_1_window_30": m2_results["mae"],
+                  "horizon_7_window_30": m3_results["mae"],
+                  }, index=["mae"]).plot(figsize=(10, 7), kind="bar")
+    plt.show()
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

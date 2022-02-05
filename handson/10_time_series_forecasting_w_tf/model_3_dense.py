@@ -37,12 +37,12 @@ def run():
     model.evaluate(test_windows, test_labels)
 
     preds = utils.make_preds(model, test_windows)
-    print(preds[:5])
-    print(test_labels[:5])
+    # print(preds[:5])
+    # print(test_labels[:5])
     results = utils.evaluate_preds(y_true=test_labels, y_pred=preds)
-    print(results)
+    print("Model 3", results)
 
-    offset = 300
+    """offset = 300
     plt.figure(figsize=(10, 7))
     # account for the test_window offset and index into test_labels to ensure correct plot
     utils.plot_time_series(timesteps=X_test[-len(test_windows):],
@@ -53,6 +53,7 @@ def run():
                            values=tf.reduce_mean(preds, axis=1),
                            start=offset, format="-",
                            label="Predictions")
-    plt.show()
+    plt.show()"""
 
     print("model 3 dense")
+    return results
