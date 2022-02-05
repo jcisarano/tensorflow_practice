@@ -42,4 +42,15 @@ def run():
     results = utils.evaluate_preds(y_true=test_labels, y_pred=preds)
     print(results)
 
+    offset = 300
+    plt.figure(figsize=(10, 7))
+    # account for the test_window offset and index into test_labels to ensure correct plot
+    utils.plot_time_series(timesteps=X_test[-len(test_windows):],
+                           values=test_labels, start=offset, label="Test Data")
+    utils.plot_time_series(timesteps=X_test[-len(test_windows):],
+                           values=preds,
+                           start=offset, format="-",
+                           label="Predictions")
+    plt.show()
+
     print("model 3 dense")
