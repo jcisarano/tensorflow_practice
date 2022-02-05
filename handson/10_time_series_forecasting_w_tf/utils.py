@@ -80,6 +80,14 @@ def evaluate_preds(y_true, y_pred):
     mape = tf.keras.metrics.mean_absolute_percentage_error(y_true, y_pred)
     mase = mean_absolute_scaled_error(y_true, y_pred)
 
+    # Account for different sized metrics. For longer horizons, reduce to single value
+    if mae.ndim > 0:
+        mae = tf.reduce_mean(mae)
+        mse = tf.reduce_mean(mse)
+        rmse = tf.reduce_mean(rmse)
+        mape = tf.reduce_mean(mape)
+        mase = tf.reduce_mean(mase)
+        
     return {"mae": mae.numpy(),
             "mse": mse.numpy(),
             "rmse": rmse.numpy(),
