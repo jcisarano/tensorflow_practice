@@ -24,10 +24,10 @@ def run():
     print(len(train_windows), len(test_windows), len(train_labels), len(test_labels))
 
     tf.random.set_seed(42)
-    # model_name = "model_3_dense"
-    # model = make_dense_model(model_name, train_windows, test_windows, train_labels, test_labels)
+    model_name = "model_3_dense"
+    model = make_dense_model(model_name, train_windows, test_windows, train_labels, test_labels, output_size=HORIZON)
 
-    # print("Evaluate trained model:")
-    # model.evaluate(test_windows, test_labels)
+    print("Evaluate trained model:")
+    model.evaluate(test_windows, test_labels)
 
     print("model 3 dense")

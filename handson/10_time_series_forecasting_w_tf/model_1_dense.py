@@ -19,10 +19,10 @@ HORIZON: int = 1
 WINDOW_SIZE: int = 7
 
 
-def make_dense_model(model_name, train_windows, test_windows, train_labels, test_labels):
+def make_dense_model(model_name, train_windows, test_windows, train_labels, test_labels, output_size=HORIZON):
     model = tf.keras.Sequential([
         layers.Dense(128, activation="relu"),
-        layers.Dense(HORIZON, activation="linear")  # linear activation outputs the value passed in from the dense layer
+        layers.Dense(output_size, activation="linear")  # linear activation outputs same val input from the dense layer
     ], name=model_name)
 
     model.compile(loss="mae",
