@@ -50,24 +50,7 @@ def run():
 
     tf.random.set_seed(42)
     model_name = "model_1_dense"
-    # model = tf.keras.Sequential([
-    #     layers.Dense(128, activation="relu"),
-    #     layers.Dense(HORIZON, activation="linear")  # linear activation outputs the value passed in from the dense layer
-    # ], name=model_name)
-
-    # model.compile(loss="mae",
-    #              optimizer=tf.keras.optimizers.Adam(),
-    #              metrics=["mae", "mse"])
-
-    # model.fit(x=train_windows,
-    #          y=train_labels,
-    #          epochs=100,
-    #          verbose=1,
-    #          batch_size=128,
-    #          validation_data=(test_windows, test_labels),
-    #          callbacks=[create_model_checkpoint(model_name=model.name)],
-    #          workers=-1
-    #          )
+    # model = make_dense_model(model_name, train_windows, test_windows, train_labels, test_labels)
 
     # print("Evaluate trained model:")
     # model.evaluate(test_windows, test_labels)
@@ -94,4 +77,4 @@ def run():
                            label="Predictions")
     plt.show()
 
-    print("dense model")
+    print("model 1 dense")
