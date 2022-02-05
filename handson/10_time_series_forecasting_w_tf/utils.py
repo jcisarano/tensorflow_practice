@@ -7,8 +7,6 @@ import os
 DATA_PATH: str = "data/BTC_USD_2013-10-01_2021-05-18-CoinDesk.csv"
 CHECKPOINT_SAVE_PATH: str = "model_experiments"
 
-HORIZON: int = 1
-WINDOW_SIZE: int = 7
 
 def plot_time_series(timesteps, values, format=".", start=0, end=None, label=None):
     """
