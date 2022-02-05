@@ -46,9 +46,11 @@ def run():
     plt.figure(figsize=(10, 7))
     # account for the test_window offset and index into test_labels to ensure correct plot
     utils.plot_time_series(timesteps=X_test[-len(test_windows):],
-                           values=test_labels, start=offset, label="Test Data")
+                           values=test_labels[:, 0],
+                           start=offset,
+                           label="Test Data")
     utils.plot_time_series(timesteps=X_test[-len(test_windows):],
-                           values=preds,
+                           values=tf.reduce_mean(preds, axis=1),
                            start=offset, format="-",
                            label="Predictions")
     plt.show()
