@@ -98,7 +98,7 @@ def get_labelled_window(x, horizon):
     :return:
     """
 
-    return x[:, :-horizon], x[:, -horizon]
+    return x[:, :-horizon], x[:, -horizon:]
 
 
 def make_windows(x, window_size, horizon):

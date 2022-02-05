@@ -25,9 +25,21 @@ def run():
 
     tf.random.set_seed(42)
     model_name = "model_3_dense"
-    model = make_dense_model(model_name, train_windows, test_windows, train_labels, test_labels, output_size=HORIZON)
+    # model = make_dense_model(model_name, train_windows, test_windows, train_labels, test_labels, output_size=HORIZON)
 
-    print("Evaluate trained model:")
+    # print("Evaluate trained model:")
+    # model.evaluate(test_windows, test_labels)
+
+    # load best performing model and evaluate
+    model = tf.keras.models.load_model(os.path.join(utils.CHECKPOINT_SAVE_PATH, model_name))
+
+    print("Evaluate best saved model:")
     model.evaluate(test_windows, test_labels)
+
+    preds = utils.make_preds(model, test_windows)
+    print(preds[:5])
+    print(test_labels[:5])
+    results = utils.evaluate_preds(y_true=test_labels, y_pred=preds)
+    print(results)
 
     print("model 3 dense")
