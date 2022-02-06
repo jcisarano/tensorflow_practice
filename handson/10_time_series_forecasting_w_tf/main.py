@@ -24,21 +24,23 @@ import naive_model as nm
 import model_1_dense as m1
 import model_2_dense as m2
 import model_3_dense as m3
+import model_4_conv1d as m4
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # bpp.run()
-    naive_results = nm.run()
-    m1_results = m1.run()
-    m2_results = m2.run()
-    m3_results = m3.run()
+    # naive_results = nm.run()
+    # m1_results = m1.run()
+    # m2_results = m2.run()
+    # m3_results = m3.run()
+    m4_results = m4.run()
 
-    pd.DataFrame({"naive": naive_results["mae"],
-                  "horizon_1_window_7": m1_results["mae"],
-                  "horizon_1_window_30": m2_results["mae"],
-                  "horizon_7_window_30": m3_results["mae"],
-                  }, index=["mae"]).plot(figsize=(10, 7), kind="bar")
-    plt.show()
+    # pd.DataFrame({"naive": naive_results["mae"],
+    #               "horizon_1_window_7": m1_results["mae"],
+    #               "horizon_1_window_30": m2_results["mae"],
+    #               "horizon_7_window_30": m3_results["mae"],
+    #               }, index=["mae"]).plot(figsize=(10, 7), kind="bar")
+    # plt.show()
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

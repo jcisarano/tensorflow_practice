@@ -27,7 +27,7 @@ def make_dense_model(model_name, train_windows, test_windows, train_labels, test
 
     model.compile(loss="mae",
                   optimizer=tf.keras.optimizers.Adam(),
-                  metrics=["mae", "mse"])
+                  metrics=["mae"])
 
     model.fit(x=train_windows,
               y=train_labels,
@@ -57,13 +57,16 @@ def run():
 
     # load best performing model and evaluate
     model = tf.keras.models.load_model(os.path.join(utils.CHECKPOINT_SAVE_PATH, model_name))
+    print("Loaded: ", model.name)
 
     print("Evaluate best saved model 1:")
     model.evaluate(test_windows, test_labels)
 
     # Simulate forecast using test dataset
     preds = utils.make_preds(model, test_windows)
-    results = utils.evaluate_preds(y_true=test_labels, y_pred=preds)
+    print(len(preds), preds[:10])
+    # preds = model.predict(test_windows)
+    results = utils.evaluate_preds(y_true=tf.squeeze(test_labels), y_pred=preds)
     print("Model 1:", results)
 
     # offset = 300
