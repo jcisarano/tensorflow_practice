@@ -1,4 +1,8 @@
 """
+# Conv1D model parts:
+    # lambda layer
+    # Conv1D model, filters=128, kernel_size=?, padding=?
+    # output layer = dense
 
 """
 import tensorflow as tf
@@ -24,7 +28,10 @@ def run():
     # so we must reshape it to fit our needs
     x = tf.constant(train_windows[0])
     expand_dims_layer = tf.keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=1))
-    # lambda layer will turn python lambda function into a layer
+    # lambda layer will turn python lambda function into a layer, and you can add it to the model to simplify
+    # the data preparation flow
     print(f"Original shape: {x.shape}")
     print(f"Expanded shape: {expand_dims_layer(x).shape}")  # adds extra dimension
     print(f"Original values with expanded shape  {expand_dims_layer(x)}")
+
+
