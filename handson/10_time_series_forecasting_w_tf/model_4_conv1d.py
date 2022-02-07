@@ -6,6 +6,7 @@
 
 """
 import tensorflow as tf
+import os
 
 import utils
 from utils import load_data, my_train_test_split, make_windows, make_train_test_splits
@@ -35,6 +36,15 @@ def make_conv1d_model(train_windows, test_windows, train_labels, test_labels, ou
               callbacks=[utils.create_model_checkpoint(model.name, utils.CHECKPOINT_SAVE_PATH)],
               workers=-1)
 
+    print("Evaluate trained model Conv1D:")
+    model.evaluate(test_windows, test_labels)
+    print(model.summary())
+
+    # print("Evaluate best saved model Conv1D:")
+    # loaded_model = tf.keras.models.load_model(os.path.join(utils.CHECKPOINT_SAVE_PATH, model_name))
+
+    preds = utils.make_preds(model, test_windows)
+    print(preds[:10])
 
 def run():
     timesteps, prices = load_data()
