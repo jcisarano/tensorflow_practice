@@ -39,7 +39,7 @@ def run():
     preds = utils.make_preds(model, test_windows)
     # print(preds[:5])
     # print(test_labels[:5])
-    results = utils.evaluate_preds(y_true=test_labels, y_pred=preds)
+    results = utils.evaluate_preds(y_true=tf.squeeze(test_labels), y_pred=preds)
     print("Model 3", results)
 
     """offset = 300

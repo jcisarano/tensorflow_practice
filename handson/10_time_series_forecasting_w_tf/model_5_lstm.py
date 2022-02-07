@@ -1,6 +1,7 @@
 """
 
 """
+import os
 
 import tensorflow as tf
 
@@ -19,16 +20,23 @@ def make_lstm_model(model_name, train_windows, test_windows, train_labels, test_
     # x = tf.keras.layers.Dense(32, activation="relu")(x)
     output = tf.keras.layers.Dense(output_size)(x)
 
-    model = tf.keras.Model(inputs=inputs, outputs=output, name=model_name)
-    model.compile(loss="mae", optimizer=tf.keras.optimizers.Adam())
-    model.fit(train_windows, train_labels,
-              epochs=100, verbose=1,
-              batch_size=128,
-              validation_data=(test_windows, test_labels),
-              callbacks=[utils.create_model_checkpoint(model_name=model_name, save_path=utils.CHECKPOINT_SAVE_PATH)],
-              workers=1)
+    # model = tf.keras.Model(inputs=inputs, outputs=output, name=model_name)
+    # model.compile(loss="mae", optimizer=tf.keras.optimizers.Adam())
+    # model.fit(train_windows, train_labels,
+    #           epochs=100, verbose=1,
+    #           batch_size=128,
+    #           validation_data=(test_windows, test_labels),
+    #           callbacks=[utils.create_model_checkpoint(model_name=model_name, save_path=utils.CHECKPOINT_SAVE_PATH)],
+    #           workers=1)
 
-    return 0
+    loaded_model = tf.keras.models.load_model(os.path.join(utils.CHECKPOINT_SAVE_PATH, model_name))
+    loaded_model.evaluate(test_windows, test_labels)
+
+    preds = utils.make_preds(loaded_model, test_windows)
+    results = utils.evaluate_preds(y_true=tf.squeeze(test_labels), y_pred=preds)
+    print(results)
+
+    return results
 
 
 def run():
