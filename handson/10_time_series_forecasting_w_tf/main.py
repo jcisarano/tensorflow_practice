@@ -30,20 +30,21 @@ import model_5_lstm as m5
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # bpp.run()
-    # naive_results = nm.run()
-    # m1_results = m1.run()
-    # m2_results = m2.run()
-    # m3_results = m3.run()
-    # m4_results = m4.run()
+    naive_results = nm.run()
+    m1_results = m1.run()
+    m2_results = m2.run()
+    m3_results = m3.run()
+    m4_results = m4.run()
     m5_results = m5.run()
 
-    # pd.DataFrame({"naive": naive_results["mae"],
-    #               "horizon_1_window_7": m1_results["mae"],
-    #               "horizon_1_window_30": m2_results["mae"],
-    #               "horizon_7_window_30": m3_results["mae"],
-    #               "conv1d": m4_results["mae"],
-    #               }, index=["mae"]).plot(figsize=(10, 7), kind="bar")
-    # plt.show()
+    pd.DataFrame({"naive": naive_results["mae"],
+                  "horizon_1_window_7": m1_results["mae"],
+                  "horizon_1_window_30": m2_results["mae"],
+                  "horizon_7_window_30": m3_results["mae"],
+                  "conv1d": m4_results["mae"],
+                  "lstm": m5_results["mae"],
+                  }, index=["mae"]).plot(figsize=(10, 7), kind="bar")
+    plt.show()
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
