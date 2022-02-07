@@ -6,10 +6,34 @@
 
 """
 import tensorflow as tf
+
+import utils
 from utils import load_data, my_train_test_split, make_windows, make_train_test_splits
 
 HORIZON: int = 1
 WINDOW_SIZE: int = 7
+
+
+def make_conv1d_model(train_windows, test_windows, train_labels, test_labels, output_size=HORIZON):
+    # input for Conv1D layer must be shape (batch_size, timesteps, input_dim)
+    # lambda layer will turn python lambda function into a layer, and you can add it to
+    # the model to simplify the data preparation flow
+    # In Conv1D layer, filters is num of sliding windows of size kernel & causal padding is good for time sequences
+
+    model_name = "model_4_conv1d"
+    model = tf.keras.Sequential([
+        tf.keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=1)),
+        tf.keras.layers.Conv1D(filters=128, kernel_size=5, strides=1, padding="causal", activation="relu"),
+        tf.keras.layers.Dense(output_size)
+    ], name=model_name)
+
+    model.compile(loss="mae", optimizer=tf.keras.optimizers.Adam())
+    model.fit(train_windows, train_labels,
+              batch_size=128,
+              epochs=100,
+              validation_data=(test_windows, test_labels),
+              callbacks=[utils.create_model_checkpoint(model.name, utils.CHECKPOINT_SAVE_PATH)],
+              workers=-1)
 
 
 def run():
@@ -21,17 +45,8 @@ def run():
     print(len(train_windows), len(train_labels), len(test_windows), len(test_labels))
 
     tf.random.set_seed(42)
-    model_name = "model_1_dense"
 
-    # input for Conv1D layer must be shape (batch_size, timesteps, input_dim)
-    print(train_windows[0].shape)
-    # so we must reshape it to fit our needs
-    x = tf.constant(train_windows[0])
-    expand_dims_layer = tf.keras.layers.Lambda(lambda x: tf.expand_dims(x, axis=1))
-    # lambda layer will turn python lambda function into a layer, and you can add it to the model to simplify
-    # the data preparation flow
-    print(f"Original shape: {x.shape}")
-    print(f"Expanded shape: {expand_dims_layer(x).shape}")  # adds extra dimension
-    print(f"Original values with expanded shape  {expand_dims_layer(x)}")
+    make_conv1d_model(train_windows, test_windows, train_labels, test_labels)
+
 
 
