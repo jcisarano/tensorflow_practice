@@ -44,7 +44,11 @@ def make_conv1d_model(train_windows, test_windows, train_labels, test_labels, ou
     # loaded_model = tf.keras.models.load_model(os.path.join(utils.CHECKPOINT_SAVE_PATH, model_name))
 
     preds = utils.make_preds(model, test_windows)
-    print(preds[:10])
+    results = utils.evaluate_preds(y_true=tf.squeeze(test_labels), y_pred=preds)
+    print(results)
+
+    return results
+
 
 def run():
     timesteps, prices = load_data()
@@ -56,7 +60,7 @@ def run():
 
     tf.random.set_seed(42)
 
-    make_conv1d_model(train_windows, test_windows, train_labels, test_labels)
-
+    results = make_conv1d_model(train_windows, test_windows, train_labels, test_labels)
+    return results
 
 
