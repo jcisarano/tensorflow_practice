@@ -12,11 +12,11 @@ WINDOW_SIZE: int = 7
 
 def make_multivar_model(X_train, X_test, y_train, y_test):
     model_name = "model_6_dense_multivariate"
-    model = tf.keras.Sequential([
-        tf.keras.layers.Dense(128, activation="relu"),
-        tf.keras.layers.Dense(128, activation="relu"),
-        tf.keras.layers.Dense(HORIZON)
-    ], name=model_name)
+    # model = tf.keras.Sequential([
+    #     tf.keras.layers.Dense(128, activation="relu"),
+    #     # tf.keras.layers.Dense(128, activation="relu"),
+    #     tf.keras.layers.Dense(HORIZON)
+    # ], name=model_name)
 
     # model.compile(loss="MAE",
     #               optimizer=tf.keras.optimizers.Adam())
@@ -32,14 +32,12 @@ def make_multivar_model(X_train, X_test, y_train, y_test):
     # model.evaluate(X_test, y_test)
 
     best_model = tf.keras.models.load_model(os.path.join(utils.CHECKPOINT_SAVE_PATH, model_name))
-    print("Evaluate best model")
+    print("Evaluate best model:")
     best_model.evaluate(X_test, y_test)
 
-    preds = best_model.predict(X_test)
-    results = utils.evaluate_preds(y_true=X_test, y_pred=preds)
+    preds = tf.squeeze(best_model.predict(X_test))
+    results = utils.evaluate_preds(y_true=tf.squeeze(y_test), y_pred=preds)
     print(results)
-
-
 
 
 def run():
@@ -47,4 +45,3 @@ def run():
 
     tf.random.set_seed(42)
     make_multivar_model(X_train, X_test, y_train, y_test)
-
