@@ -9,15 +9,35 @@ CHECKPOINT_SAVE_PATH: str = "model_experiments"
 
 # bitcoin block reward halving events
 block_reward_1 = 50     # 3 Jan 2009
-block_reward_1 = 25     # 8 Nov 2012
-block_reward_1 = 12.5   # 9 July 2016
-block_reward_1 = 6.25   # 18 May 2020
+block_reward_2 = 25     # 8 Nov 2012
+block_reward_3 = 12.5   # 9 July 2016
+block_reward_4 = 6.25   # 18 May 2020
 
 # halving event dates
 block_reward_1_datetime = np.datetime64("2009-01-03")
 block_reward_2_datetime = np.datetime64("2012-11-08")
 block_reward_3_datetime = np.datetime64("2016-07-09")
 block_reward_4_datetime = np.datetime64("2020-05-18")
+
+
+def create_block_reward_date_ranges():
+    bitcoin_prices = load_dataframe()
+    block_reward_2_days = (block_reward_3_datetime - bitcoin_prices.index[0]).days
+    block_reward_3_days = (block_reward_4_datetime - bitcoin_prices.index[0]).days
+    # print(block_reward_2_days, block_reward_3_days)
+
+    bitcoin_prices_block = bitcoin_prices.copy()
+    bitcoin_prices_block["block_reward"] = None
+
+    bitcoin_prices_block.iloc[:block_reward_2_days, -1] = block_reward_2
+    bitcoin_prices_block.iloc[block_reward_2_days:block_reward_3_days, -1] = block_reward_3
+    bitcoin_prices_block.iloc[block_reward_3_days:, -1] = block_reward_4
+
+    # print(bitcoin_prices_block.head())
+    # print(bitcoin_prices_block.iloc[1500:1505])
+    # print(bitcoin_prices_block.tail())
+
+    return bitcoin_prices_block
 
 
 def plot_time_series(timesteps, values, format=".", start=0, end=None, label=None):
@@ -56,12 +76,17 @@ def make_train_test_splits(windows, labels, test_split=0.2):
     return train_windows, test_windows, train_labels, test_labels
 
 
-def load_data(data_path=DATA_PATH):
+def load_dataframe(data_path=DATA_PATH):
     df = pd.read_csv(data_path,
                      parse_dates=["Date"],  # parses the date column to pandas.datetime
                      index_col=["Date"])  # makes the date column the index, useful because this is sequential data
 
     bitcoin_prices = pd.DataFrame(df["Closing Price (USD)"]).rename(columns={"Closing Price (USD)": "Price"})
+    return bitcoin_prices
+
+
+def load_data(data_path=DATA_PATH):
+    bitcoin_prices = load_dataframe(data_path=data_path)
     timesteps = bitcoin_prices.index.to_numpy()
     prices = bitcoin_prices["Price"].to_numpy()
 
