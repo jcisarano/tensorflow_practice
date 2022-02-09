@@ -39,9 +39,11 @@ def make_multivar_model(X_train, X_test, y_train, y_test):
     results = utils.evaluate_preds(y_true=tf.squeeze(y_test), y_pred=preds)
     print(results)
 
+    return results
+
 
 def run():
     X_train, X_test, y_train, y_test = utils.make_windows_multivar()
 
     tf.random.set_seed(42)
-    make_multivar_model(X_train, X_test, y_train, y_test)
+    return make_multivar_model(X_train, X_test, y_train, y_test)
