@@ -7,6 +7,18 @@ import os
 DATA_PATH: str = "data/BTC_USD_2013-10-01_2021-05-18-CoinDesk.csv"
 CHECKPOINT_SAVE_PATH: str = "model_experiments"
 
+# bitcoin block reward halving events
+block_reward_1 = 50     # 3 Jan 2009
+block_reward_1 = 25     # 8 Nov 2012
+block_reward_1 = 12.5   # 9 July 2016
+block_reward_1 = 6.25   # 18 May 2020
+
+# halving event dates
+block_reward_1_datetime = np.datetime64("2009-01-03")
+block_reward_2_datetime = np.datetime64("2012-11-08")
+block_reward_3_datetime = np.datetime64("2016-07-09")
+block_reward_4_datetime = np.datetime64("2020-05-18")
+
 
 def plot_time_series(timesteps, values, format=".", start=0, end=None, label=None):
     """
