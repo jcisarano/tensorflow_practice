@@ -1,3 +1,5 @@
+import os
+
 import tensorflow as tf
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,15 +18,28 @@ def make_multivar_model(X_train, X_test, y_train, y_test):
         tf.keras.layers.Dense(HORIZON)
     ], name=model_name)
 
-    model.compile(loss="MAE",
-                  optimizer=tf.keras.optimizers.Adam())
+    # model.compile(loss="MAE",
+    #               optimizer=tf.keras.optimizers.Adam())
 
-    model.fit(X_train, y_train,
-              epochs=100,
-              batch_size=128,
-              validation_data=(X_test, y_test),
-              callbacks=[utils.create_model_checkpoint(model_name=model_name, save_path=utils.CHECKPOINT_SAVE_PATH)],
-              workers=-1)
+    # model.fit(X_train, y_train,
+    #           epochs=100,
+    #           batch_size=128,
+    #           validation_data=(X_test, y_test),
+    #           callbacks=[utils.create_model_checkpoint(model_name=model_name, save_path=utils.CHECKPOINT_SAVE_PATH)],
+    #           workers=-1)
+
+    # print("Evaluate trained model")
+    # model.evaluate(X_test, y_test)
+
+    best_model = tf.keras.models.load_model(os.path.join(utils.CHECKPOINT_SAVE_PATH, model_name))
+    print("Evaluate best model")
+    best_model.evaluate(X_test, y_test)
+
+    preds = best_model.predict(X_test)
+    results = utils.evaluate_preds(y_true=X_test, y_pred=preds)
+    print(results)
+
+
 
 
 def run():
