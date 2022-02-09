@@ -26,6 +26,7 @@ import model_2_dense as m2
 import model_3_dense as m3
 import model_4_conv1d as m4
 import model_5_lstm as m5
+import model_6_multivariate as m6
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -35,7 +36,8 @@ if __name__ == '__main__':
     # m2_results = m2.run()
     # m3_results = m3.run()
     # m4_results = m4.run()
-    m5_results = m5.run()
+    # m5_results = m5.run()
+    m6_results = m6.run()
 
     # pd.DataFrame({"naive": naive_results["mae"],
     #               "horizon_1_window_7": m1_results["mae"],
