@@ -53,7 +53,12 @@ def make_windows_multivar(window_size=7, horizon=1):
     # print(X.head)
     # print(y.head)
 
-    return X, y
+    split_size = int(len(X) * 0.8)
+    X_train, y_train = X[:split_size], y[:split_size]
+    X_test, y_test = X[split_size:], y[split_size:]
+    # print(len(X_train), len(y_train), len(X_test), len(y_test))
+
+    return X_train, X_test, y_train, y_test
 
 def plot_time_series(timesteps, values, format=".", start=0, end=None, label=None):
     """
