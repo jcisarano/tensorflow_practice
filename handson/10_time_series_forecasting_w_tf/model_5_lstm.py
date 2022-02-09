@@ -48,6 +48,7 @@ def run():
     train_windows, test_windows, train_labels, test_labels = make_train_test_splits(full_windows, full_labels)
 
     bitcoin_prices_block_df = utils.create_block_reward_date_ranges()
+    utils.make_windows_multivar()
 
     # visualize block reward vs prices over time
     from sklearn.preprocessing import minmax_scale

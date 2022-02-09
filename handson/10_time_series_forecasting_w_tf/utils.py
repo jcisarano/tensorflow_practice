@@ -40,6 +40,21 @@ def create_block_reward_date_ranges():
     return bitcoin_prices_block
 
 
+def make_windows_multivar(window_size=7, horizon=1):
+    bitcoin_prices_windowed = create_block_reward_date_ranges()
+    for i in range(window_size):
+        bitcoin_prices_windowed[f"Price+{i+1}"] = bitcoin_prices_windowed["Price"].shift(periods=i+1)
+
+    # print(bitcoin_prices_windowed.head)
+
+    X = bitcoin_prices_windowed.dropna().drop("Price", axis=1).astype(np.float32)
+    y = bitcoin_prices_windowed.dropna()["Price"].astype(np.float32)
+
+    # print(X.head)
+    # print(y.head)
+
+    return X, y
+
 def plot_time_series(timesteps, values, format=".", start=0, end=None, label=None):
     """
     Plots series of points in times against values
