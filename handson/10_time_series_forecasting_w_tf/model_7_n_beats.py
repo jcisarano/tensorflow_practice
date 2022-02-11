@@ -18,6 +18,8 @@ from utils import load_data, load_dataframe
 
 WINDOW_SIZE: int = 7
 HORIZON: int = 1
+BATCH_SIZE: int = 1024
+
 
 class NBeatsBlock(tf.keras.layers.Layer):
     def __init__(self,
@@ -85,6 +87,23 @@ def run():
     X_test, y_test = X[split_size:], y[split_size:]
     print(len(X_train), len(y_train), len(X_test), len(y_test))
 
+    # using tf.data API will make dataset more performant
+    # this is more useful for very large datasets
+    train_features_dataset = tf.data.Dataset.from_tensor_slices(X_train)
+    train_labels_dataset = tf.data.Dataset.from_tensor_slices(y_train)
+
+    test_features_dataset = tf.data.Dataset.from_tensor_slices(X_test)
+    test_labels_dataset = tf.data.Dataset.from_tensor_slices(y_test)
+
+    # combine labels and features to tuple (features, labels)
+    train_dataset = tf.data.Dataset.zip((train_features_dataset, train_labels_dataset))
+    test_dataset = tf.data.Dataset.zip((test_features_dataset, test_labels_dataset))
+
+    # batch and prefetch
+    train_dataset = train_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)  # autotune determines # of available CPUs
+    test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
+
+    print(train_dataset, test_dataset)
 
     return 0
 
