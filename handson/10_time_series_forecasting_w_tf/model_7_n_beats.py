@@ -14,6 +14,8 @@ Uses TensorFlow layer subclassing to make custom layers and also Functional API 
 """
 import tensorflow as tf
 
+WINDOW_SIZE: int = 7
+HORIZON: int = 1
 
 class NBeatsBlock(tf.keras.layers.Layer):
     def __init__(self,
@@ -45,6 +47,23 @@ class NBeatsBlock(tf.keras.layers.Layer):
 
 
 def run():
+
+
+    # test NBeatsBlock class
+    dummy_nbleats_block_layer = NBeatsBlock(input_size=WINDOW_SIZE,
+                                            theta_size=WINDOW_SIZE + HORIZON,  # backcast + forecast
+                                            horizon=HORIZON,
+                                            n_neurons=128,
+                                            n_layers=4)
+
+    # create dummy inputs (important that they have the same size as input_size)
+    dummy_inputs = tf.expand_dims(tf.range(WINDOW_SIZE) + 1, axis=0)  # input shape to model must reflect input shape
+    print(dummy_inputs)
+    backcast, forecast = dummy_nbleats_block_layer(dummy_inputs)
+    # these are randomized activation outputs of theta layer (no training has happened yet)
+    print(f"Backcast: {tf.squeeze(backcast.numpy())}")
+    print(f"Forecast: {tf.squeeze(forecast.numpy())}")
+
     return 0
 
     print("n-beats")
