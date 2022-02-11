@@ -19,6 +19,13 @@ from utils import load_data, load_dataframe
 WINDOW_SIZE: int = 7
 HORIZON: int = 1
 BATCH_SIZE: int = 1024
+N_EPOCHS: int = 5000
+N_NEURONS: int = 512
+N_LAYERS: int = 4
+N_STACKS: int = 30
+
+INPUT_SIZE = WINDOW_SIZE * HORIZON
+THETA_SIZE = INPUT_SIZE + HORIZON
 
 
 class NBeatsBlock(tf.keras.layers.Layer):
@@ -113,7 +120,6 @@ def run():
 
     X_train, X_test, y_train, y_test = make_datasets()
     train_dataset, test_dataset = batc_and_prefetch_datasets(X_train, X_test, y_train, y_test)
-
 
     print(train_dataset,test_dataset)
 
