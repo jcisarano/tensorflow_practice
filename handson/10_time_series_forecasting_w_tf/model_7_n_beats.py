@@ -47,6 +47,7 @@ class NBeatsBlock(tf.keras.layers.Layer):
 
 
 def test_nbeats_block_class():
+    tf.random.set_seed(42)
     # test NBeatsBlock class
     dummy_nbleats_block_layer = NBeatsBlock(input_size=WINDOW_SIZE,
                                             theta_size=WINDOW_SIZE + HORIZON,  # backcast + forecast
@@ -65,7 +66,7 @@ def test_nbeats_block_class():
 
 def run():
     test_nbeats_block_class()
-    
+
     return 0
 
     print("n-beats")
