@@ -121,7 +121,20 @@ def run():
     X_train, X_test, y_train, y_test = make_datasets()
     train_dataset, test_dataset = batc_and_prefetch_datasets(X_train, X_test, y_train, y_test)
 
-    print(train_dataset,test_dataset)
+    print(train_dataset, test_dataset)
+
+    # examples of subtract and add layers
+    tensor_1 = tf.range(10) + 10
+    tensor_2 = tf.range(10)
+
+    subtracted = tf.keras.layers.subtract([tensor_1, tensor_2])
+    added = tf.keras.layers.add([tensor_1, tensor_2])
+
+    print(f"Input tensors: {tensor_1.numpy()} & {tensor_2.numpy()} ")
+    print(f"Subtracted: {subtracted.numpy()}")
+    print(f"Added: {added.numpy()}")
+
+    # n-beats uses doubly residual stacking to help train deeper architecture (see section 3.2)
 
     return 0
 
