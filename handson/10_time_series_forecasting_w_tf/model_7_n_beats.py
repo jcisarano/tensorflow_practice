@@ -14,6 +14,8 @@ Uses TensorFlow layer subclassing to make custom layers and also Functional API 
 """
 import tensorflow as tf
 
+from utils import load_data, load_dataframe
+
 WINDOW_SIZE: int = 7
 HORIZON: int = 1
 
@@ -65,7 +67,24 @@ def test_nbeats_block_class():
 
 
 def run():
-    test_nbeats_block_class()
+    # test_nbeats_block_class()
+
+    prices = load_dataframe()
+    prices_nbeats = prices.copy()
+    for i in range(WINDOW_SIZE):
+        prices_nbeats[f"Price+{i+1}"] = prices_nbeats["Price"].shift(periods=i+1)
+    print(prices_nbeats.head())
+
+    # make features and labels
+    X = prices_nbeats.dropna().drop("Price", axis=1)
+    y = prices_nbeats.dropna()["Price"]
+
+    # make train and test sets
+    split_size = int(len(X) * 0.8)
+    X_train, y_train = X[:split_size], y[:split_size]
+    X_test, y_test = X[split_size:], y[split_size:]
+    print(len(X_train), len(y_train), len(X_test), len(y_test))
+
 
     return 0
 

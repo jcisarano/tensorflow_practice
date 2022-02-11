@@ -60,6 +60,7 @@ def make_windows_multivar(window_size=7, horizon=1):
 
     return X_train, X_test, y_train, y_test
 
+
 def plot_time_series(timesteps, values, format=".", start=0, end=None, label=None):
     """
     Plots series of points in times against values
