@@ -68,14 +68,12 @@ def test_nbeats_block_class():
     print(f"Forecast: {tf.squeeze(forecast.numpy())}")
 
 
-def run():
-    # test_nbeats_block_class()
-
+def make_datasets():
     prices = load_dataframe()
     prices_nbeats = prices.copy()
     for i in range(WINDOW_SIZE):
         prices_nbeats[f"Price+{i+1}"] = prices_nbeats["Price"].shift(periods=i+1)
-    print(prices_nbeats.head())
+    # print(prices_nbeats.head())
 
     # make features and labels
     X = prices_nbeats.dropna().drop("Price", axis=1)
@@ -85,8 +83,12 @@ def run():
     split_size = int(len(X) * 0.8)
     X_train, y_train = X[:split_size], y[:split_size]
     X_test, y_test = X[split_size:], y[split_size:]
-    print(len(X_train), len(y_train), len(X_test), len(y_test))
+    # print(len(X_train), len(y_train), len(X_test), len(y_test))
 
+    return X_train, X_test, y_train, y_test
+
+
+def batc_and_prefetch_datasets(X_train, X_test, y_train, y_test):
     # using tf.data API will make dataset more performant
     # this is more useful for very large datasets
     train_features_dataset = tf.data.Dataset.from_tensor_slices(X_train)
@@ -103,7 +105,17 @@ def run():
     train_dataset = train_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)  # autotune determines # of available CPUs
     test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 
-    print(train_dataset, test_dataset)
+    return train_dataset, test_dataset
+
+
+def run():
+    # test_nbeats_block_class()
+
+    X_train, X_test, y_train, y_test = make_datasets()
+    train_dataset, test_dataset = batc_and_prefetch_datasets(X_train, X_test, y_train, y_test)
+
+
+    print(train_dataset,test_dataset)
 
     return 0
 
