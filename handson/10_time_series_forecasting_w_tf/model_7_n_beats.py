@@ -46,9 +46,7 @@ class NBeatsBlock(tf.keras.layers.Layer):
         return backcast, forecast
 
 
-def run():
-
-
+def test_nbeats_block_class():
     # test NBeatsBlock class
     dummy_nbleats_block_layer = NBeatsBlock(input_size=WINDOW_SIZE,
                                             theta_size=WINDOW_SIZE + HORIZON,  # backcast + forecast
@@ -64,6 +62,10 @@ def run():
     print(f"Backcast: {tf.squeeze(backcast.numpy())}")
     print(f"Forecast: {tf.squeeze(forecast.numpy())}")
 
+
+def run():
+    test_nbeats_block_class()
+    
     return 0
 
     print("n-beats")
