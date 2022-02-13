@@ -202,6 +202,7 @@ def run():
                                 patience=100,
                                 verbose=1
                             )],
+                        verbose=0,
                         workers=-1)
 
     model.evaluate(test_dataset)
@@ -211,6 +212,10 @@ def run():
     results = evaluate_preds(y_true=y_test,
                              y_pred=preds)
     print(results)
+
+    # Plot the architecture and save to file
+    # from tensorflow.keras.utils import plot_model
+    # plot_model(model)
 
     return results
 
