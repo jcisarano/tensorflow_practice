@@ -28,7 +28,7 @@ N-BEATS steps
 """
 import tensorflow as tf
 
-from utils import load_data, load_dataframe
+from utils import load_data, load_dataframe, make_preds, evaluate_preds
 
 WINDOW_SIZE: int = 7
 HORIZON: int = 1
@@ -204,6 +204,14 @@ def run():
                             )],
                         workers=-1)
 
-    return 0
+    model.evaluate(test_dataset)
+    preds = make_preds(model, test_dataset)
+    print(preds[:10])
+
+    results = evaluate_preds(y_true=y_test,
+                             y_pred=preds)
+    print(results)
+
+    return results
 
     print("n-beats")
