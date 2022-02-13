@@ -129,15 +129,9 @@ def batc_and_prefetch_datasets(X_train, X_test, y_train, y_test):
     return train_dataset, test_dataset
 
 
-def run():
-    # test_nbeats_block_class()
-
-    X_train, X_test, y_train, y_test = make_datasets()
-    train_dataset, test_dataset = batc_and_prefetch_datasets(X_train, X_test, y_train, y_test)
-
-    print(train_dataset, test_dataset)
-
-    # examples of subtract and add layers (will be used for residual (or skip) connections later)
+def tf_math_examples():
+    # n-beats uses doubly residual stacking (aka skip connections) to help train deeper architecture (see section 3.2)
+    # examples of subtract and add layers which will be used for residual connections later
     tensor_1 = tf.range(10) + 10
     tensor_2 = tf.range(10)
 
@@ -148,7 +142,15 @@ def run():
     print(f"Subtracted: {subtracted.numpy()}")
     print(f"Added: {added.numpy()}")
 
-    # n-beats uses doubly residual stacking to help train deeper architecture (see section 3.2)
+
+def run():
+    # test_nbeats_block_class()
+
+    X_train, X_test, y_train, y_test = make_datasets()
+    train_dataset, test_dataset = batc_and_prefetch_datasets(X_train, X_test, y_train, y_test)
+
+    print(train_dataset, test_dataset)
+
 
 
     return 0
