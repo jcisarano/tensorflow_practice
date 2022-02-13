@@ -11,6 +11,20 @@ building a very deep neural network with interpretable outputs.'
  Blocks > Stacks > Deep Network Model
 
 Uses TensorFlow layer subclassing to make custom layers and also Functional API for its custom architecture
+
+N-BEATS steps
+    # Set up instance of N-BEATS block layer using NBeatsBlock class - this will be the initial block, the rest are
+        created by stacks
+    # Create an input layer for the N_BEATS stack (using Keras functional API)
+    # Make the initial backcast and forecast for the model with block layer created above
+    # Use for loop to create stacks of block layers
+    # Use the NBeatsBlock class within for loop to create blocks which return backcasts and block-level forecasts
+    # Create the doubly residual stacking using subtract and add layers
+    # Put the model inputs and outputs together using tf.keras.Model()
+    # Compile with MAE loss (however, the paper uses multiple losses) and Adam() optimizer
+    # Fit N-BEATS for 5000 epochs using these callbacks:
+        - Early stopping - Stop training if the model stops improving
+        - Reduce learning rate on plateau - Lower LR if the model stops improving, taking smaller steps to improve
 """
 import tensorflow as tf
 
@@ -123,7 +137,7 @@ def run():
 
     print(train_dataset, test_dataset)
 
-    # examples of subtract and add layers
+    # examples of subtract and add layers (will be used for residual (or skip) connections later)
     tensor_1 = tf.range(10) + 10
     tensor_2 = tf.range(10)
 
@@ -135,6 +149,7 @@ def run():
     print(f"Added: {added.numpy()}")
 
     # n-beats uses doubly residual stacking to help train deeper architecture (see section 3.2)
+
 
     return 0
 
