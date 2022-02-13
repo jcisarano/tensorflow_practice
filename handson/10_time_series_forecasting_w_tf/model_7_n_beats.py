@@ -93,7 +93,7 @@ def make_datasets():
     prices = load_dataframe()
     prices_nbeats = prices.copy()
     for i in range(WINDOW_SIZE):
-        prices_nbeats[f"Price+{i+1}"] = prices_nbeats["Price"].shift(periods=i+1)
+        prices_nbeats[f"Price+{i + 1}"] = prices_nbeats["Price"].shift(periods=i + 1)
     # print(prices_nbeats.head())
 
     # make features and labels
@@ -109,7 +109,7 @@ def make_datasets():
     return X_train, X_test, y_train, y_test
 
 
-def batc_and_prefetch_datasets(X_train, X_test, y_train, y_test):
+def batch_and_prefetch_datasets(X_train, X_test, y_train, y_test):
     # using tf.data API will make dataset more performant
     # this is more useful for very large datasets
     train_features_dataset = tf.data.Dataset.from_tensor_slices(X_train)
@@ -123,7 +123,8 @@ def batc_and_prefetch_datasets(X_train, X_test, y_train, y_test):
     test_dataset = tf.data.Dataset.zip((test_features_dataset, test_labels_dataset))
 
     # batch and prefetch
-    train_dataset = train_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)  # autotune determines # of available CPUs
+    train_dataset = train_dataset.batch(BATCH_SIZE).prefetch(
+        tf.data.AUTOTUNE)  # autotune determines # of available CPUs
     test_dataset = test_dataset.batch(BATCH_SIZE).prefetch(tf.data.AUTOTUNE)
 
     return train_dataset, test_dataset
@@ -147,11 +148,61 @@ def run():
     # test_nbeats_block_class()
 
     X_train, X_test, y_train, y_test = make_datasets()
-    train_dataset, test_dataset = batc_and_prefetch_datasets(X_train, X_test, y_train, y_test)
+    train_dataset, test_dataset = batch_and_prefetch_datasets(X_train, X_test, y_train, y_test)
+    # print(train_dataset, test_dataset)
 
-    print(train_dataset, test_dataset)
+    tf.random.set_seed(42)
 
+    # Create initial NBeatsBlock
+    nbeats_block_layer = NBeatsBlock(input_size=INPUT_SIZE,
+                                     theta_size=THETA_SIZE,
+                                     horizon=HORIZON,
+                                     n_neurons=N_NEURONS,
+                                     n_layers=N_LAYERS,
+                                     name="InitalBlock")
 
+    # Create input layer for stack
+    stack_input = tf.keras.layers.Input(shape=(INPUT_SIZE), name="StackInput")
+
+    # Create initial backcast and forecast
+    residuals, forecast = nbeats_block_layer(stack_input)
+
+    # Create stacks of block layers
+    for i, _ in enumerate(range(N_STACKS - 1)):  # subtract 1 because 1st stack is created above
+
+        # Use NBeatsBlock to calc backcast and forecast:
+        backcast, block_forecast = NBeatsBlock(
+            input_size=INPUT_SIZE,
+            theta_size=THETA_SIZE,
+            horizon=HORIZON,
+            n_neurons=N_NEURONS,
+            n_layers=N_LAYERS,
+            name=f"NBeatsBlock_{i}"
+        )(residuals)  # pass in the residuals
+
+        # Create doubly residual stacking
+        residuals = tf.keras.layers.subtract([residuals, backcast], name=f"Subtract_{i}")
+        forecast = tf.keras.layers.add([forecast, block_forecast], name=f"Add_{i}")
+
+    model = tf.keras.Model(inputs=stack_input, outputs=forecast, name="Model_7_NBEATS")
+    model.compile(loss="MAE", optimizer=tf.keras.optimizers.Adam())
+
+    # Fit with early stopping and reduce lr on plateau
+    history = model.fit(train_dataset,
+                        epochs=N_EPOCHS,
+                        validation_data=test_dataset,
+                        callbacks=[
+                            tf.keras.callbacks.EarlyStopping(
+                                monitor="val_loss",
+                                patience=200,
+                                restore_best_weights=True
+                            ),
+                            tf.keras.callbacks.ReduceLROnPlateau(
+                                monitor="val_loss",
+                                patience=100,
+                                verbose=1
+                            )],
+                        workers=-1)
 
     return 0
 
