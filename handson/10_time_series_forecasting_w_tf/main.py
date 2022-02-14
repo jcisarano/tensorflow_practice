@@ -28,7 +28,7 @@ import model_4_conv1d as m4
 import model_5_lstm as m5
 import model_6_multivariate as m6
 import model_7_n_beats as m7
-import model_8_ensemble
+import model_8_ensemble as m8
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
