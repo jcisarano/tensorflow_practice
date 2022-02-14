@@ -28,6 +28,7 @@ import model_4_conv1d as m4
 import model_5_lstm as m5
 import model_6_multivariate as m6
 import model_7_n_beats as m7
+import model_8_ensemble
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -39,7 +40,8 @@ if __name__ == '__main__':
     # m4_results = m4.run()
     # m5_results = m5.run()
     # m6_results = m6.run()
-    m7_results = m7.run()
+    # m7_results = m7.run()
+    m8_results = m8.run()
 
     # pd.DataFrame({"naive": naive_results["mae"],
     #               "horizon_1_window_7": m1_results["mae"],
