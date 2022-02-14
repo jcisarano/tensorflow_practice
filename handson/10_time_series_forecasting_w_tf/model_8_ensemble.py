@@ -5,10 +5,19 @@ Ensemble model combines output of multiple *different* models for better decisio
 import os
 import tensorflow as tf
 import utils
+import numpy as np
 from model_7_n_beats import make_datasets, batch_and_prefetch_datasets
 
 HORIZON: int = 1
 WINDOW_SIZE: int = 7
+
+
+def make_ensemble_preds(ensemble_models, data):
+    ensemble_preds = []
+    for model in ensemble_models:
+        preds = model.predict(data)
+        ensemble_preds.append(preds)
+    return tf.constant(tf.squeeze(ensemble_preds))
 
 
 def get_ensemble_models(train_data, test_data,
@@ -61,4 +70,18 @@ def run():
     train_dataset, test_dataset = batch_and_prefetch_datasets(X_train, X_test, y_train, y_test)
 
     ensemble_models = get_ensemble_models(train_dataset, test_dataset, num_iter=5, num_epochs=1000)
+
+    ensemble_preds = make_ensemble_preds(ensemble_models, test_dataset)
+
+    ensemble_mean = tf.reduce_mean(ensemble_preds, axis=0)
+    ensemble_median = np.median(ensemble_preds, axis=0)
+    results = utils.evaluate_preds(y_true=y_test, y_pred=ensemble_preds)
+
+    # try reducing median and mean before evaluating, performance seems better with median
+    mean_results = utils.evaluate_preds(y_true=y_test, y_pred=ensemble_mean)
+    median_results = utils.evaluate_preds(y_true=y_test, y_pred=ensemble_median)
+    print("Results", results)
+    print("Median Results", median_results)
+    print("Mean Results", mean_results)
+
     print("ensemble")
