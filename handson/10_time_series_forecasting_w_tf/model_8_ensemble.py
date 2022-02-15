@@ -65,6 +65,29 @@ def get_ensemble_models(train_data, test_data,
     return ensemble_models
 
 
+def get_upper_lower(preds):
+    """
+    Prediction ranges can also be useful with ensemble models. E.g. instead of predicting an exact number, use the
+    predictions from the models to get a range of confidence values.
+
+    One way to get the 95% confidence prediction intervals for a deep learning model is the bootstrap method:
+    1. Take the predictions from a number of randomly initialized models
+    2. Measure the standard deviation of the predictions
+    3. Multiply the standard deviation by 1.96 (assuming the distribution of data is Gaussian/normal, because that means
+        95% of the observations fall within 1.96 standard deviations of the mean)
+    4. To get the prediction interval upper and lower bounds, add and subtract the step 3 value to mean of
+        predictions made in 1
+    * https://en.wikipedia.org/wiki/1.96
+    * https://eng.uber.com/neural-networks-uncertainty-estimation/
+    """
+    std = tf.math.reduce_std(preds, axis=0)
+    interval = 1.96 * std
+    preds_mean = tf.reduce_mean(preds, axis=0)
+    lower, upper = preds_mean - interval, preds_mean + interval
+
+    return lower, upper
+
+
 def run():
     X_train, X_test, y_train, y_test = make_datasets()
     train_dataset, test_dataset = batch_and_prefetch_datasets(X_train, X_test, y_train, y_test)
@@ -83,5 +106,7 @@ def run():
     print("Results", results)
     print("Median Results", median_results)
     print("Mean Results", mean_results)
+
+
 
     print("ensemble")
