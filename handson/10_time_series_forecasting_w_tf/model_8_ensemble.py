@@ -6,6 +6,7 @@ import os
 import tensorflow as tf
 import utils
 import numpy as np
+import matplotlib.pyplot as plt
 from model_7_n_beats import make_datasets, batch_and_prefetch_datasets
 
 HORIZON: int = 1
@@ -107,6 +108,17 @@ def run():
     print("Median Results", median_results)
     print("Mean Results", mean_results)
 
+    lower, upper = get_upper_lower(ensemble_preds)
 
+    # plot median of ensemble preds along with prediction intervals
+    offset = 500
+    plt.figure(figsize=(10, 7))
+    plt.plot(X_test.index[offset:], y_test[offset:], "g", label="Test data")
+    plt.plot(X_test.index[offset:], ensemble_median[offset:], "k-", label="Ensemble median")
+    plt.xlabel("Date")
+    plt.ylabel("BTC price")
+    plt.fill_between(X_test.index[offset:], (lower)[offset:], (upper)[offset:], label="Prediction intervals")
+    plt.legend(loc="upper left", fontsize=14)
+    plt.show()
 
     print("ensemble")
