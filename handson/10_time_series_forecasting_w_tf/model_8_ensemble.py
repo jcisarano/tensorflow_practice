@@ -89,6 +89,22 @@ def get_upper_lower(preds):
     return lower, upper
 
 
+def plot_upper_lower_bounds(X_test, y_test, ensemble_preds):
+    lower, upper = get_upper_lower(ensemble_preds)
+    ensemble_median = np.median(ensemble_preds, axis=0)
+
+    # plot median of ensemble preds along with prediction intervals
+    offset = 500
+    plt.figure(figsize=(10, 7))
+    plt.plot(X_test.index[offset:], y_test[offset:], "g", label="Test data")
+    plt.plot(X_test.index[offset:], ensemble_median[offset:], "k-", label="Ensemble median")
+    plt.xlabel("Date")
+    plt.ylabel("BTC price")
+    plt.fill_between(X_test.index[offset:], (lower)[offset:], (upper)[offset:], label="Prediction intervals")
+    plt.legend(loc="upper left", fontsize=14)
+    plt.show()
+
+
 def run():
     X_train, X_test, y_train, y_test = make_datasets()
     train_dataset, test_dataset = batch_and_prefetch_datasets(X_train, X_test, y_train, y_test)
@@ -108,17 +124,6 @@ def run():
     print("Median Results", median_results)
     print("Mean Results", mean_results)
 
-    lower, upper = get_upper_lower(ensemble_preds)
-
-    # plot median of ensemble preds along with prediction intervals
-    offset = 500
-    plt.figure(figsize=(10, 7))
-    plt.plot(X_test.index[offset:], y_test[offset:], "g", label="Test data")
-    plt.plot(X_test.index[offset:], ensemble_median[offset:], "k-", label="Ensemble median")
-    plt.xlabel("Date")
-    plt.ylabel("BTC price")
-    plt.fill_between(X_test.index[offset:], (lower)[offset:], (upper)[offset:], label="Prediction intervals")
-    plt.legend(loc="upper left", fontsize=14)
-    plt.show()
+    plot_upper_lower_bounds(X_test, y_test, ensemble_preds)
 
     print("ensemble")
