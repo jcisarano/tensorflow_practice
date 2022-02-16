@@ -9,8 +9,11 @@ import numpy as np
 import utils
 
 BATCH_SIZE: int = 1024
+WINDOW_SIZE = 7
+HORIZON = 1
 
-def make_prices_windowed(window_size=7, horizon=1):
+
+def make_prices_windowed(window_size=WINDOW_SIZE, horizon=HORIZON):
     bitcoin_prices_windowed = utils.create_block_reward_date_ranges()
     for i in range(window_size):
         bitcoin_prices_windowed[f"Price+{i+1}"] = bitcoin_prices_windowed["Price"].shift(periods=i+1)
@@ -35,16 +38,21 @@ def make_prices_windowed(window_size=7, horizon=1):
 
     return dataset_all
 
-    # split_size = int(len(X_all) * 0.8)
-    # X_train, y_train = X_all[:split_size], y_all[:split_size]
-    # X_test, y_test = X_all[split_size:], y_all[split_size:]
-    # # print(len(X_train), len(y_train), len(X_test), len(y_test))
 
-    # return X_train, X_test, y_train, y_test
+def create_model(train_dataset):
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(128, activation="relu"),
+        tf.keras.layers.Dense(128, activation="relu"),
+        tf.keras.layers.Dense(HORIZON)
+    ], name="model_9_future_prediction")
+
+    model.compile(loss="MAE", optimizer=tf.keras.optimizers.Adam())
+    model.fit(train_dataset, epochs=100)
 
 
 def run():
-    X_train, X_test, y_train, y_test = make_prices_windowed()
+    train_dataset = make_prices_windowed()
+    create_model(train_dataset)
 
 
     print("fut pred")
