@@ -2,6 +2,24 @@
 Ensemble model combines output of multiple *different* models for better decision making
 """
 
+"""
+Notes on uncertainty in machine learning
+Uncertainty estimates in ML seek to qualitatively and quantitatively answer these questions:
+    1. What can my model know? With perfect data, what is possible for it to learn?
+    2. What doesn't my model know? What can it never predict? Would it be helpful if the model could tell you when
+        it is making a prediction, that it does not know if it is right or not?
+There are two major types of uncertainty in ML:
+    * Aleatoric uncertainty - cannot be reduced, often referred to as data uncertainty or "subway" uncertainty
+    * Epistemic uncertainty - can be reduced, aka model or coconut uncertainty
+    
+Subway: The subway is scheduled to arrive at 10:08 am, but it will often arrive +/- a few minutes. Time estimate can't 
+    be improved with more data because there will always be some uncertainty.
+Coconut: The chance of a coconut falling on your head when you're on a beach with coconut trees. Can be improved with
+    more data: where are the trees, how many trees are there, etc. Can be improved as understanding of the model
+    improves and more params are collected.
+"""
+
+
 import os
 import tensorflow as tf
 import utils
