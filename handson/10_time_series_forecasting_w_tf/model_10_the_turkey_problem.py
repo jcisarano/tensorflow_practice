@@ -18,4 +18,13 @@ def run():
     btc_price_turkey[-1] = btc_price_turkey[-1] * 0.01
     print(btc_price_turkey[-10:])
 
+    bitcoin_prices = utils.load_dataframe()
+    btc_timesteps_turkey = np.array(bitcoin_prices.index)
+    print(btc_timesteps_turkey[-10:])
+
+    plt.figure(figsize=(10, 7))
+    utils.plot_time_series(timesteps=btc_timesteps_turkey, values=btc_price_turkey,
+                           format="-", label="BTC Price + Turkey Problem", start=2500)
+    plt.show()
+
     print("the turkey problem")
