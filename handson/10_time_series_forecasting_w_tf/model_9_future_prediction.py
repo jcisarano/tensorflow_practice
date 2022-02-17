@@ -58,9 +58,14 @@ def create_model(train_dataset, X_all, y_all):
 
     future_forecast = make_future_forecast(historical_dataset=y_all, model=model)
 
-    last_timestep = X_all.tail(1).index.item()
+    bitcoin_prices = utils.load_dataframe()
+    last_timestep = bitcoin_prices.index[-1]
     next_timesteps = get_future_dates(last_timestep)
-    print(next_timesteps)
+
+    plt.figure(figsize=(10, 7))
+    # utils.plot_time_series(bitcoin_prices.index, b)
+    utils.plot_time_series(next_timesteps, future_forecast, format="-", label="Predicted BTC price")
+    plt.show()
 
     return future_forecast
 
