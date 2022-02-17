@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 import utils
 from model_9_future_prediction import load_btc_price
 
+WINDOW_SIZE = 7
+HORIZON = 1
+
 
 def run():
     btc_price = load_btc_price()
@@ -27,4 +30,9 @@ def run():
                            format="-", label="BTC Price + Turkey Problem", start=2500)
     plt.show()
 
+    full_windows, full_labels = utils.make_windows(np.array(btc_price_turkey), window_size=WINDOW_SIZE, horizon=HORIZON)
+    X_train, X_test, y_train, y_test = utils.make_train_test_splits(full_windows, full_labels)
+    print(len(X_train), len(X_test), len(y_train), len(y_test))
+
     print("the turkey problem")
+    
