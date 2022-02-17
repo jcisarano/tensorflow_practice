@@ -66,6 +66,9 @@ def create_model(train_dataset, X_all, y_all):
     next_timesteps = get_future_dates(last_timestep)
     btc_price = load_btc_price()
 
+    next_timesteps = np.insert(next_timesteps, 0, last_timestep)
+    future_forecast = np.insert(future_forecast, 0, btc_price[-1])
+
     plt.figure(figsize=(10, 7))
     utils.plot_time_series(bitcoin_prices.index, btc_price, start=2500, format="-", label="Actual BTC Price")
     utils.plot_time_series(next_timesteps, future_forecast, format="-", label="Predicted BTC price")
