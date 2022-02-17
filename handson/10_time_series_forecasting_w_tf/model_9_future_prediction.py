@@ -6,6 +6,9 @@ For time series forecasts, you have to retrain the model every time you want to 
 https://towardsdatascience.com/3-facts-about-time-series-forecasting-that-surprise-experienced-machine-learning-practitioners-69c18ee89387
 
 """
+import csv
+from datetime import datetime
+
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -61,9 +64,10 @@ def create_model(train_dataset, X_all, y_all):
     bitcoin_prices = utils.load_dataframe()
     last_timestep = bitcoin_prices.index[-1]
     next_timesteps = get_future_dates(last_timestep)
+    btc_price = load_btc_price()
 
     plt.figure(figsize=(10, 7))
-    # utils.plot_time_series(bitcoin_prices.index, b)
+    utils.plot_time_series(bitcoin_prices.index, btc_price, start=2500, format="-", label="Actual BTC Price")
     utils.plot_time_series(next_timesteps, future_forecast, format="-", label="Predicted BTC price")
     plt.show()
 
@@ -99,6 +103,19 @@ def get_future_dates(start_date, into_future=INTO_FUTURE, offset=1):
     end_date = start_date + np.timedelta64(into_future, "D")
 
     return np.arange(start_date, end_date, dtype="datetime64[D]")
+
+
+def load_btc_price(data_path=utils.DATA_PATH):
+    timesteps = []
+    btc_price = []
+    with open(data_path, "r") as f:
+        csv_reader = csv.reader(f, delimiter=",")
+        next(csv_reader)
+        for line in csv_reader:
+            timesteps.append(datetime.strptime(line[1], "%Y-%m-%d"))  # date as datetime object
+            btc_price.append(float(line[2]))  # price as float
+
+    return btc_price
 
 
 def run():
