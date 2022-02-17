@@ -25,7 +25,7 @@ def make_prices_windowed(window_size=WINDOW_SIZE, horizon=HORIZON):
         bitcoin_prices_windowed[f"Price+{i+1}"] = bitcoin_prices_windowed["Price"].shift(periods=i+1)
 
     # print(bitcoin_prices_windowed.head)
-    print(bitcoin_prices_windowed.tail())
+    # print(bitcoin_prices_windowed.tail())
 
     X_all = bitcoin_prices_windowed.dropna().drop(["Price", "block_reward"], axis=1).astype(np.float32)
     y_all = bitcoin_prices_windowed.dropna()["Price"].to_numpy()
@@ -58,6 +58,10 @@ def create_model(train_dataset, X_all, y_all):
 
     future_forecast = make_future_forecast(historical_dataset=y_all, model=model)
 
+    last_timestep = X_all.tail(1).index.item()
+    next_timesteps = get_future_dates(last_timestep)
+    print(next_timesteps)
+
     return future_forecast
 
 
@@ -78,10 +82,25 @@ def make_future_forecast(historical_dataset, model, into_future=INTO_FUTURE, win
     return future_forecasts
 
 
-def run():
-    train_dataset, X_all, y_all = make_prices_windowed()
-    create_model(train_dataset, X_all, y_all)
+def get_future_dates(start_date, into_future=INTO_FUTURE, offset=1):
+    """
+    Returns array of datetime vals ranging from start_date to start_date+into_future
+    :param start_date:
+    :param into_future:
+    :param offset:
+    :return:
+    """
+    start_date = start_date + np.timedelta64(offset, "D")
+    end_date = start_date + np.timedelta64(into_future, "D")
 
+    return np.arange(start_date, end_date, dtype="datetime64[D]")
+
+
+def run():
+    tf.random.set_seed(42)
+    train_dataset, X_all, y_all = make_prices_windowed()
+
+    future_forecasts = create_model(train_dataset, X_all, y_all)
 
     print("fut pred")
 
