@@ -13,6 +13,19 @@ WINDOW_SIZE = 7
 HORIZON = 1
 
 
+def create_model():
+    model = tf.keras.Sequential([
+
+    ])
+
+
+def plot_turkey(timesteps, prices):
+    plt.figure(figsize=(10, 7))
+    utils.plot_time_series(timesteps=timesteps, values=prices,
+                           format="-", label="BTC Price + Turkey Problem", start=2500)
+    plt.show()
+
+
 def run():
     btc_price = load_btc_price()
     btc_price_turkey = btc_price.copy()
@@ -25,14 +38,12 @@ def run():
     btc_timesteps_turkey = np.array(bitcoin_prices.index)
     print(btc_timesteps_turkey[-10:])
 
-    plt.figure(figsize=(10, 7))
-    utils.plot_time_series(timesteps=btc_timesteps_turkey, values=btc_price_turkey,
-                           format="-", label="BTC Price + Turkey Problem", start=2500)
-    plt.show()
+    # plot_turkey(btc_timesteps_turkey, btc_price_turkey)
 
     full_windows, full_labels = utils.make_windows(np.array(btc_price_turkey), window_size=WINDOW_SIZE, horizon=HORIZON)
     X_train, X_test, y_train, y_test = utils.make_train_test_splits(full_windows, full_labels)
     print(len(X_train), len(X_test), len(y_train), len(y_test))
 
+    create_model()
+
     print("the turkey problem")
-    
