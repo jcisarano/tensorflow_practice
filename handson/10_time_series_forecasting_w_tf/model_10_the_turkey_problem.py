@@ -15,7 +15,8 @@ WINDOW_SIZE = 7
 HORIZON = 1
 
 
-def create_model(X_train, X_test, y_train, y_test, epochs=1000, horizon=HORIZON):
+def create_model(X_train, X_test, y_train, y_test, btc_timesteps_turkey, btc_price_turkey, epochs=1000,
+                 horizon=HORIZON):
     model_name = "model_10_turkey_problem"
     """model = tf.keras.Sequential([
         tf.keras.layers.Dense(128, activation="relu"),
@@ -46,10 +47,21 @@ def create_model(X_train, X_test, y_train, y_test, epochs=1000, horizon=HORIZON)
     print(f"Evaluate {model_name}:")
     loaded_model.evaluate(X_test, y_test)
     preds = utils.make_preds(loaded_model, X_test)
+    print(f"Turkey preds:", preds[:10])
 
     # preds = model.predict(test_windows)
-    results = utils.evaluate_preds(y_true=tf.squeeze(y_test), y_pred=preds)
+    results = utils.evaluate_preds(y_true=y_test, y_pred=preds)
     print(f"Results for loaded {model_name}:", results)
+
+    plt.figure(figsize=(10, 7))
+    utils.plot_time_series(timesteps=btc_timesteps_turkey[-len(X_test):],
+                           values=btc_price_turkey[-len(y_test):],
+                           format="-",
+                           label="Turkey Test Data", start=300)
+    utils.plot_time_series(timesteps=btc_timesteps_turkey[-len(X_test):],
+                           values=preds,
+                           label="Turkey Preds", start=300)
+    plt.show()
 
 
 def plot_turkey(timesteps, prices):
@@ -77,6 +89,6 @@ def run():
     X_train, X_test, y_train, y_test = utils.make_train_test_splits(full_windows, full_labels)
     # print(len(X_train), len(X_test), len(y_train), len(y_test))
 
-    create_model(X_train, X_test, y_train, y_test)
+    create_model(X_train, X_test, y_train, y_test, btc_timesteps_turkey, btc_price_turkey)
 
     print("the turkey problem")
