@@ -145,3 +145,5 @@ def run():
     plot_upper_lower_bounds(X_test, y_test, ensemble_preds)
 
     print("ensemble")
+
+    return results

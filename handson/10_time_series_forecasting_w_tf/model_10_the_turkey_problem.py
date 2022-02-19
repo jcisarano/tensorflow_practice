@@ -63,6 +63,8 @@ def create_model(X_train, X_test, y_train, y_test, btc_timesteps_turkey, btc_pri
                            label="Turkey Preds", start=300)
     plt.show()
 
+    return results
+
 
 def plot_turkey(timesteps, prices):
     plt.figure(figsize=(10, 7))
@@ -89,6 +91,6 @@ def run():
     X_train, X_test, y_train, y_test = utils.make_train_test_splits(full_windows, full_labels)
     # print(len(X_train), len(X_test), len(y_train), len(y_test))
 
-    create_model(X_train, X_test, y_train, y_test, btc_timesteps_turkey, btc_price_turkey)
+    return create_model(X_train, X_test, y_train, y_test, btc_timesteps_turkey, btc_price_turkey)
 
-    print("the turkey problem")
+    # print("the turkey problem")

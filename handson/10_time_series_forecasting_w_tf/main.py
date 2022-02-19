@@ -35,27 +35,41 @@ import model_10_the_turkey_problem as m10
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     # bpp.run()
-    # naive_results = nm.run()
-    # m1_results = m1.run()
-    # m2_results = m2.run()
-    # m3_results = m3.run()
-    # m4_results = m4.run()
-    # m5_results = m5.run()
-    # m6_results = m6.run()
+    naive_results = nm.run()
+    m1_results = m1.run()
+    m2_results = m2.run()
+    m3_results = m3.run()
+    m4_results = m4.run()
+    m5_results = m5.run()
+    m6_results = m6.run()
     # m7_results = m7.run()
-    # m8_results = m8.run()
+    m8_results = m8.run()
     # m9_results = m9.run()
     m10_results = m10.run()
 
-    # pd.DataFrame({"naive": naive_results["mae"],
-    #               "horizon_1_window_7": m1_results["mae"],
-    #               "horizon_1_window_30": m2_results["mae"],
-    #               "horizon_7_window_30": m3_results["mae"],
-    #               "conv1d": m4_results["mae"],
-    #               "lstm": m5_results["mae"],
-    #               "multivariate": m6_results["mae"],
-    #               }, index=["mae"]).plot(figsize=(10, 7), kind="bar")
+    pd.DataFrame({"naive": naive_results["mae"],
+                  "horizon_1_window_7": m1_results["mae"],
+                  "horizon_1_window_30": m2_results["mae"],
+                  "horizon_7_window_30": m3_results["mae"],
+                  "conv1d": m4_results["mae"],
+                  "lstm": m5_results["mae"],
+                  "multivariate": m6_results["mae"],
+    #               "nbeats": m7_results["mae"],
+                  "ensemble": m8_results["mae"],
+                  "turkey": m10_results["mae"],
+                  }, index=["mae"]).plot(figsize=(10, 7), kind="bar")
+    plt.show()
+
+    # all_results = pd.DataFrame({"naive": naive_results["mae"],
+    #                             "horizon_1_window_7": m1_results["mae"],
+    #                             "horizon_1_window_30": m2_results["mae"],
+    #                             "horizon_7_window_30": m3_results["mae"],
+    #                             "conv1d": m4_results["mae"],
+    #                             "lstm": m5_results["mae"],
+    #                             "multivariate": m6_results["mae"],
+    #                             # "nbeats": m7_results["mae"],
+    #                             "ensemble": m8_results["mae"],
+    #                             "turkey": m10_results["mae"]}).T
+    # print(all_results.head(10))
+    # all_results[["mae"]].sort_values(by="mae").plot(figsize=(10, 7), kind="bar")
     # plt.show()
-
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
