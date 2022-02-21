@@ -30,4 +30,19 @@ def run():
     print("tf.square(a):\n", tf.square(a))
     print("np.square(t):\n", np.square(t))
 
+    # type conflicts
+    try:
+        tf.constant(2.0) + tf.constant(40)
+    except tf.errors.InvalidArgumentError as ex:
+        print(ex)
+
+    try:
+        tf.constant(2.0) + tf.constant(40., dtype=tf.float64)
+    except tf.errors.InvalidArgumentError as ex:
+        print(ex)
+
+    t2 = tf.constant(40., dtype=tf.float64)
+    print(tf.constant(2.0) + tf.cast(t2, tf.float32))
+
+
     print("tensor operations")
