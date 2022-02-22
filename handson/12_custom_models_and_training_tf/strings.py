@@ -9,7 +9,14 @@ def run():
     print(u)
 
     b = tf.strings.unicode_encode(u, "UTF-8")
-    print(tf.strings.length(b, unit="UTF8_CHAR"))
-    print(tf.strings.unicode_decode(b, "UTF-8"))
+    print(b)  # same as original constant
+    print("tf.strings.length(b)", tf.strings.length(b, unit="UTF8_CHAR"))
+    print("tf.strings.unicode_decode(b)", tf.strings.unicode_decode(b, "UTF-8"))  # same as u
+
+    p = tf.constant(["Café", "Coffee", "caffè", "咖啡"])
+    print("tf.strings.length(p)", tf.strings.length(p, unit="UTF8_CHAR"))
+
+    r = tf.strings.unicode_decode(p, "UTF8")
+    print("tf.strings.unicode_decode(r)", r)
 
     print("strings")
