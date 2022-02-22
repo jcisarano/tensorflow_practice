@@ -1,3 +1,8 @@
+"""
+A RaggedTensor is a tensor with one or more ragged dimensions, which are dimensions whose slices may have
+different lengths.
+"""
+
 import tensorflow as tf
 import numpy as np
 
