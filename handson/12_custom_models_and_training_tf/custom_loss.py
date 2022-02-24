@@ -63,4 +63,10 @@ def run():
     model.compile(loss=huber_fn, optimizer="nadam", metrics=["mae"])
     model.fit(X_train_scaled, y_train, epochs=2, validation_data=(X_valid_scaled, y_valid), workers=-1)
 
+    save_path = "saved_models/model_w_custom_loss.h5"
+    model.save(save_path)
+    loaded_model = tf.keras.models.load_model(save_path,
+                                              custom_objects={"huber_fn": huber_fn})
+    loaded_model.fit(X_train_scaled, y_train, epochs=2, validation_data=(X_valid_scaled, y_valid), workers=-1)
+
     print("custom loss")
