@@ -6,6 +6,7 @@ import sparse_tensors as sparse
 import sets
 import variables as vv
 import tensor_arrays as ta
+import custom_loss as cl
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -15,6 +16,7 @@ if __name__ == '__main__':
     # sparse.run()
     # sets.run()
     # vv.run()
-    ta.run()
+    # ta.run()
+    cl.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
