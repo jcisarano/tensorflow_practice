@@ -86,6 +86,16 @@ def run():
     loaded_model.fit(X_train_scaled, y_train, epochs=2,
                      validation_data=(X_valid_scaled, y_valid))
 
+    save_path_custom = "saved_models/model_w_custom_loss_threshold.h5"
+    loaded_model.save(save_path_custom)
+
+    print("\nLoaded model with custom threshold\n")
+    # load model and define loss function with custom threshold
+    loaded_model_cust = tf.keras.models.load_model(save_path_custom,
+                                                   custom_objects={"huber_fn":create_huber(2.0)})
+
+    loaded_model_cust.fit(X_train_scaled, y_train, epochs=2,
+                          validation_data=(X_valid_scaled, y_valid))
 
 
     print("custom loss")
