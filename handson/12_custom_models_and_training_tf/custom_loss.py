@@ -50,6 +50,16 @@ def plot_loss_function():
     plt.show()
 
 
+def create_huber(threshold=1.0):
+    def huber_fn(y_true, y_pred):
+        error = y_true - y_pred
+        is_small_error = tf.abs(error) < threshold
+        squared_loss = tf.square(error) / 2
+        linear_loss = threshold * tf.abs(error) - threshold**2 / 2
+        return tf.where(is_small_error, squared_loss, linear_loss)
+    return huber_fn
+
+
 def run():
     X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test = load_and_prep_data()
 
@@ -65,8 +75,17 @@ def run():
 
     save_path = "saved_models/model_w_custom_loss.h5"
     model.save(save_path)
+
+    print("\nLoaded model\n")
     loaded_model = tf.keras.models.load_model(save_path,
                                               custom_objects={"huber_fn": huber_fn})
     loaded_model.fit(X_train_scaled, y_train, epochs=2, validation_data=(X_valid_scaled, y_valid), workers=-1)
+
+    print("\nCompile and fit with custom loss threshold\n")
+    loaded_model.compile(loss=create_huber(2.0), optimizer="nadam", metrics=["mae"])
+    loaded_model.fit(X_train_scaled, y_train, epochs=2,
+                     validation_data=(X_valid_scaled, y_valid))
+
+
 
     print("custom loss")
