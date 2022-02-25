@@ -37,7 +37,7 @@ def plot_loss_function():
     plt.figure(figsize=(8, 3.5))
     z = np.linspace(-4, 4, 200)
     plt.plot(z, huber_fn(0, z), "b-", linewidth=2, label="huber($z$)")
-    plt.plot(z, z**2/2, "b:", linewidth=1, label=r"$\frac{1}{2}z^2$")
+    plt.plot(z, z ** 2 / 2, "b:", linewidth=1, label=r"$\frac{1}{2}z^2$")
     plt.plot([-1, -1], [0, huber_fn(0., -1.)], "r--")
     plt.plot([1, 1], [0, huber_fn(0., 1.)], "r--")
     plt.gca().axhline(y=0, color='k')
@@ -55,9 +55,27 @@ def create_huber(threshold=1.0):
         error = y_true - y_pred
         is_small_error = tf.abs(error) < threshold
         squared_loss = tf.square(error) / 2
-        linear_loss = threshold * tf.abs(error) - threshold**2 / 2
+        linear_loss = threshold * tf.abs(error) - threshold ** 2 / 2
         return tf.where(is_small_error, squared_loss, linear_loss)
+
     return huber_fn
+
+
+class HuberLoss(tf.keras.losses.Loss):
+    def __init__(self, threshold=1.0, **kwargs):
+        self.threshold = threshold
+        super().__init__(**kwargs)
+
+    def call(self, y_true, y_pred):
+        error = y_true - y_pred
+        is_small_error = tf.abs(error) < self.threshold
+        squared_loss = tf.square(error) / 2
+        linear_loss = self.threshold * tf.abs(error) - self.threshold ** 2 / 2
+        return tf.where(is_small_error, squared_loss, linear_loss)
+
+    def get_config(self):
+        base_config = super().get_config()
+        return {**base_config, "threshold": self.threshold}
 
 
 def run():
@@ -92,10 +110,9 @@ def run():
     print("\nLoaded model with custom threshold\n")
     # load model and define loss function with custom threshold
     loaded_model_cust = tf.keras.models.load_model(save_path_custom,
-                                                   custom_objects={"huber_fn":create_huber(2.0)})
+                                                   custom_objects={"huber_fn": create_huber(2.0)})
 
     loaded_model_cust.fit(X_train_scaled, y_train, epochs=2,
                           validation_data=(X_valid_scaled, y_valid))
-
 
     print("custom loss")
