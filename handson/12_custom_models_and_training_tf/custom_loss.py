@@ -121,6 +121,17 @@ def run():
     ])
     model.compile(loss=HuberLoss(2.), optimizer="nadam", metrics=["mae"])
     print("\nFit model with HuberLoss class\n")
-    model.fit(X_train_scaled, y_train, epochs=2, validation_data=(X_valid_scaled, y_valid))
+    model.fit(X_train_scaled, y_train, epochs=2,
+              validation_data=(X_valid_scaled, y_valid),
+              workers=-1)
+
+    save_path_class = "saved_models/model_w_custom_loss_class.h5"
+    model.save(save_path_class)
+    loaded_model = tf.keras.models.load_model(save_path_class, custom_objects={"HuberLoss":HuberLoss})
+    print("\nFit loaded model with HuberLoss class\n")
+    loaded_model.fit(X_train_scaled, y_train, epochs=2,
+                     validation_data=(X_valid_scaled, y_valid),
+                     workers=-1)
+    print("\nLoaded model threshold:", loaded_model.loss.threshold)
 
     print("custom loss")
