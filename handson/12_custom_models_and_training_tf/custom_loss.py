@@ -115,4 +115,12 @@ def run():
     loaded_model_cust.fit(X_train_scaled, y_train, epochs=2,
                           validation_data=(X_valid_scaled, y_valid))
 
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(30, activation="selu", kernel_initializer="lecun_normal", input_shape=input_shape),
+        tf.keras.layers.Dense(1)
+    ])
+    model.compile(loss=HuberLoss(2.), optimizer="nadam", metrics=["mae"])
+    print("\nFit model with HuberLoss class\n")
+    model.fit(X_train_scaled, y_train, epochs=2, validation_data=(X_valid_scaled, y_valid))
+
     print("custom loss")
