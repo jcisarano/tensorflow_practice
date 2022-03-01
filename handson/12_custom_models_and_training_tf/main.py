@@ -7,6 +7,7 @@ import sets
 import variables as vv
 import tensor_arrays as ta
 import custom_loss as cl
+import other_custom_functions as ocf
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -17,6 +18,7 @@ if __name__ == '__main__':
     # sets.run()
     # vv.run()
     # ta.run()
-    cl.run()
+    # cl.run()
+    ocf.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
