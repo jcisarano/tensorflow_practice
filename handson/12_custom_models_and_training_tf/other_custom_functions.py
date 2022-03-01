@@ -13,7 +13,7 @@ def my_glorot_initializer(shape, dtype=tf.float32):
     return tf.random.normal(shape, stddev=stddev, dtype=dtype)
 
 
-def my_l1_regulizer(weights):
+def my_l1_regularizer(weights):
     return tf.reduce_sum(tf.abs(0.01 * weights))
 
 
@@ -27,7 +27,7 @@ def run():
 
     layer = tf.keras.layers.Dense(1, activation=my_softplus,
                                   kernel_initializer=my_glorot_initializer,
-                                  kernel_regularizer=my_l1_regulizer,
+                                  kernel_regularizer=my_l1_regularizer,
                                   kernel_constraint=my_positive_weights)
 
     tf.keras.backend.clear_session()
@@ -39,7 +39,7 @@ def run():
                               kernel_initializer="lecun_normal",
                               input_shape=input_shape),
         tf.keras.layers.Dense(1, activation=my_softplus,
-                              kernel_regularizer=my_l1_regulizer,
+                              kernel_regularizer=my_l1_regularizer,
                               kernel_constraint=my_positive_weights,
                               kernel_initializer=my_glorot_initializer),
     ])
@@ -47,7 +47,16 @@ def run():
     model.compile(loss="mse", optimizer="nadam", metrics=["mae"])
     model.fit(X_train_scaled, y_train, epochs=2, validation_data=(X_valid_scaled, y_valid), workers=-1)
 
+    save_path = "saved_models/model_w_custom_functions.h5"
+    model.save(save_path)
 
-
+    loaded_model = tf.keras.models.load_model(save_path,
+                                              custom_objects={
+                                                  "my_l1_regularizer": my_l1_regularizer,
+                                                  "my_positive_weights": my_positive_weights,
+                                                  "my_glorot_initializer": my_glorot_initializer,
+                                                  "my_softplus": my_softplus,
+                                              })
+    loaded_model.fit(X_train_scaled, y_train, epochs=2, validation_data=(X_valid_scaled, y_valid), workers=-1)
 
     print("other custom functions")
