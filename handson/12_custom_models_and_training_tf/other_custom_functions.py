@@ -21,19 +21,7 @@ def my_positive_weights(weights):
     return tf.where(weights < 0., tf.zeros_like(weights), weights)
 
 
-def run():
-    X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test = load_and_prep_data()
-    input_shape = X_train_scaled.shape[1:]
-
-    layer = tf.keras.layers.Dense(1, activation=my_softplus,
-                                  kernel_initializer=my_glorot_initializer,
-                                  kernel_regularizer=my_l1_regularizer,
-                                  kernel_constraint=my_positive_weights)
-
-    tf.keras.backend.clear_session()
-    np.random.seed(42)
-    tf.random.set_seed(42)
-
+def train_model_w_custom_functions(X_train_scaled, X_valid_scaled, y_train, y_valid, input_shape):
     model = tf.keras.Sequential([
         tf.keras.layers.Dense(30, activation="selu",
                               kernel_initializer="lecun_normal",
@@ -58,5 +46,22 @@ def run():
                                                   "my_softplus": my_softplus,
                                               })
     loaded_model.fit(X_train_scaled, y_train, epochs=2, validation_data=(X_valid_scaled, y_valid), workers=-1)
+
+
+def run():
+    X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test = load_and_prep_data()
+    input_shape = X_train_scaled.shape[1:]
+
+    layer = tf.keras.layers.Dense(1, activation=my_softplus,
+                                  kernel_initializer=my_glorot_initializer,
+                                  kernel_regularizer=my_l1_regularizer,
+                                  kernel_constraint=my_positive_weights)
+
+    tf.keras.backend.clear_session()
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    train_model_w_custom_functions(X_train_scaled, X_valid_scaled, y_train, y_valid, input_shape)
+
 
     print("other custom functions")
