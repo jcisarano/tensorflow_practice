@@ -19,5 +19,11 @@ def run():
     model.compile(loss="mse", optimizer="nadam", metrics=[create_huber(2.0)])
     model.fit(X_train_scaled, y_train, epochs=2, workers=-1)
 
+    # show differenc between loss and metric due to floating point precision errors
+    model.compile(loss=create_huber(2.0), optimizer="nadam", metrics=[create_huber(2.0)])
+    sample_weight = np.random.rand(len(y_train))
+    history = model.fit(X_train_scaled, y_train, epochs=2, sample_weight=sample_weight)
+    print(history.history["loss"][0], history.history["huber_fn"][0] * sample_weight.mean())
+
 
     print("custom metrics")
