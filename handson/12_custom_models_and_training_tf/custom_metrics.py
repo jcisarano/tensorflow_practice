@@ -4,7 +4,7 @@ import numpy as np
 from custom_loss import load_and_prep_data, create_huber
 
 
-class HuberMetric(tf.keras.metrics.Metric):
+class HuberMetric_old(tf.keras.metrics.Metric):
     def __init__(self, threshold=1.0, **kwargs):
         super().__init__(**kwargs)
         self.threshold = threshold
@@ -23,6 +23,38 @@ class HuberMetric(tf.keras.metrics.Metric):
     def get_config(self):
         base_config = super().get_config()
         return {**base_config, "threshold":self.threshold}
+
+
+class HuberMetric(tf.keras.metrics.Mean):
+    """
+        Another way to make the HuberMetric class. This one handles shapes better and
+        also supports sample weights
+    """
+    def __init__(self, threshold=1.0, name="HuberMetric", dtype=None):
+        self.threshold = threshold
+        self.huber_fn = create_huber(threshold)
+        super().__init__(name=name, dtype=dtype)
+
+    def update_state(self, y_true, y_pred, sample_weight=None):
+        metric = self.huber_fn(y_true, y_pred)
+        super(HuberMetric, self).update_state(metric, sample_weight)
+
+    def get_config(self):
+        base_config = super().get_config()
+        return {**base_config, "threshold": self.threshold}
+
+
+def model_w_custom_class_1(X_train_scaled, y_train, input_shape):
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(30, activation="selu", kernel_initializer="lecun_normal", input_shape=input_shape),
+        tf.keras.layers.Dense(1),
+    ])
+    model.compile(loss=tf.keras.losses.Huber(2.0), optimizer="nadam", weighted_metrics=[HuberMetric(2.0)])
+    sample_weight = np.random.rand(len(y_train))
+    history = model.fit(X_train_scaled.astype(np.float32),
+                        y_train.astype(np.float32), epochs=2,
+                        sample_weight=sample_weight, workers=-1)
+    print(history.history["loss"][0], history.history["HuberMetric"][0]*sample_weight.mean())
 
 
 def model_w_custom_class(X_train_scaled, y_train, input_shape):
@@ -68,7 +100,8 @@ def run():
     tf.random.set_seed(42)
 
     # simple_model_w_custom_metric(X_train_scaled, y_train, input_shape)
-    model_w_custom_class(X_train_scaled, y_train, input_shape)
+    # model_w_custom_class(X_train_scaled, y_train, input_shape)
+    model_w_custom_class_1(X_train_scaled, y_train, input_shape)
 
 
 
