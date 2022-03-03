@@ -33,6 +33,16 @@ def model_w_custom_class(X_train_scaled, y_train, input_shape):
     model.compile(loss=create_huber(2.0), optimizer="nadam", metrics=[HuberMetric(2.0)])
     model.fit(X_train_scaled.astype(np.float32), y_train.astype(np.float32), epochs=2, workers=-1)
 
+    save_path = "saved_models/model_w_custom_metric_class.h5"
+    model.save(save_path)
+    loaded_model = tf.keras.models.load_model(save_path,
+                                              custom_objects={
+                                                  "huber_fn": create_huber(2.0),
+                                                  "HuberMetric": HuberMetric
+                                              })
+    loaded_model.fit(X_train_scaled.astype(np.float32), y_train.astype(np.float32), epochs=2)
+    print(loaded_model.metrics[-1].threshold)
+
 
 def simple_model_w_custom_metric(X_train_scaled, y_train, input_shape):
     model = tf.keras.models.Sequential([
