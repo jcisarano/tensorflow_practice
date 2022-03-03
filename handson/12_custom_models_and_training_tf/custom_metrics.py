@@ -56,6 +56,14 @@ def model_w_custom_class_1(X_train_scaled, y_train, input_shape):
                         sample_weight=sample_weight, workers=-1)
     print(history.history["loss"][0], history.history["HuberMetric"][0]*sample_weight.mean())
 
+    save_path = "saved_models/model_w_custom_metric_class_v2.h5"
+    model.save(save_path)
+    loaded_model = tf.keras.models.load_model(save_path,
+                                              custom_objects={
+                                                  "HuberMetric": HuberMetric
+                                              })
+    loaded_model.fit(X_train_scaled.astype(np.float32), y_train.astype(np.float32), epochs=2, workers=-1)
+    print(model.metrics[-1].threshold)
 
 def model_w_custom_class(X_train_scaled, y_train, input_shape):
     model = tf.keras.models.Sequential([
