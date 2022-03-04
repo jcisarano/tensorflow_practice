@@ -43,6 +43,13 @@ def cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_trai
               validation_data=(X_valid_scaled, y_valid))
     model.evaluate(X_test_scaled, y_test)
 
+    save_path = "saved_models/model_w_custom_layer.h5"
+    model.save(save_path)
+    loaded_model = tf.keras.models.load_model(save_path,
+                                              custom_objects={"MyDense": MyDense})
+    print("\nEvaluate loaded model:\n")
+    loaded_model.evaluate(X_test_scaled, y_test)
+
 
 def cust_exp_layer(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape):
     exponential_layer = tf.keras.layers.Lambda(lambda x: tf.exp(x))
