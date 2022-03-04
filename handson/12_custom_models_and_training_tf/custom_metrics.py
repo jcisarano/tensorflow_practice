@@ -65,6 +65,7 @@ def model_w_custom_class_1(X_train_scaled, y_train, input_shape):
     loaded_model.fit(X_train_scaled.astype(np.float32), y_train.astype(np.float32), epochs=2, workers=-1)
     print(model.metrics[-1].threshold)
 
+
 def model_w_custom_class(X_train_scaled, y_train, input_shape):
     model = tf.keras.models.Sequential([
         tf.keras.layers.Dense(30, activation="selu", kernel_initializer="lecun_normal"),
