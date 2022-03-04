@@ -33,6 +33,17 @@ class MyDense(tf.keras.layers.Layer):
                 "activation": tf.keras.activations.serialize(self.activation)}
 
 
+def cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape):
+    model = tf.keras.models.Sequential([
+        MyDense(30, activation="relu", input_shape=input_shape),
+        MyDense(1),
+    ])
+    model.compile(loss="mse", optimizer="nadam")
+    model.fit(X_train_scaled, y_train, epochs=2,
+              validation_data=(X_valid_scaled, y_valid))
+    model.evaluate(X_test_scaled, y_test)
+
+
 def cust_exp_layer(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape):
     exponential_layer = tf.keras.layers.Lambda(lambda x: tf.exp(x))
     print(exponential_layer([-1., 0., 1.]))
@@ -58,6 +69,7 @@ def run():
     np.random.seed(42)
     tf.random.set_seed(42)
 
-    cust_exp_layer(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
+    # cust_exp_layer(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
+    cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
 
     print("custom layers")
