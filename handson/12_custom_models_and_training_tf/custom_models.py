@@ -46,8 +46,14 @@ def run():
 
     model = ResidualRegressor(1)
     model.compile(loss="mse", optimizer="nadam")
-    history = model.fit(X_train_scaled, y_train, epochs=5)
+    history = model.fit(X_train_scaled, y_train, epochs=5, workers=-1)
     score = model.evaluate(X_test_scaled, y_test)
     y_pred = model.predict(X_new_scaled)
+
+    model_save_path="saved_models/custom_model.ckpt"
+    model.save(model_save_path)
+
+    loaded_model = tf.keras.models.load_model(model_save_path)
+    history = loaded_model.fit(X_train_scaled, y_train, epochs=5, workers=-1)
 
     print("custom models")
