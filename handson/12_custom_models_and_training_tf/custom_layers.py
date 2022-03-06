@@ -50,19 +50,33 @@ def split_data(data):
     return data[:, :half], data[:, half:]
 
 
-def multilayer_test(X_train_scaled, X_valid_scaled, X_test_scaled):
-    inputs1 = tf.keras.layers.Input(shape=[2])
-    inputs2 = tf.keras.layers.Input(shape=[2])
-    outputs1, outputs2 = MyMultiLayer()((inputs1, inputs2))
+def multilayer_test(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test):
+    # inputs1 = tf.keras.layers.Input(shape=[2])
+    # inputs2 = tf.keras.layers.Input(shape=[2])
+    # outputs1, outputs2 = MyMultiLayer()((inputs1, inputs2))
 
     X_train_scaled_A, X_train_scaled_B = split_data(X_train_scaled)
     X_valid_scaled_A, X_valid_scaled_B = split_data(X_valid_scaled)
     X_test_scaled_A, X_test_scaled_B = split_data(X_test_scaled)
 
-    print("\nSplit data:\n")
-    print(X_train_scaled_A.shape, X_train_scaled_B.shape)
+    # print("\nSplit data:\n")
+    # print(X_train_scaled_A.shape, X_train_scaled_B.shape)
 
-    outputs1, outputs2 = MyMultiLayer()((X_train_scaled_A, X_train_scaled_B))
+    # outputs1, outputs2 = MyMultiLayer()((X_train_scaled_A, X_train_scaled_B))
+
+    input_A = tf.keras.layers.Input(shape=X_test_scaled_A.shape[-1])
+    input_B = tf.keras.layers.Input(shape=X_test_scaled_B.shape[-1])
+    hidden_A, hidden_B = MyMultiLayer()((input_A, input_B))
+    hidden_A = tf.keras.layers.Dense(30, activation='selu')(hidden_A)
+    hidden_B = tf.keras.layers.Dense(30, activation='selu')(hidden_B)
+    concat = tf.keras.layers.Concatenate()((hidden_A, hidden_B))
+    output = tf.keras.layers.Dense(1)(concat)
+    model = tf.keras.models.Model(inputs=[input_A, input_B], outputs=[output])
+
+    model.compile(loss="mse", optimizer="nadam")
+    model.fit((X_train_scaled_A, X_train_scaled_B), y_train, epochs=2,
+              validation_data=((X_valid_scaled_A, X_valid_scaled_B), y_valid),
+              workers=-1)
 
 
 def cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape):
@@ -111,6 +125,6 @@ def run():
     # cust_exp_layer(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
     # cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
 
-    multilayer_test(X_train_scaled, X_valid_scaled, X_test_scaled)
+    multilayer_test(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
 
     print("custom layers")
