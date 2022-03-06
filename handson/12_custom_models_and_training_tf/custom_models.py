@@ -56,4 +56,24 @@ def run():
     loaded_model = tf.keras.models.load_model(model_save_path)
     history = loaded_model.fit(X_train_scaled, y_train, epochs=5, workers=-1)
 
+    # same idea, uses Sequential API
+
+    keras.backend.clear_session()
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    block1 = ResidualBlock(2, 30)
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(30, activation="elu", kernel_initializer="he_normal"),
+        block1, block1, block1,
+        ResidualBlock(2, 30),
+        tf.keras.layers.Dense(1)
+    ])
+
+    model.compile(loss="mse", optimizer="nadam")
+    model.fit(X_train_scaled, y_train, epochs=5, workers=-1)
+    score = model.evaluate(X_test_scaled, y_test)
+    y_pred = model.predict(X_new_scaled)
+
+
     print("custom models")
