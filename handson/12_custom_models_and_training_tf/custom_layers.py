@@ -58,7 +58,7 @@ class AddGaussianNoise(tf.keras.layers.Layer):
 
     def compute_output_shape(self, batch_input_shape):
         return batch_input_shape
-    
+
 
 def split_data(data):
     columns_count = data.shape[-1]
@@ -93,6 +93,19 @@ def multilayer_test(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_va
     model.fit((X_train_scaled_A, X_train_scaled_B), y_train, epochs=2,
               validation_data=((X_valid_scaled_A, X_valid_scaled_B), y_valid),
               workers=-1)
+
+
+def model_w_gaussian_noise(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test):
+    model = tf.keras.models.Sequential([
+        AddGaussianNoise(stddev=1.0),
+        tf.keras.layers.Dense(30, activation="selu"),
+        tf.keras.layers.Dense(1),
+    ])
+    model.compile(loss="mse", optimizer="nadam")
+    model.fit(X_train_scaled, y_train, epochs=2,
+              validation_data=(X_valid_scaled, y_valid),
+              workers=-1)
+    model.evaluate(X_test_scaled, y_test)
 
 
 def cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape):
@@ -141,6 +154,7 @@ def run():
     # cust_exp_layer(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
     # cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
 
-    multilayer_test(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
+    # multilayer_test(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
+    model_w_gaussian_noise(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test)
 
     print("custom layers")
