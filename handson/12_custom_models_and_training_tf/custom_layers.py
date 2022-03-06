@@ -44,6 +44,22 @@ class MyMultiLayer(tf.keras.layers.Layer):
         return [batch_input_shape1, batch_input_shape2]
 
 
+class AddGaussianNoise(tf.keras.layers.Layer):
+    def __init__(self, stddev, **kwargs):
+        super().__init__(**kwargs)
+        self.stddev = stddev
+
+    def call(self, X, training=None):
+        if training:
+            noise = tf.random.normal(tf.shape(X), stddev=self.stddev)
+            return X + noise
+        else:
+            return X
+
+    def compute_output_shape(self, batch_input_shape):
+        return batch_input_shape
+    
+
 def split_data(data):
     columns_count = data.shape[-1]
     half = columns_count // 2
