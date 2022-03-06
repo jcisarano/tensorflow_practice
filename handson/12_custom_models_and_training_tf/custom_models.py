@@ -36,6 +36,34 @@ class ResidualRegressor(tf.keras.models.Model):
         return self.out(Z)
 
 
+class ReconstructingRegressor(tf.keras.Model):
+    def __init__(self, output_dim, **kwargs):
+        super().__init__(**kwargs)
+        self.hidden = [tf.keras.layers.Dense(30, activation="selu",
+                                             kernel_initializer="lecun_normal")
+                       for _ in range(5)]
+        self.out = tf.keras.layers.Dense(output_dim)
+        self.reconstruction_mean = tf.keras.metrics.Mean(name="reconstruction_error")
+
+    def build(self, batch_input_shape):
+        n_inputs = batch_input_shape[-1]
+        self.reconstruct = tf.keras.layers.Dense(n_inputs)
+
+    def call(self, inputs, training=None):
+        Z = inputs
+        for layer in self.hidden:
+            Z = layer(Z)
+        reconstruction = self.reconstruct(Z)
+        recon_loss = tf.reduce_mean(tf.square(reconstruction-inputs))
+        self.add_loss(0.05*recon_loss)
+        if training:
+            result = self.reconstruction_mean(recon_loss)
+            self.add_metric(result)
+        return self.out(Z)
+
+
+
+
 def run():
     X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test = load_and_prep_data()
     X_new_scaled = X_test_scaled
