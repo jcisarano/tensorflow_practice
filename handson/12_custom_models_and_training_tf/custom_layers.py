@@ -33,6 +33,23 @@ class MyDense(tf.keras.layers.Layer):
                 "activation": tf.keras.activations.serialize(self.activation)}
 
 
+class MyMultiLayer(tf.keras.layers.Layer):
+    def call(self, X):
+        X1, X2 = X
+        print(f"X1.shape: {X1.shape} X2.shape: {X2.shape}")
+        return X1+X2, X1*X2
+
+    def compute_output_shape(self, batch_input_shape):
+        batch_input_shape1, batch_input_shape2 = batch_input_shape
+        return [batch_input_shape1, batch_input_shape2]
+
+
+def multilayer_test():
+    inputs1 = tf.keras.layers.Input(shape=[2])
+    inputs2 = tf.keras.layers.Input(shape=[2])
+    outputs1, outputs2 = MyMultiLayer()((inputs1, inputs2))
+
+
 def cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape):
     model = tf.keras.models.Sequential([
         MyDense(30, activation="relu", input_shape=input_shape),
@@ -77,6 +94,8 @@ def run():
     tf.random.set_seed(42)
 
     # cust_exp_layer(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
-    cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
+    # cust_dense_layer_class(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test, input_shape)
 
+    multilayer_test()
+    
     print("custom layers")
