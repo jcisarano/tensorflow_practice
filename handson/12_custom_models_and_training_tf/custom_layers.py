@@ -145,7 +145,6 @@ def cust_exp_layer(X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_val
 
 def run():
     X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test = load_and_prep_data()
-    input_shape = X_train_scaled.shape[1:]
 
     keras.backend.clear_session()
     np.random.seed(42)
