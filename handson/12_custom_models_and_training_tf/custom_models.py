@@ -68,6 +68,7 @@ def run():
     X_train_scaled, X_valid_scaled, X_test_scaled, y_train, y_valid, y_test = load_and_prep_data()
     X_new_scaled = X_test_scaled
 
+    print("\nResidualRegressor example\n")
     keras.backend.clear_session()
     np.random.seed(42)
     tf.random.set_seed(42)
@@ -86,6 +87,7 @@ def run():
 
     # same idea, uses Sequential API
 
+    print("\nStart Sequential API example\n")
     keras.backend.clear_session()
     np.random.seed(42)
     tf.random.set_seed(42)
@@ -103,5 +105,14 @@ def run():
     score = model.evaluate(X_test_scaled, y_test)
     y_pred = model.predict(X_new_scaled)
 
+    print("\nStart ReconstructingRegressor example\n")
+    keras.backend.clear_session()
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    model = ReconstructingRegressor(1)
+    model.compile(loss="mse", optimizer="nadam")
+    history = model.fit(X_train_scaled, y_train, epochs=2)
+    y_pred = model.predict(X_test_scaled)
 
     print("custom models")
