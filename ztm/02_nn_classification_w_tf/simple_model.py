@@ -116,7 +116,7 @@ def run(X, y):
         Fit for longer    
     """
 
-    """    tf.random.set_seed(42)
+    tf.random.set_seed(42)
     model_2 = tf.keras.models.Sequential([
         tf.keras.layers.Dense(100),
         tf.keras.layers.Dense(10),
@@ -135,24 +135,24 @@ def run(X, y):
     # test this model with regression data
     tf.random.set_seed(42)
 
-    #need a model that uses regression loss and metrics types
-    model_2 = tf.keras.models.Sequential([
+    # need a model that uses regression loss and metrics types
+    """model_2 = tf.keras.models.Sequential([
         tf.keras.layers.Dense(100),
         tf.keras.layers.Dense(10),
         tf.keras.layers.Dense(1),
     ])
     model_2.compile(loss=tf.keras.losses.mae,
                     optimizer=tf.keras.optimizers.Adam(),
-                    metrics=["mae"])"""
+                    metrics=["mae"])
 
-    """    X_regression = tf.range(0, 1000, 5)
+    X_regression = tf.range(0, 1000, 5)
     y_regression = tf.range(100, 1100, 5)  # y = x + 100
 
     # split into training and test sets
     X_reg_train, X_reg_test = X_regression[:150], X_regression[150:]
-    y_reg_train, y_reg_test = y_regression[:150], y_regression[150:]"""
+    y_reg_train, y_reg_test = y_regression[:150], y_regression[150:]
 
-    """    model_2.fit(X_reg_train, y_reg_train, epochs=100)
+    model_2.fit(X_reg_train, y_reg_train, epochs=100)
 
     # make predictions with this model and plot them
     y_reg_pred = model_2.predict(X_reg_test)
@@ -181,7 +181,8 @@ def run(X, y):
     plot_decision_boundary(model_3, X, y)"""
 
     # nonlinear activation
-    """    tf.random.set_seed(42)
+
+    """tf.random.set_seed(42)
     model_4 = tf.keras.models.Sequential([
         tf.keras.layers.Dense(1, activation=tf.keras.activations.relu),
     ])
@@ -219,7 +220,7 @@ def run(X, y):
     plot_decision_boundary(model_6, X, y)"""
 
     # toy linear tensor
-    A = tf.cast(tf.range(-10, 10), tf.float32)
+    """A = tf.cast(tf.range(-10, 10), tf.float32)
     plt.plot(A)
     plt.show()
 
@@ -236,4 +237,4 @@ def run(X, y):
     plt.show()
 
     plt.plot(softmax(A))
-    plt.show()
+    plt.show()"""

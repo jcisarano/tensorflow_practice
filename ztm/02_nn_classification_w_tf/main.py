@@ -45,8 +45,8 @@ if __name__ == '__main__':
 
     # mc.run()
     # pc.run(X, y)
-    # md.run()
+    md.run()
 
-    fpe.run()
+    # fpe.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
