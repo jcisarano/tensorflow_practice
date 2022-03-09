@@ -23,11 +23,31 @@ def plot_multiple_images(images, labels, class_names, predictions=None, pred_pro
         plt.xlabel(label, color=color)
     plt.show()
 
+
 def run():
     class_names = ["T-shirt/top", "Trouser", "Pullover", "Dress", "Coat",
                    "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot", ]
     (X_train, y_train), (X_test, y_test) = fashion_mnist.load_data()
     print(X_train.shape, y_train.shape)
     plot_multiple_images(images=X_test, labels=y_test, class_names=class_names)
+
+    X_train_norm = X_train / X_train.max()
+    X_test_norm = X_test / X_test.max()
+
+    y_train_one_hot = tf.one_hot(y_train, depth=10)
+
+    img_shape = (28, 28)
+    tf.random.set_seed(42)
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Flatten(input_shape=img_shape),
+        tf.keras.layers.Dense(40, activation="relu"),
+        tf.keras.layers.Dense(20, activation="relu"),
+        tf.keras.layers.Dense(len(class_names), activation="softmax"),
+    ])
+    model.compile(loss=tf.keras.losses.CategoricalCrossentropy(),
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+    model.fit(X_train_norm, y_train_one_hot, epochs=10, workers=-1)
+
 
     print("multiclass classification")
