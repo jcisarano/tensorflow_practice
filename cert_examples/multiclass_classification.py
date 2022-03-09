@@ -49,5 +49,15 @@ def run():
                   metrics=["accuracy"])
     model.fit(X_train_norm, y_train_one_hot, epochs=10, workers=-1)
 
+    y_pred = model.predict(X_test_norm)
+    print(y_pred)
+    y_pred_max = y_pred.argmax(axis=1)
+
+    from sklearn.metrics import confusion_matrix
+    print(confusion_matrix(y_true=y_test, y_pred=y_pred_max))
+
+    plot_multiple_images(images=X_test, labels=y_test,
+                         predictions=y_pred_max, pred_probs=y_pred, class_names=class_names)
+
 
     print("multiclass classification")
