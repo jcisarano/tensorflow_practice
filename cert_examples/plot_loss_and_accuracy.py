@@ -2,6 +2,7 @@ import tensorflow as tf
 from keras.datasets import fashion_mnist
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 def train_model():
@@ -39,5 +40,10 @@ def run():
     plt.title("Model loss and accuracy")
     plt.legend(loc="center right")
     plt.show()
+
+    pd.DataFrame(history.history).plot(title="Pandas plot same model loss and accuracy")
+    plt.show()
+
+
 
     print("plot loss and accuracy")
