@@ -1,6 +1,7 @@
 import os
 import tensorflow as tf
 from keras_preprocessing.image import ImageDataGenerator
+import tensorflow_hub as hub
 
 # paths to pretrained models
 EFFICIENTNET_URL: str = "https://tfhub.dev/tensorflow/efficientnet/b0/feature-vector/1"
@@ -31,6 +32,26 @@ def load_and_prep_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, batch
     return train_data, test_data
 
 
+def create_simple_model(model_path, num_classes: int = 10, input_shape=IMAGE_SHAPE):
+    model = tf.keras.models.Sequential([
+        hub.KerasLayer(model_path, input_shape=input_shape + (3,), trainable=False, name="feature_extractor_layer"),
+        tf.keras.layers.Dense(num_classes, activation="softmax", name="output_layer"),
+    ])
+    model.compile(loss="categorical_crossentropy", optimizer=tf.keras.optimizers.Adam(), metrics=["accuracy"])
+    print(model.summary())
+
+    return model
+
+
 def run():
     train_data, test_data = load_and_prep_data()
+    model = create_simple_model(RESNET_URL)
+
+    model.fit(train_data,
+              epochs=50,
+              steps_per_epoch=len(train_data),
+              validation_data=test_data,
+              validation_steps=len(test_data),
+              workers=-1)
+
     print("transfer learning")
