@@ -44,7 +44,8 @@ def create_simple_model(model_path, num_classes: int = 10, input_shape=IMAGE_SHA
 
 
 def create_model_frm_tf(num_classes: int = 10, input_shape=IMAGE_SHAPE):
-    base_model = tf.keras.applications.EfficientNetB0(include_top=False)
+    # base_model = tf.keras.applications.EfficientNetB0(include_top=False)
+    base_model = tf.keras.applications.ResNet50(include_top=False)
     base_model.trainable = False
     inputs = tf.keras.layers.Input(shape=input_shape, name="input_layer")
     x = base_model(inputs, training=False)
@@ -59,11 +60,24 @@ def create_model_frm_tf(num_classes: int = 10, input_shape=IMAGE_SHAPE):
     return model
 
 
+def create_model_w_unlocked_layers(num_classes: int = 10, input_shape=IMAGE_SHAPE):
+    model = create_model_frm_tf(num_classes, input_shape)
+    model.trainable = True
+    for layer in model.layers[:-5]:
+        layer.trainable = False
+
+    model.compile(loss="categorical_crossentropy",
+                  optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001),
+                  metrics=["accuracy"])
+    print(model.summary())
+    return model
+
 
 def run():
     train_data, test_data = load_and_prep_data()
     # model = create_simple_model(RESNET_URL)
-    model = create_model_frm_tf(input_shape=(224, 224, 3))
+    # model = create_model_frm_tf(input_shape=(224, 224, 3))
+    model = create_model_w_unlocked_layers(input_shape=(224, 224, 3))
 
     model.fit(train_data,
               epochs=50,
