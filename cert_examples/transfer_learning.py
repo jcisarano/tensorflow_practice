@@ -43,15 +43,33 @@ def create_simple_model(model_path, num_classes: int = 10, input_shape=IMAGE_SHA
     return model
 
 
+def create_model_frm_tf(num_classes: int = 10, input_shape=IMAGE_SHAPE):
+    base_model = tf.keras.applications.EfficientNetB0(include_top=False)
+    base_model.trainable = False
+    inputs = tf.keras.layers.Input(shape=input_shape, name="input_layer")
+    x = base_model(inputs, training=False)
+    x = tf.keras.layers.GlobalAveragePooling2D(name="global_avg_pooling_2d")(x)
+    outputs = tf.keras.layers.Dense(num_classes, activation="softmax", name="output_layer")(x)
+
+    model = tf.keras.Model(inputs, outputs)
+    model.compile(loss="categorical_crossentropy", optimizer=tf.keras.optimizers.Adam(), metrics=["accuracy"])
+
+    print(model.summary())
+
+    return model
+
+
+
 def run():
     train_data, test_data = load_and_prep_data()
-    model = create_simple_model(RESNET_URL)
+    # model = create_simple_model(RESNET_URL)
+    model = create_model_frm_tf(input_shape=(224, 224, 3))
 
     model.fit(train_data,
               epochs=50,
               steps_per_epoch=len(train_data),
               validation_data=test_data,
-              validation_steps=len(test_data),
+              validation_steps=int(0.25 * len(test_data)),
               workers=-1)
 
     print("transfer learning")

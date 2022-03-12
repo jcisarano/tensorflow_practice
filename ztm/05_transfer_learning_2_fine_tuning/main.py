@@ -8,8 +8,8 @@ import image_plot_and_predict as ipp
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    ipp.run()
-    # fce.run()
+    # ipp.run()
+    fce.run()
     # tfle.run()
     # fc.run()
 
