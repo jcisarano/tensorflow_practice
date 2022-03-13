@@ -76,8 +76,14 @@ def create_model_w_unlocked_layers(num_classes: int = 10, input_shape=IMAGE_SHAP
 
 def run():
     train_data, test_data = load_and_prep_data()
-    # model = create_simple_model(RESNET_URL)
-    model = create_model_frm_tf(input_shape=(224, 224, 3))
+
+    # best results: resnet v2 50 from URL
+    model = create_simple_model(RESNET_URL)
+
+    # second best version: resnet v2 50 from tf api
+    # model = create_model_frm_tf(input_shape=(224, 224, 3))
+
+    # unlocked layers performs worse in this example? Can it be improved with different hyperparams?
     # model = create_model_w_unlocked_layers(input_shape=(224, 224, 3))
 
     model.fit(train_data,
