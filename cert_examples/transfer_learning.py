@@ -45,7 +45,8 @@ def create_simple_model(model_path, num_classes: int = 10, input_shape=IMAGE_SHA
 
 def create_model_frm_tf(num_classes: int = 10, input_shape=IMAGE_SHAPE):
     # base_model = tf.keras.applications.EfficientNetB0(include_top=False)
-    base_model = tf.keras.applications.ResNet50(include_top=False)
+    # ResNet V2 seems to work better on this dataset
+    base_model = tf.keras.applications.resnet_v2.ResNet50V2(include_top=False)
     base_model.trainable = False
     inputs = tf.keras.layers.Input(shape=input_shape, name="input_layer")
     x = base_model(inputs, training=False)
@@ -76,11 +77,11 @@ def create_model_w_unlocked_layers(num_classes: int = 10, input_shape=IMAGE_SHAP
 def run():
     train_data, test_data = load_and_prep_data()
     # model = create_simple_model(RESNET_URL)
-    # model = create_model_frm_tf(input_shape=(224, 224, 3))
-    model = create_model_w_unlocked_layers(input_shape=(224, 224, 3))
+    model = create_model_frm_tf(input_shape=(224, 224, 3))
+    # model = create_model_w_unlocked_layers(input_shape=(224, 224, 3))
 
     model.fit(train_data,
-              epochs=50,
+              epochs=25,
               steps_per_epoch=len(train_data),
               validation_data=test_data,
               validation_steps=int(0.25 * len(test_data)),
