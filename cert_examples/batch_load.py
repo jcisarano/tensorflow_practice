@@ -12,7 +12,7 @@ from transfer_learning import load_and_prep_data, TRAIN_DATA_PATH, TEST_DATA_PAT
 
 
 def run():
-    # loads in batches using ImageGenerator
+    # loads images in batches using ImageGenerator
     # train_data, test_data = load_and_prep_data()
 
     # more current version, loads image data without need to create ImageGenerator
