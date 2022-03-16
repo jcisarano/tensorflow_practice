@@ -54,6 +54,8 @@ def create_reduce_lr_callback():
 class MyEarlyStopping(tf.keras.callbacks.Callback):
     """Custom callback for stopping on reaching accuracy threshold
     Didn't test this -- it might work?
+    For more complete example, see: https://www.tensorflow.org/guide/keras/custom_callback
+
     my_early_stop = MyEarlyStopping(0.95)
     """
     def __init__(self, acc_thresh):
