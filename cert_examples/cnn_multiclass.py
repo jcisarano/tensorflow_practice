@@ -2,6 +2,8 @@ import os
 
 import numpy as np
 import pathlib
+import tensorflow as tf
+import matplotlib.pyplot as plt
 
 from keras_preprocessing.image import ImageDataGenerator
 
@@ -44,6 +46,92 @@ def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_
     return train_data, test_data
 
 
+# baseline model matches the one on CNN Explorer site
+def baseline_model(shape=(IMG_SIZE, IMG_SIZE, 3)):
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Conv2D(filters=10, kernel_size=3, input_shape=shape),
+        tf.keras.layers.Activation(activation="relu"),
+        tf.keras.layers.Conv2D(10, 3, activation="relu"),
+        tf.keras.layers.MaxPool2D(),
+        tf.keras.layers.Conv2D(10, 3, activation="relu"),
+        tf.keras.layers.Conv2D(10, 3, activation="relu"),
+        tf.keras.layers.MaxPool2D(),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(10, activation="softmax")  # 10 because there are 10 categories
+    ])
+
+    model.compile(loss=tf.keras.losses.CategoricalCrossentropy(), optimizer=tf.keras.optimizers.Adam(),
+                  metrics=["accuracy"])
+
+    return model
+
+
+def plot_loss_curve(history):
+    """
+    Returns separate loss curves for training and validation metrics
+    :param history:
+    :return:
+    """
+    loss = history.history["loss"]
+    val_loss = history.history["val_loss"]
+    accuracy = history.history["accuracy"]
+    val_accuracy = history.history["val_accuracy"]
+    epochs = range(len(history.history["loss"]))
+
+    # plot loss
+    _, axes = plt.subplots(ncols=2, figsize=(10, 4), sharey=True)
+    plt.sca(axes[0])
+    plt.plot(epochs, loss, label="training_loss")
+    plt.plot(epochs, val_loss, label="val_loss")
+    plt.title("loss")
+    plt.xlabel("epochs")
+    plt.legend()
+
+    # plot accuracy
+
+    xmax = max(val_loss + accuracy)
+    xmin = min(val_loss + accuracy)
+    ymin = 0
+    ymax = len(val_loss)
+    plt.sca(axes[1])
+    plt.plot(epochs, accuracy, label="training_accuracy")
+    plt.plot(epochs, val_accuracy, label="val_accuracy")
+    plt.title("accuracy")
+    plt.xlabel("epochs")
+    plt.axis([xmin, xmax, ymin, ymax])
+    plt.legend()
+    plt.show()
+
+
+def pred_and_plot_multiclass(model, filename, class_names):
+    """
+    :param model:
+    :param filename:
+    :param class_names:
+    :return:
+    """
+    img = load_and_preprocess_img(filename)
+    pred = model.predict(tf.expand_dims(img, axis=0))
+    pred_class = class_names[tf.argmax(pred[0])]
+
+    plt.imshow(img)
+    plt.title(f"Prediction: {pred_class}")
+    plt.axis(False)
+    plt.show()
+
+
+def load_and_preprocess_img(path, img_shape=224):
+    # load the image
+    img = tf.io.read_file(path)
+    # decode the image into a tensor
+    img = tf.image.decode_image(img)
+    # resize
+    img = tf.image.resize(img, [img_shape, img_shape])
+    # normalize image values
+    img = img / 255.
+
+    return img
+
 def run():
     # Step 1: Visualize the data
     class_names = get_class_names(TRAIN_DATA_PATH)
@@ -54,3 +142,52 @@ def run():
     # Step 2: Preprocess the data
     # train_data, test_data = load_minibatch_data(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
     train_data, test_data = load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH)
+
+    # Step 3: Create the baseline CNN model
+    model = baseline_model()
+    # model = simplified_model()
+
+    # Step 4: Fit the model
+    baseline_history = model.fit(train_data,
+                                 epochs=50,
+                                 steps_per_epoch=len(train_data),
+                                 validation_data=test_data,
+                                 validation_steps=len(test_data),
+                                 workers=-1, use_multiprocessing=True)
+
+    # 5. Evaluate the model
+    print(model.evaluate(test_data))
+
+    plot_loss_curve(baseline_history)
+
+    # 6. Adjust model hyperparameters to beat the baseline and reduce overfitting
+    """Some methods to prevent overfitting:
+        1. Train more data
+        2. Simplify model, e.g. remove some layers or reduce num of hidden units
+        3. Use data augmentation
+        4. Use transfer learning (uses training from another, similar model/data on your dataset)
+    """
+
+    # 7. Continue to experiment to improve performance
+    """
+        1. Change model architecture (layers, hidden units)
+        2. Adjust learning rate
+        3. Change data augmentation hyperparams
+        4. Train for longer
+        5. Transfer learning (covered in future section)
+    """
+
+    # Test against other images
+    img_0 = os.path.join(LOCAL_DATA_PATH, "03-hamburger.jpeg")
+    img_1 = os.path.join(LOCAL_DATA_PATH, "03-pizza-dad.jpeg")
+    img_2 = os.path.join(LOCAL_DATA_PATH, "03-steak.jpeg")
+    img_3 = os.path.join(LOCAL_DATA_PATH, "03-sushi.jpeg")
+
+    pred_and_plot_multiclass(model, img_0, class_names)
+    pred_and_plot_multiclass(model, img_1, class_names)
+    pred_and_plot_multiclass(model, img_2, class_names)
+    pred_and_plot_multiclass(model, img_3, class_names)
+
+    model.save("models/model_mb64_e50")
+    # loaded_model = tf.keras.models.load_model("models/model_augmented")
+    # print(loaded_model.evaluate(test_data))
