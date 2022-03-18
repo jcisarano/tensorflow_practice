@@ -3,6 +3,8 @@ import tarfile
 import urllib.request
 import zipfile
 
+import pandas as pd
+
 
 def fetch_remote_data(remote_data_url, local_save_path, local_filename):
     os.makedirs(local_save_path, exist_ok=True)
