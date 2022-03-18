@@ -11,6 +11,7 @@ import transfer_learning as trans_learn
 import batch_load as bat_lod
 import tf_datasets as tf_dat
 import cnn_binary_classification as cnn_binary
+import cnn_multiclass as cnn_multi
 
 
 # Press the green button in the gutter to run the script.
@@ -21,6 +22,7 @@ if __name__ == '__main__':
     # trans_learn.run()
     # bat_lod.run()
     # tf_dat.run()
-    cnn_binary.run()
+    # cnn_binary.run()
+    cnn_multi.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
