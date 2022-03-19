@@ -24,6 +24,18 @@ def get_class_names(directory):
 
 
 def load_minibatch_data_augmented(train_dir=TRAIN_DATA_PATH, test_dir=TEST_DATA_PATH, do_shuffle=True, img_size=IMG_SIZE):
+    """
+    IMAGE DATA GENERATOR USED FOR DATA AUGMENTATION
+
+    Note that ImageDataGenerator handles resizing images
+    Other ways to manually resize images:
+    https://wandb.ai/ayush-thakur/dl-question-bank/reports/How-to-Handle-Images-of-Different-Sizes-in-a-Convolutional-Neural-Network--VmlldzoyMDk3NzQ
+    :param train_dir:
+    :param test_dir:
+    :param do_shuffle:
+    :param img_size:
+    :return:
+    """
     train_datagen = ImageDataGenerator(rescale=1/255.,
                                        rotation_range=0.2,
                                        shear_range=0.2,
@@ -131,6 +143,7 @@ def load_and_preprocess_img(path, img_shape=224):
     img = img / 255.
 
     return img
+
 
 def run():
     # Step 1: Visualize the data
