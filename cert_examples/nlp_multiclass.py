@@ -109,9 +109,18 @@ def run():
 
     # visualize_processed_text(raw_test_ds, vectorize_layer)
 
+    # Apply the text vectorizer layer to each dataset
     vectorizer = vectorize_text(vectorize_layer)
     train_ds = raw_train_ds.map(vectorizer)
     test_ds = raw_test_ds.map(vectorizer)
     val_ds = raw_val_ds.map(vectorizer)
+
+    # configure datasets for performance using cache() and prefetch()
+    AUTOTUNE = tf.data.AUTOTUNE
+    train_ds = train_ds.cache().prefetch()(buffer_size=AUTOTUNE)
+    test_ds = test_ds.cache().prefetch()(buffer_size=AUTOTUNE)
+    val_ds = val_ds.cache().prefetch()(buffer_size=AUTOTUNE)
+
+
 
     print("multiclass")
