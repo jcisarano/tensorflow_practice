@@ -117,9 +117,9 @@ def run():
 
     # configure datasets for performance using cache() and prefetch()
     AUTOTUNE = tf.data.AUTOTUNE
-    train_ds = train_ds.cache().prefetch()(buffer_size=AUTOTUNE)
-    test_ds = test_ds.cache().prefetch()(buffer_size=AUTOTUNE)
-    val_ds = val_ds.cache().prefetch()(buffer_size=AUTOTUNE)
+    train_ds = train_ds.cache().prefetch(buffer_size=AUTOTUNE)
+    test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
+    val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 
 
