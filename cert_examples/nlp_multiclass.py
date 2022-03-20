@@ -138,11 +138,15 @@ def run():
     model.compile(loss=losses.SparseCategoricalCrossentropy(from_logits=True),
                   optimizer=tf.keras.optimizers.Adam(),
                   metrics=['accuracy'])
-    model.fit(
+    history = model.fit(
         train_ds,
         validation_data=val_ds,
-        epochs=10,
+        epochs=15,
         workers=-1
     )
+
+    loss, accuracy = model.evaluate(test_ds)
+    print("Loss:", loss)
+    print("Accuracy:", accuracy)
 
     print("multiclass")
