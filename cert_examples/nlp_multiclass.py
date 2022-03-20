@@ -93,6 +93,7 @@ def visualize_processed_text(raw_ds, vectorize_layer):
 
 def run():
     raw_train_ds, raw_test_ds, raw_val_ds = load_dataset()
+    num_classes = len(raw_train_ds.class_names)
 
     max_features = 10000
     sequence_length = 250
@@ -104,9 +105,9 @@ def run():
         output_sequence_length=sequence_length
     )
 
-    # copies to dataset w/o labels and then processes via TextVectorization
-    # train_text = raw_train_ds.map(lambda x, y: x)
-    # vectorize_layer.adapt(train_text)
+    # copies to dataset w/o labels and then processes via TextVectorization (IMPORTANT!)
+    train_text = raw_train_ds.map(lambda x, y: x)
+    vectorize_layer.adapt(train_text)
 
     # visualize_processed_text(raw_test_ds, vectorize_layer)
 
@@ -122,7 +123,6 @@ def run():
     test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
     val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
-    class_count = len(raw_train_ds.class_names)
     embedding_dim = 16
     model = tf.keras.models.Sequential(
         [
@@ -130,7 +130,7 @@ def run():
             layers.Dropout(0.2),
             layers.GlobalMaxPool1D(),
             layers.Dropout(0.2),
-            layers.Dense(class_count)
+            layers.Dense(num_classes)
         ]
     )
     print(model.summary())
