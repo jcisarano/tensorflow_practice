@@ -12,6 +12,7 @@ import batch_load as bat_lod
 import tf_datasets as tf_dat
 import cnn_binary_classification as cnn_binary
 import cnn_multiclass as cnn_multi
+import nlp_multiclass as nlp_multi
 
 
 # Press the green button in the gutter to run the script.
@@ -23,6 +24,7 @@ if __name__ == '__main__':
     # bat_lod.run()
     # tf_dat.run()
     # cnn_binary.run()
-    cnn_multi.run()
+    # cnn_multi.run()
+    nlp_multi.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

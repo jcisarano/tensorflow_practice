@@ -2,6 +2,8 @@
 Models similar to those in nlp_binary_classification.py but using tf.keras.models.Sequential()
 instead of the functional API
 These are simpler?
+TextVectorization
+Embedding
 """
 
 import tensorflow as tf
