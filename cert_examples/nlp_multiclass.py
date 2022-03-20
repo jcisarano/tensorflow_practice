@@ -31,6 +31,9 @@ def load_dataset(path, batch_size=32, seed=42):
             print("Review", text_batch.numpy()[i])
             print("Label", label_batch.numpy()[i])
 
+    print("Label 0 corresponds to", raw_ds.class_names[0])
+    print("Label 1 corresponds to", raw_ds.class_names[1])
+
 
 def run():
     load_dataset(TRAIN_DIR)
