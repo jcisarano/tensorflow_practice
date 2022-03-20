@@ -75,6 +75,7 @@ def vectorize_text(vectorize_layer):
     def vectorize(text, label, vectorize_layer=vectorize_layer):
         text = tf.expand_dims(text, -1)
         return vectorize_layer(text), label
+
     return vectorize
 
 
@@ -121,6 +122,27 @@ def run():
     test_ds = test_ds.cache().prefetch(buffer_size=AUTOTUNE)
     val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
+    class_count = len(raw_train_ds.class_names)
+    embedding_dim = 16
+    model = tf.keras.models.Sequential(
+        [
+            layers.Embedding(max_features + 1, embedding_dim),
+            layers.Dropout(0.2),
+            layers.GlobalMaxPool1D(),
+            layers.Dropout(0.2),
+            layers.Dense(class_count)
+        ]
+    )
+    print(model.summary())
 
+    model.compile(loss=losses.SparseCategoricalCrossentropy(from_logits=True),
+                  optimizer=tf.keras.optimizers.Adam(),
+                  metrics=['accuracy'])
+    model.fit(
+        train_ds,
+        validation_data=val_ds,
+        epochs=10,
+        workers=-1
+    )
 
     print("multiclass")
