@@ -91,6 +91,24 @@ def visualize_processed_text(raw_ds, vectorize_layer):
     print('Vocabulary size: {}'.format(len(vectorize_layer.get_vocabulary())))
 
 
+def plot_training_and_loss(history):
+    acc = history.history["accuracy"]
+    val_acc = history.history["val_accuracy"]
+    loss = history.history["loss"]
+    val_loss = history.history["val_loss"]
+
+    epochs = range(1, len(acc) + 1)
+
+    plt.plot(epochs, loss, "bo", label="Training Loss")
+    plt.plot(epochs, val_loss, "b", label="Validation Loss")
+    plt.title("Training and validation loss")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.show()
+
+
+
 def run():
     raw_train_ds, raw_test_ds, raw_val_ds = load_dataset()
     num_classes = len(raw_train_ds.class_names)
@@ -148,5 +166,7 @@ def run():
     loss, accuracy = model.evaluate(test_ds)
     print("Loss:", loss)
     print("Accuracy:", accuracy)
+
+    plot_training_and_loss(history)
 
     print("multiclass")
