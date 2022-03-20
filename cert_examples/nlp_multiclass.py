@@ -71,9 +71,11 @@ def custom_standardization(input_data):
                                     '')
 
 
-def vectorize_text(text, label, vectorize_layer):
-    text = tf.expand_dims(text, -1)
-    return vectorize_layer(text), label
+def vectorize_text(vectorize_layer):
+    def vectorize(text, label, vectorize_layer=vectorize_layer):
+        text = tf.expand_dims(text, -1)
+        return vectorize_layer(text), label
+    return vectorize
 
 
 def visualize_processed_text(raw_ds, vectorize_layer):
@@ -102,9 +104,14 @@ def run():
     )
 
     # copies to dataset w/o labels and then processes via TextVectorization
-    train_text = raw_train_ds.map(lambda x, y: x)
-    vectorize_layer.adapt(train_text)
+    # train_text = raw_train_ds.map(lambda x, y: x)
+    # vectorize_layer.adapt(train_text)
 
-    visualize_processed_text(raw_test_ds, vectorize_layer)
+    # visualize_processed_text(raw_test_ds, vectorize_layer)
+
+    vectorizer = vectorize_text(vectorize_layer)
+    train_ds = raw_train_ds.map(vectorizer)
+    test_ds = raw_test_ds.map(vectorizer)
+    val_ds = raw_val_ds.map(vectorizer)
 
     print("multiclass")
