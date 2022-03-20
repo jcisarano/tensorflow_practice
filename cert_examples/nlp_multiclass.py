@@ -1,5 +1,5 @@
 """
-
+Multiclass example from https://www.tensorflow.org/tutorials/keras/text_classification
 """
 
 import matplotlib.pyplot as plt
@@ -57,6 +57,54 @@ def load_dataset(batch_size=32, seed=42):
     return train_ds, test_ds, val_ds
 
 
+def custom_standardization(input_data):
+    """
+    Custom standardization function converts strings to lowercase, removes punctuation, and removes <br /> tags.
+    This will be used by the TextVectorization layer
+    :param input_data:
+    :return:
+    """
+    lowercase = tf.strings.lower(input_data)
+    stripped_html = tf.strings.regex_replace(lowercase, '<br />', ' ')
+    return tf.strings.regex_replace(stripped_html,
+                                    '[%s]' % re.escape(string.punctuation),
+                                    '')
+
+
+def vectorize_text(text, label, vectorize_layer):
+    text = tf.expand_dims(text, -1)
+    return vectorize_layer(text), label
+
+
+def visualize_processed_text(raw_ds, vectorize_layer):
+    text_batch, label_batch = next(iter(raw_ds))
+    first_review, first_label = text_batch[0], label_batch[0]
+    print("Review", first_review)
+    print("Label", raw_ds.class_names[first_label])
+    print("Vectorized review", vectorize_text(first_review, first_label, vectorize_layer))
+
+    print("1287 ---> ", vectorize_layer.get_vocabulary()[1287])
+    print("313 ---> ", vectorize_layer.get_vocabulary()[313])
+    print('Vocabulary size: {}'.format(len(vectorize_layer.get_vocabulary())))
+
+
 def run():
     raw_train_ds, raw_test_ds, raw_val_ds = load_dataset()
+
+    max_features = 10000
+    sequence_length = 250
+
+    vectorize_layer = layers.TextVectorization(
+        standardize=custom_standardization,
+        max_tokens=max_features,
+        output_mode='int',
+        output_sequence_length=sequence_length
+    )
+
+    # copies to dataset w/o labels and then processes via TextVectorization
+    train_text = raw_train_ds.map(lambda x, y: x)
+    vectorize_layer.adapt(train_text)
+
+    visualize_processed_text(raw_test_ds, vectorize_layer)
+
     print("multiclass")
