@@ -116,7 +116,6 @@ def plot_loss_and_acc(history):
     plt.show()
 
 
-
 def run():
     raw_train_ds, raw_test_ds, raw_val_ds = load_dataset()
     num_classes = len(raw_train_ds.class_names)
@@ -176,5 +175,19 @@ def run():
     print("Accuracy:", accuracy)
 
     plot_loss_and_acc(history)
+
+    # can also combine vectorizer and trained model to streamline use:
+    combined_model = tf.keras.Sequential([
+        vectorize_layer,
+        model,
+        layers.Activation("sigmoid")
+        # layers.Dense(num_classes)
+    ])
+    combined_model.compile(loss=losses.SparseCategoricalCrossentropy(from_logits=True),
+                           optimizer=tf.keras.optimizers.Adam(),
+                           metrics=["accuracy"])
+    loss, accuracy = combined_model.evaluate(raw_test_ds)
+    print("Combined model loss:", loss)
+    print("Combined model accuracy:", accuracy)
 
     print("multiclass")
