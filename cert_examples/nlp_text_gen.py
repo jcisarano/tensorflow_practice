@@ -1,3 +1,7 @@
+"""
+Given a character, or sequence of characters, what is the most probable next character?
+"""
+
 import tensorflow as tf
 
 import numpy as np
@@ -16,7 +20,37 @@ def load_data():
     print(f"{len(vocab)} unique chars")
     print(vocab)
 
+    return text, vocab
+
+
+def text_from_ids(chars_from_ids: tf.keras.layers.StringLookup, ids):
+    return tf.strings.reduce_join(chars_from_ids(ids), axis=-1)
+
 
 def run():
-    load_data()
+    text, vocab = load_data()
+
+    ids_from_chars = tf.keras.layers.StringLookup(
+        vocabulary=list(vocab), mask_token=None
+    )
+    chars_from_ids = tf.keras.layers.StringLookup(
+        vocabulary=ids_from_chars.get_vocabulary(), invert=True, mask_token=None
+    )
+
+    all_ids = ids_from_chars(tf.strings.unicode_split(text, "UTF-8"))
+    print(all_ids)
+    ids_dataset = tf.data.Dataset.from_tensor_slices(all_ids)
+    for ids in ids_dataset.take(10):
+        print(chars_from_ids(ids).numpy().decode("utf-8"))
+
+    seq_length = 100
+    examples_per_epoch = len(text) // (seq_length + 1)
+    sequences = ids_dataset.batch(seq_length + 1, drop_remainder=True)
+
+    for seq in sequences.take(1):
+        print(chars_from_ids(seq))
+
+    for seq in sequences.take(5):
+        print(text_from_ids(chars_from_ids, seq).numpy())
+
     print("nlp text gen")
