@@ -27,6 +27,18 @@ def text_from_ids(chars_from_ids: tf.keras.layers.StringLookup, ids):
     return tf.strings.reduce_join(chars_from_ids(ids), axis=-1)
 
 
+def split_input_target(sequence):
+    """
+    Takes a sequence as input, duplictes it, and shifts it to align the input and label for each timestep.
+    For any input (letter) in the sequence, the label is the next letter in the sequence
+    :param sequence:
+    :return:
+    """
+    input_text = sequence[:-1]
+    target_text = sequence[1:]
+    return input_text, target_text
+
+
 def run():
     text, vocab = load_data()
 
@@ -52,5 +64,11 @@ def run():
 
     for seq in sequences.take(5):
         print(text_from_ids(chars_from_ids, seq).numpy())
+
+    dataset = sequences.map(split_input_target)
+
+    for input_example, target_example in dataset.take(1):
+        print("Input :", text_from_ids(chars_from_ids, input_example).numpy())
+        print("Target :", text_from_ids(chars_from_ids, target_example).numpy())
 
     print("nlp text gen")
