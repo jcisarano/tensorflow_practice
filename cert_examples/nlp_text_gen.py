@@ -136,5 +136,25 @@ def run():
     print("Input:\n", text_from_ids(chars_from_ids, input_example_batch[0]).numpy())
     print("\nNext Char Predictions:\n", text_from_ids(chars_from_ids, sampled_indices).numpy())
 
+    # COMPILE
+    loss = tf.losses.SparseCategoricalCrossentropy(from_logits=True)
+    example_batch_mean_loss = loss(target_example_batch, example_batch_predictions)
+    print("Prediction shape: ", example_batch_predictions.shape, " # (batch_size, sequence_length, vocab_size)")
+    print("Mean loss:        ", example_batch_mean_loss)
+    print(tf.exp(example_batch_mean_loss).numpy())
+
+    model.compile(optimizer="adam", loss=loss)
+
+    # CREATE CHECKPOINT CALLBACK FOR SAVE
+    checkpoint_dir = "models/training_checkpoints"
+    checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt_{epoch}")
+    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_prefix,
+        save_weights_only=True
+    )
+
+    EPOCHS = 20
+    history = model.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback])
+
     print("nlp text gen")
 
