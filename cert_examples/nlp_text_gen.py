@@ -43,7 +43,7 @@ def split_input_target(sequence):
 
 class MyModel(tf.keras.Model):
     def __init__(self, vocab_size, embedding_dim, rnn_units):
-        super().__init(self)
+        super().__init__(self)
         self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
         self.gru = tf.keras.layers.GRU(rnn_units,
                                        return_sequences=True,
@@ -62,7 +62,6 @@ class MyModel(tf.keras.Model):
             return x, states
         else:
             return x
-
 
 
 def run():
@@ -116,5 +115,17 @@ def run():
     embedding_dim = 256
     rnn_units = 1024
 
+    model = MyModel(
+        vocab_size=len(ids_from_chars.get_vocabulary()),
+        embedding_dim=embedding_dim,
+        rnn_units=rnn_units
+    )
+
+    for input_example_batch, target_example_batch in dataset.take(1):
+        example_batch_predictions = model(input_example_batch)
+        print(example_batch_predictions.shape, "# (batch_size, sequence_length, vocab_size")
+
+    print(model.summary())
 
     print("nlp text gen")
+
