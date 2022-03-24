@@ -121,11 +121,20 @@ def run():
         rnn_units=rnn_units
     )
 
+    # see example predictions
     for input_example_batch, target_example_batch in dataset.take(1):
         example_batch_predictions = model(input_example_batch)
         print(example_batch_predictions.shape, "# (batch_size, sequence_length, vocab_size")
 
+    # output as numbers
     print(model.summary())
+    sampled_indices = tf.random.categorical(example_batch_predictions[0], num_samples=1)
+    sampled_indices = tf.squeeze(sampled_indices, axis=-1).numpy()
+    print(sampled_indices)
+
+    # convert to text
+    print("Input:\n", text_from_ids(chars_from_ids, input_example_batch[0]).numpy())
+    print("\nNext Char Predictions:\n", text_from_ids(chars_from_ids, sampled_indices).numpy())
 
     print("nlp text gen")
 
