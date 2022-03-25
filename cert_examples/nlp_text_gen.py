@@ -64,6 +64,54 @@ class MyModel(tf.keras.Model):
             return x
 
 
+class OneStep(tf.keras.Model):
+    """
+    Class to make single step predictions
+    """
+    def __init__(self, model, chars_from_ids, ids_from_chars, temperature=1.0):
+        super().__init__()
+        self.temperature = temperature
+        self.model = model
+        self.chars_from_ids = chars_from_ids
+        self.ids_from_chars = ids_from_chars
+
+        # create a mask to prevent "[UNK]" from being generated
+        skip_ids = self.ids_from_chars(["[UNK]"])[:, None]
+        sparse_mask = tf.SparseTensor(
+            # Put a -inf at each bad index
+            values=[-float('inf')]*len(skip_ids),
+            indices=skip_ids,
+            # match the shape to the vocabulary
+            dense_shape=[len(ids_from_chars.get_vocabulary())]
+        )
+        self.prediction_mask = tf.sparse.to_dense(sparse_mask)
+
+    @tf.function
+    def generate_one_step(self, inputs, states=None):
+        # Convert strings to token IDs
+        input_chars = tf.strings.unicode_split(inputs, 'UTF-8')
+        input_ids = self.ids_from_chars(input_chars).to_tensor()
+
+        # Run the model
+        # predicted_logits.shape is [batch, char, next_char_logits]
+        predicted_logits, states = self.model(inputs=input_ids, states=states, return_state=True)
+
+        # Only use the last rpediction
+        predicted_logits = predicted_logits[:, -1, :]
+        predicted_logits = predicted_logits/self.temperature
+        # Apply the prediction mask: prevent "[UNK]" form being generated
+        predicted_logits = predicted_logits + self.prediction_mask
+
+        # Sample the output logits to generate token IDs
+        predicted_ids = tf.random.categorical(predicted_logits, num_samples=1)
+        predicted_ids = tf.squeeze(predicted_ids, axis=-1)
+
+        # Convert from token ides to characters
+        predicted_chars = self.chars_from_ids(predicted_ids)
+
+        return predicted_chars, states
+
+
 def run():
     text, vocab = load_data()
 
