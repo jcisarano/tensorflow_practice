@@ -204,5 +204,21 @@ def run():
     EPOCHS = 20
     history = model.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback])
 
+    one_step_model = OneStep(model, chars_from_ids, ids_from_chars)
+
+    start = time.time()
+    states = None
+    next_char = tf.constant(["ROMEO:"])
+    result = [next_char]
+
+    for n in range(1000):
+        next_char, states = one_step_model.generate_one_step(next_char, states=states)
+        result.append(next_char)
+
+    result = tf.strings.join(result)
+    end = time.time()
+    print(result[0].numpy().decode('utf-8'), '\n\n' + '_'*80)
+    print('\nRuntime: ', end-start)
+
     print("nlp text gen")
 
