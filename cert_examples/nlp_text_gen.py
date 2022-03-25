@@ -2,6 +2,13 @@
 Given a character, or sequence of characters, what is the most probable next character?
 
 Uses GRU, but could be swapped out with LSTM
+
+Other ideas for improvement:
+    - The easiest thing you can do to improve the results is to train it for longer (try EPOCHS = 30).
+    - You can also experiment with a different start string, try adding another RNN layer to improve the model's
+        accuracy, or adjust the temperature parameter to generate more or less random predictions.
+    - If you want the model to generate text faster the easiest thing you can do is batch the text generation. In the
+        example below the model generates 5 outputs in about the same time it took to generate 1 above.
 """
 
 import tensorflow as tf
@@ -201,10 +208,10 @@ def run():
         save_weights_only=True
     )
 
-    EPOCHS = 20
+    EPOCHS = 30
     history = model.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback])
 
-    one_step_model = OneStep(model, chars_from_ids, ids_from_chars)
+    one_step_model = OneStep(model=model, chars_from_ids=chars_from_ids, ids_from_chars=ids_from_chars)
 
     start = time.time()
     states = None
