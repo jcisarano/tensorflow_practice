@@ -120,17 +120,20 @@ class OneStep(tf.keras.Model):
 
 
 class CustomTraining(MyModel):
+    """
+    Custom training model allows training loop where predictions are fed back into the model to improve on mistakes
+    """
     @tf.function
     def train_step(self, inputs):
         inputs, labels = inputs
         with tf.GradientTape() as tape:
             predictions = self(inputs, training=True)
             loss = self.loss(labels, predictions)
-        grads = tape.gradient(loss, model.trainable_variables)
-        self.optimizer.apply_gradients(zip(grads, model.trainable_variables))
+        grads = tape.gradient(loss, self.trainable_variables)  # calculate loss
+        self.optimizer.apply_gradients(zip(grads, self.trainable_variables))  # calculate updates and apply
 
         return {'loss': loss}
-    
+
 
 def run():
     text, vocab = load_data()
@@ -221,7 +224,7 @@ def run():
         save_weights_only=True
     )
 
-    EPOCHS = 30
+    EPOCHS = 1
     history = model.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback])
 
     one_step_model = OneStep(model=model, chars_from_ids=chars_from_ids, ids_from_chars=ids_from_chars)
@@ -254,6 +257,17 @@ def run():
     end = time.time()
     print(result, '\n\n' + '_'*80)
     print('\nRun time: ', end - start)
+
+    # CustomTraining model example
+    model = CustomTraining(
+        vocab_size=len(ids_from_chars.get_vocabulary()),
+        embedding_dim=embedding_dim,
+        rnn_units=rnn_units
+    )
+    model.compile(optimizer=tf.keras.optimizers.Adam(),
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True))
+    model.fit(dataset, epochs=1)
+
 
     print("nlp text gen")
 
