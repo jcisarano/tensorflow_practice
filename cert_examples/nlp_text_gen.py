@@ -119,6 +119,19 @@ class OneStep(tf.keras.Model):
         return predicted_chars, states
 
 
+class CustomTraining(MyModel):
+    @tf.function
+    def train_step(self, inputs):
+        inputs, labels = inputs
+        with tf.GradientTape() as tape:
+            predictions = self(inputs, training=True)
+            loss = self.loss(labels, predictions)
+        grads = tape.gradient(loss, model.trainable_variables)
+        self.optimizer.apply_gradients(zip(grads, model.trainable_variables))
+
+        return {'loss': loss}
+    
+
 def run():
     text, vocab = load_data()
 
