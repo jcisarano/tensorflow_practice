@@ -23,6 +23,16 @@ def load_data():
     return timesteps, prices
 
 
+def my_train_test_split(X, y, split=0.8):
+    split_size = int(split*len(y))
+    X_train, y_train = X[:split_size], y[:split_size]
+    X_test, y_test = X[split_size:], y[split_size:]
+
+    return X_train, X_test, y_train, y_test
+
+
 def run():
     timesteps, prices = load_data()
+    X_train, X_test, y_train, y_test = my_train_test_split(timesteps, prices)
+
     print("time series")
