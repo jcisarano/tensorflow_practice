@@ -55,9 +55,23 @@ def make_windows(x, window_size, horizon):
     return windows, labels
 
 
+def make_train_test_splits(windows, labels, test_split=0.2):
+    split_size = int(len(windows)*(1-test_split))
+    train_windows = windows[:split_size]
+    train_labels = labels[:split_size]
+    test_windows = windows[split_size:]
+    test_labels = labels[split_size:]
+
+    return train_windows, test_windows, train_labels, test_labels
+
+
 def run():
     timesteps, prices = load_data()
     # X_train, X_test, y_train, y_test = my_train_test_split(timesteps, prices)
     full_windows, full_labels = make_windows(prices, window_size=WINDOW_SIZE, horizon=HORIZON)
+    train_windows, test_windows, train_labels, test_labels = make_train_test_splits(full_windows, full_labels)
+
+    tf.random.set_seed(42)
+
 
     print("time series")
