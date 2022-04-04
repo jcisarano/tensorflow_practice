@@ -25,7 +25,7 @@ def create_block_reward_data_ranges():
     bitcoin_prices = load_dataframe(path)
     block_reward_2_days = (block_reward_3_datetime - bitcoin_prices.index[0]).days
     block_reward_3_days = (block_reward_4_datetime - bitcoin_prices.index[0]).days
-    print(block_reward_2_days, block_reward_3_days)
+    # print(block_reward_2_days, block_reward_3_days)
 
     bitcoin_prices_block = bitcoin_prices.copy()
     bitcoin_prices_block["block_reward"] = None
@@ -34,15 +34,32 @@ def create_block_reward_data_ranges():
     bitcoin_prices_block.iloc[block_reward_2_days:block_reward_3_days, -1] = block_reward_3
     bitcoin_prices_block.iloc[block_reward_3_days:, -1] = block_reward_4
 
-    print(bitcoin_prices_block.head())
-    print(bitcoin_prices_block.iloc[1500:1505])
-    print(bitcoin_prices_block.tail())
+     # print(bitcoin_prices_block.head())
+     # print(bitcoin_prices_block.iloc[1500:1505])
+     # print(bitcoin_prices_block.tail())
 
     return bitcoin_prices_block
 
 
 def make_windows_multivar(window_size=7, horizon=1):
     bitcoin_prices_windowed = create_block_reward_data_ranges()
+    for i in range(window_size):
+        bitcoin_prices_windowed[f"Price+{i+1}"] = bitcoin_prices_windowed["Price"].shift(periods=i+1)
+
+    print(bitcoin_prices_windowed.head)
+
+    X = bitcoin_prices_windowed.dropna().drop("Price", axis=1).astype(np.float32)
+    y = bitcoin_prices_windowed.dropna()["Price"].astype(np.float32)
+
+    print(X.head)
+    print(y.head)
+
+    split_size = int(len(X) * 0.8)
+    X_train, y_train = X[:split_size], y[:split_size]
+    X_test, y_test = X[split_size:], y[split_size:]
+    print(len(X_train), len(y_train), len(X_test), len(y_test))
+
+    return X_train, X_test, y_train, y_test
 
 
 def run():
