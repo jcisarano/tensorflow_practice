@@ -15,6 +15,7 @@ import cnn_multiclass as cnn_multi
 import nlp_multiclass as nlp_multi
 import nlp_text_gen as text_gen
 import time_series as time_ser
+import time_series_multivar as multivar_time_ser
 
 
 # Press the green button in the gutter to run the script.
@@ -29,6 +30,7 @@ if __name__ == '__main__':
     # cnn_multi.run()
     # nlp_multi.run()
     # text_gen.run()
-    time_ser.run()
+    # time_ser.run()
+    multivar_time_ser.run()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
