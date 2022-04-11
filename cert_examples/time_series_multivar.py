@@ -19,6 +19,9 @@ block_reward_2_datetime = np.datetime64("2012-11-08")
 block_reward_3_datetime = np.datetime64("2016-07-09")
 block_reward_4_datetime = np.datetime64("2020-05-18")
 
+HORIZON: int = 1
+
+
 
 def create_block_reward_data_ranges():
     path = os.path.join(time_series.DATA_PATH, time_series.FILENAME)
@@ -62,8 +65,33 @@ def make_windows_multivar(window_size=7, horizon=1):
     return X_train, X_test, y_train, y_test
 
 
+def make_model_multivar(X_train, X_test, y_train, y_test):
+    model_name = "time_series_multivar"
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(128, activation="relu"),
+        # tf.keras.layers.Dense(128, activation="relu"),
+        tf.keras.layers.Dense(HORIZON)
+    ], name=model_name)
+
+    model.compile(loss="MAE",
+                  optimizer=tf.keras.optimizers.Adam())
+
+    model.fit(X_train, y_train,
+              epochs=100,
+              batch_size=128,
+              validation_data=(X_test, y_test),
+              callbacks=[time_series.create_model_checkpoint(model_name=model_name,
+                                                             save_path=time_series.CHECKPOINT_PATH)],
+              workers=-1)
+
+    model.evaluate(X_test, y_test)
+
+    return model
+
+
 def run():
     X_train, X_test, y_train, y_test = make_windows_multivar()
+    model = make_model_multivar(X_train, X_test, y_train, y_test)
 
 
     print("multivariate time series")
