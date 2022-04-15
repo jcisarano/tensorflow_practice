@@ -22,7 +22,6 @@ block_reward_4_datetime = np.datetime64("2020-05-18")
 HORIZON: int = 1
 
 
-
 def create_block_reward_data_ranges():
     path = os.path.join(time_series.DATA_PATH, time_series.FILENAME)
     bitcoin_prices = load_dataframe(path)
@@ -37,9 +36,9 @@ def create_block_reward_data_ranges():
     bitcoin_prices_block.iloc[block_reward_2_days:block_reward_3_days, -1] = block_reward_3
     bitcoin_prices_block.iloc[block_reward_3_days:, -1] = block_reward_4
 
-     # print(bitcoin_prices_block.head())
-     # print(bitcoin_prices_block.iloc[1500:1505])
-     # print(bitcoin_prices_block.tail())
+    # print(bitcoin_prices_block.head())
+    # print(bitcoin_prices_block.iloc[1500:1505])
+    # print(bitcoin_prices_block.tail())
 
     return bitcoin_prices_block
 
