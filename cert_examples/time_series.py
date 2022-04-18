@@ -50,9 +50,14 @@ def make_windows(x, window_size, horizon):
     :param horizon:
     :return:
     """
+    # create the window, len win_size + horizon (includes the data and label at this point)
     window_step = np.expand_dims(np.arange(window_size + horizon), axis=0)
+    # creates 2d array of indices of size (data length, window_step length)
+    # window_indexes = window_step + np.expand_dims(np.arange(len(x)-(window_size+horizon-1)), axis=0).T
     window_indexes = window_step + np.expand_dims(np.arange(len(x) - (window_size + horizon - 1)), axis=1)
+    # convert array of indices to temp array of actual data
     windowed_array = x[window_indexes]
+    # split temp windows into windows array and labels array
     windows, labels = get_labelled_windows(windowed_array, horizon=horizon)
 
     return windows, labels
