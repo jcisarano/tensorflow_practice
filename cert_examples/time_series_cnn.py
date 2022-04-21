@@ -21,7 +21,7 @@ def make_conv1d_model(train_windows, test_windows, train_labels, test_labels, ou
         tf.keras.layers.Conv1D(filters=128, kernel_size=5, strides=1, padding="causal", activation="relu"),
         tf.keras.layers.Dense(output_size)
     ], name=model_name)
-    
+
     model.compile(loss="mae", optimizer=tf.keras.optimizers.Adam())
     model.fit(train_windows, train_labels,
               batch_size=128,
@@ -32,7 +32,6 @@ def make_conv1d_model(train_windows, test_windows, train_labels, test_labels, ou
               workers=-1)
 
     model.evaluate(test_windows, test_labels)
-
 
 
 def run():
